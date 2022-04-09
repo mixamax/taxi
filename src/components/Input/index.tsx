@@ -1,0 +1,304 @@
+import React, { useMemo, useState } from 'react'
+import './styles.scss'
+import InputMask, { Props as InputMaskProps } from 'react-input-mask'
+import SITE_CONSTANTS from '../../siteConstants'
+import useMergedRef from '@react-hook/merged-ref'
+import { ISelectOption } from '../../types'
+import cn from 'classnames'
+import Button from '../Button'
+import { ESuggestionType, ISuggestion } from '../../types/types'
+import { t, TRANSLATION } from '../../localization'
+import MetaTags from 'react-meta-tags'
+import images from '../../constants/images'
+import CompareVariants, { ECompareVariants } from '../CompareVariants'
+import RadioCheckbox from '../RadioCheckbox'
+
+const getSuggestionClass = (type: ESuggestionType = ESuggestionType.PointOfficial) => {
+  switch (type) {
+    case ESuggestionType.PointOfficial: return 'official'
+    case ESuggestionType.PointUnofficial: return 'unofficial'
+    case ESuggestionType.PointUserTop: return 'user-top'
+  }
+}
+
+export enum EInputTypes {
+  Default,
+  Textarea,
+  Select,
+  MaskedPhone
+}
+
+interface ISideCheckbox {
+  value: boolean,
+  onClick: () => any
+  component: React.ReactNode
+}
+
+interface IProps {
+  inputType?: EInputTypes
+  error?: string | null
+  label?: string
+  buttons?: (React.ComponentProps<'img'> | React.ComponentProps<typeof Button>)[]
+  suggestions?: ISuggestion[]
+  onSuggestionClick?: (value: ISuggestion) => any
+  options?: ISelectOption[]
+  inputProps?: React.ComponentProps<'input'> | React.ComponentProps<'select'> | React.ComponentProps<'textarea'> | InputMaskProps
+  onChange?: (newValue: string) => any
+  fieldWrapperClassName?: string
+  oneline?: boolean
+  showDisablerCheckbox?: boolean
+  onDisableChange?: (value: boolean) => any
+  defaultValue?: string
+  sideText?: string
+  sideCheckbox?: ISideCheckbox
+  compareVariant?: ECompareVariants
+  onChangeCompareVariant?: (value: ECompareVariants) => any
+  hideInput?: boolean
+}
+
+const Input: React.FC<IProps> = (
+  {
+    inputType,
+    error,
+    label,
+    buttons,
+    options,
+    inputProps = {},
+    fieldWrapperClassName,
+    suggestions,
+    oneline,
+    showDisablerCheckbox,
+    defaultValue,
+    sideText,
+    sideCheckbox,
+    compareVariant,
+    hideInput,
+    onChange,
+    onDisableChange,
+    onChangeCompareVariant,
+    onSuggestionClick,
+  },
+) => {
+  const [isFocused, setIsFocused] = useState(false)
+  const [isDisabled, setIsDisabled] = useState(inputProps.disabled || false)
+  const [isDefaultValueUsed, setIsDefaultValueUsed] = useState(false)
+
+  const id = useMemo(() => inputProps.id || Math.random().toString().slice(2), [])
+
+  const innerRef = React.createRef<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>()
+  const refs: any[] = [innerRef]
+  if ((inputProps as React.ComponentProps<'input'>).ref) refs.push((inputProps as React.ComponentProps<'input'>).ref)
+  if ((inputProps as InputMaskProps).inputRef) refs.push((inputProps as InputMaskProps).inputRef)
+  const mergedRef = useMergedRef(...refs)
+
+  const getInputByType = () => {
+    const properties = {
+      className: cn('input', inputProps.className),
+      onFocus: (e: any) => {
+        setIsFocused(true)
+        inputProps.onFocus && inputProps.onFocus(e)
+      },
+      onBlur: (e: any) => {
+        setTimeout(() => setIsFocused(prev => false), 300)
+        inputProps.onBlur && inputProps.onBlur(e)
+      },
+      onChange: (e: any) => {
+        onChange && onChange(e.target.value)
+        inputProps.onChange && inputProps.onChange(e as any)
+      },
+      id,
+      disabled: isDisabled || isDefaultValueUsed || inputProps.disabled,
+    }
+
+    switch (inputType) {
+      case EInputTypes.Textarea:
+        return (
+          <textarea
+            ref={mergedRef}
+            {...inputProps as React.ComponentProps<'textarea'>}
+            {...properties}
+          />
+        )
+      case EInputTypes.Select: return (
+        <select
+          ref={mergedRef}
+          {...inputProps as React.ComponentProps<'select'>}
+          {...properties}
+        >
+          {options?.map((item, index) => <option value={item.value} key={index}>{item.label}</option>)}
+        </select>
+      )
+      case EInputTypes.MaskedPhone:
+        return (
+          <InputMask
+            alwaysShowMask
+            inputRef={mergedRef}
+            {...inputProps as InputMaskProps}
+            mask={SITE_CONSTANTS.DEFAULT_PHONE_MASK}
+            {...properties}
+          />
+        )
+      default:
+        return (
+          <input
+            ref={mergedRef}
+            {...inputProps as React.ComponentProps<'input'>}
+            {...properties}
+          />
+        )
+    }
+  }
+
+  const handleSuggestionClick = (item: ISuggestion) => {
+    setIsFocused(false)
+    onSuggestionClick && onSuggestionClick(item)
+  }
+
+  const handleDisablerCheckboxChange = (e: React.ChangeEvent) => {
+    setIsDisabled(prev => {
+      onDisableChange && onDisableChange(!prev)
+      return !prev
+    })
+  }
+
+  const handleIsDefaultValueUsedChange = () => {
+    setIsDefaultValueUsed(prev => {
+      defaultValue && !prev && onChange && onChange(defaultValue)
+      return !prev
+    })
+  }
+
+  return (
+    <div className={
+      cn(
+        'input__field-wrapper',
+        fieldWrapperClassName,
+        {
+          'input__field-wrapper--oneline': oneline || isDefaultValueUsed,
+          'input__field-wrapper--margin-disabled': hideInput,
+        },
+      )
+    }
+    >
+      <MetaTags>
+        <style>
+          {`
+            .input__label {
+              color: ${SITE_CONSTANTS.PALETTE.primary.dark}
+            }
+
+            input[type="date"]::-webkit-calendar-picker-indicator {
+              background-image: url("${images.date}");
+              background-position: center;
+              margin-left: 0px;
+              width: 17px;
+            }
+
+            input[type="time"]::-webkit-calendar-picker-indicator {
+              background-image: url("${images.time}");
+              background-position: center;
+              margin-left: 0px;
+              width: 17px;
+            }
+
+          `}
+        </style>
+      </MetaTags>
+      <div className={cn('input__header', { 'input__header--empty': !showDisablerCheckbox && !defaultValue && !label && !sideCheckbox })}>
+        <div className="input__header-item">
+          {showDisablerCheckbox && (
+            <RadioCheckbox
+              checked={!isDisabled && !inputProps.disabled && !hideInput}
+              onChange={handleDisablerCheckboxChange}
+            />
+          )}
+          {defaultValue && (
+            <div className="input__default-value">
+              <RadioCheckbox
+                checked={isDefaultValueUsed}
+                onChange={handleIsDefaultValueUsedChange}
+              />
+              <span onClick={handleIsDefaultValueUsedChange}>{t(TRANSLATION.USE_THE)} {isDefaultValueUsed ? '' : defaultValue}</span>
+            </div>
+          )}
+          {
+            !!label && (
+              <label
+                htmlFor={id}
+                className="input__label"
+                style={{ color: (inputProps as React.ComponentProps<'input'>).required && !(inputProps as React.ComponentProps<'input'>).value ? 'red' : '' }}
+              >
+                {label}{hideInput ? '' : ':'}
+              </label>
+            )
+          }
+        </div>
+        {!hideInput && !!sideCheckbox && (
+          <div className="input__header-item" onClick={() => sideCheckbox.onClick()}>
+            <RadioCheckbox
+              checked={sideCheckbox.value}
+              onClick={e => e.stopPropagation()}
+            />
+            {sideCheckbox.component}
+          </div>
+        )}
+      </div>
+      {
+        !hideInput && (
+          <>
+            <div className="input__side-text-wrapper">
+              {sideText && <span>{sideText}</span>}
+              <div
+                className={cn(
+                  'input__wrapper',
+                  {
+                    'input__wrapper--with-hints': suggestions?.length,
+                    disabled: isDisabled || isDefaultValueUsed || inputProps.disabled,
+                  },
+                )}
+              >
+                {getInputByType()}
+                {!!buttons && <div className='input__buttons'>
+                  {buttons.map((item, index) => (
+                    (item as React.ComponentProps<'img'>).src ?
+                      (
+                    // eslint-disable-next-line jsx-a11y/alt-text
+                        <img key={index} {...item as React.ComponentProps<'img'>} />
+                      ) :
+                      (
+                        <Button key={index} {...item as React.ComponentProps<typeof Button>} />
+                      )
+                  ))}
+                </div>}
+                <div className={cn('input__suggestions', { 'input__suggestions--active': isFocused && suggestions?.length })}>
+                  {suggestions && suggestions.map((item, index) => (
+                    <div
+                      key={index}
+                      onClick={() => handleSuggestionClick(item)}
+                      className={cn('input__suggestion', `input__suggestion--${getSuggestionClass(item.type)}`)}
+                    >
+                      {item.point?.address}
+                      {
+                        item.distance ?
+                          ` ${(item.distance / 1000).toFixed(1)}${t(TRANSLATION.KM, { toLower: true })}` :
+                          undefined
+                      }
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            {
+              compareVariant !== undefined &&
+            onChangeCompareVariant &&
+            <CompareVariants value={compareVariant} onChange={onChangeCompareVariant} />
+            }
+            {!!error && <p className="input__error">{error}</p>}
+          </>
+        )
+      }
+    </div>
+  )
+}
+
+export default Input
