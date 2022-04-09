@@ -170,6 +170,7 @@
     "@babel/polyfill": "^7.12.1",
     "@babel/preset-env": "^7.10.2",
     "@babel/preset-react": "^7.10.1",
+    "@babel/preset-typescript": "^7.16.7",
     "@types/file-saver": "^2.0.5",
     "@types/glidejs__glide": "^3.4.1",
     "@types/jsoneditor": "^9.5.1",
