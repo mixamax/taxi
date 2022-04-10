@@ -104,7 +104,7 @@ const CandidatesModal: React.FC<IProps> = ({
                     <div className="candidate__header-subinfo">
                       {/* <p className="candidate__header-registration">{t(TRANSLATION.REGISTRATION)}:
                       {item.u_registration.format(dateFormatDate)}</p> */}
-                      <p className="candidate__header-replies">{t(TRANSLATION.COMMENTS)}: {/*item.u_replies?.length || */0} {t(TRANSLATION.CHOSEN)}: {/*item.u_choosen || */0}&nbsp;&nbsp;&nbsp;{t(TRANSLATION.PRICE_PERFORMER)}: {item.c_options?.performers_price}{CURRENCY.SIGN}</p>
+                      <p className="candidate__header-replies">{t(TRANSLATION.COMMENTS)}: {/*item.u_replies?.length || */0} {t(TRANSLATION.CHOSEN)}: {/*item.u_choosen || */0}&nbsp;&nbsp;&nbsp;{t(TRANSLATION.PRICE_PERFORMER)}: {item.c_options?.performers_price} {CURRENCY.SIGN}</p>
                     </div>
                     <div
                       className={cn('candidate__header-arrow', { 'candidate__header-arrow--active': activeCandidate === item.u_id })}
