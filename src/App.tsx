@@ -139,10 +139,10 @@ const App: React.FC<IProps> = ({
       </MetaTags> :
       null
   }
-
-  return <>
+  console.log(configStatus)
+  return <React.Fragment key={`${language}_${configStatus}`}>
     {getMetaTags()}
-    <AppRoutes key={`${language}${configStatus}`} />
+    <AppRoutes />
     {/* <PositionTracker/> */}
     <VoteModal />
     <TimerModal />
@@ -163,7 +163,7 @@ const App: React.FC<IProps> = ({
     <CandidatesModal />
     {user && <ProfileModal />}
     {activeChat && <Chat key={activeChat} />}
-  </>
+  </React.Fragment>
 }
 
 export default connector(App)

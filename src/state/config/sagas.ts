@@ -19,7 +19,7 @@ function* checkConfigSaga(data: TAction) {
   yield put({ type: ActionTypes.CHECK_CONFIG_START })
   try {
     yield* call(API.checkConfig, data.payload)
-    yield put({ type: ActionTypes.CHECK_CONFIG_SUCCESS })
+    // yield put({ type: ActionTypes.CHECK_CONFIG_SUCCESS })
     Config.setConfig(data.payload)
   } catch (error) {
     console.error(error)
@@ -35,6 +35,8 @@ function* clearConfigSaga() {
 function* setConfigLoadedSaga() {
   SITE_CONSTANTS.recalculate()
   CURRENCY.recalculated()
+
+  console.log('recalculated', SITE_CONSTANTS.PALETTE.primary.main)
 
   yield put({ type: ActionTypes.SET_CONFIG_SUCCESS })
 }
