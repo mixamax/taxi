@@ -1,6 +1,6 @@
 import { PassengerOrderConfig } from './tools/siteConstants/formConfig'
-import { parseAvailableModes, parseEntries, parseMoneyModes } from './tools/utils'
-import { IPaletteColor, TAvailableModes, TEntries, TMoneyModes } from './types/types'
+import { parseAvailableModes, parseEntries, parseLanguages, parseMoneyModes } from './tools/utils'
+import { IPaletteColor, TAvailableModes, TEntries, ILanguage, TMoneyModes } from './types/types'
 import shader from 'shader'
 
 const SITE_CONSTANTS_SECTION = 'site_constants'
@@ -37,6 +37,12 @@ const defaultValues = {
   MONEY_MODES: '',
   BIG_TRUCK_TRANSPORT_TYPES: '1-truck;2-wagon',
   BIG_TRUCK_CARGO_TYPES: '1-truck;2-wagon',
+  LANGUAGES: {
+    1: { iso: 'ru', logo: 'ru', native: 'Русский' },
+    2: { iso: 'en', logo: 'gb', native: 'English' },
+    3: { iso: 'ar', logo: 'ma', native: 'العربية' },
+    4: { iso: 'fr', logo: 'fr', native: 'Français' },
+  },
 } as const
 
 class Constants {
@@ -66,6 +72,7 @@ class Constants {
   MONEY_MODES: TMoneyModes
   BIG_TRUCK_TRANSPORT_TYPES: TEntries
   BIG_TRUCK_CARGO_TYPES: TEntries
+  LANGUAGES: ILanguage[]
 
   constructor() {
     this.PASSENGER_ORDER_CONFIG = new PassengerOrderConfig()
@@ -139,6 +146,7 @@ class Constants {
       defaultValues.BIG_TRUCK_CARGO_TYPES,
       parseEntries,
     )
+    this.LANGUAGES = parseLanguages((window as any).data?.langs || defaultValues.LANGUAGES)
   }
 
   calc_ENABLE_CUSTOMER_PRICE() {

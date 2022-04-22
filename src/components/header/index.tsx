@@ -4,7 +4,6 @@ import { matchPath, useLocation } from 'react-router-dom'
 import history from '../../tools/history'
 import './styles.scss'
 import { t, TRANSLATION } from '../../localization'
-import { LANGUAGES } from '../../constants/languages'
 import { useInterval } from '../../tools/hooks'
 import moment from 'moment'
 import images from '../../constants/images'
@@ -84,10 +83,6 @@ const Header: React.FC<IProps> = ({
     } else if (seconds !== 0) setSeconds(0)
   }, 1000)
 
-  const selectLanguage = (e: React.MouseEvent<HTMLDivElement>, id: typeof language) => {
-    setLanguage(id)
-  }
-
   const onReturn = () => {
     history.push('/driver-order')
   }
@@ -162,7 +157,7 @@ const Header: React.FC<IProps> = ({
           className='langs-container'
           style={{ background: SITE_CONSTANTS.PALETTE.primary.dark }}
         >
-          <img src={LANGUAGES[language].image} alt={LANGUAGES[language].code}/>
+          <img src={language.logo} alt={language.native}/>
           <img
             src={images.arrowDown}
             style={{ transform: `rotate(${languagesOpened ? 180 : 0}deg)` }}
@@ -174,8 +169,8 @@ const Header: React.FC<IProps> = ({
             style={{ background: SITE_CONSTANTS.PALETTE.primary.dark, display: languagesOpened ? 'flex' : 'none' }}
           >
             {
-              Object.values(LANGUAGES).map(item => (
-                <img src={item.image} onClick={e => selectLanguage(e, item.id)} alt={item.code} key={item.id}/>
+              SITE_CONSTANTS.LANGUAGES.map(item => (
+                <img src={item.logo} onClick={e => setLanguage(item)} alt={item.native} key={item.id}/>
               ))
             }
           </span>

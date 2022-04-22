@@ -1,6 +1,5 @@
 import React, { Suspense, lazy } from 'react'
 import { Route, Switch, Redirect } from 'react-router-dom'
-import LoadFrame from './components/LoadFrame'
 import {
   configSelectors,
 } from './state/config'
@@ -29,13 +28,9 @@ interface IProps extends ConnectedProps<typeof connector> {
 }
 
 const AppRoutesWrapper: React.FC<IProps> = ({ status, user }) => {
-  return status === EStatuses.Loading ?
-    <section>
-      <LoadFrame/>
-    </section> :
-    status === EStatuses.Success ?
-      <Suspense fallback={<LoadFrame/>}><AppRoutes user={user}/></Suspense> :
-      <UnavailableBase/>
+  return status === EStatuses.Success ?
+    <Suspense fallback={null}><AppRoutes user={user}/></Suspense> :
+    <UnavailableBase/>
 }
 
 const UnavailableBase = () => {

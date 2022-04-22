@@ -139,8 +139,8 @@ const App: React.FC<IProps> = ({
       </MetaTags> :
       null
   }
-  console.log(configStatus)
-  return <React.Fragment key={`${language}_${configStatus}`}>
+
+  return <React.Fragment key={`${language.id}_${configStatus}`}>
     {getMetaTags()}
     <AppRoutes />
     {/* <PositionTracker/> */}

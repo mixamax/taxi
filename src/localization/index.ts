@@ -1,7 +1,6 @@
 import store from '../state'
 import TRANSLATION from './translation'
 import CATEGORIES from './categories'
-import { LANGUAGES } from '../constants/languages'
 import { configSelectors } from '../state/config'
 
 interface IOptions {
@@ -30,7 +29,7 @@ const t = (id: string, options: IOptions = {}) => {
 
     key = splittedID[splittedID.length - 1]
 
-    const language = LANGUAGES[configSelectors.language(store.getState())]
+    const language = configSelectors.language(store.getState())
 
     let result = ''
 
@@ -43,7 +42,7 @@ const t = (id: string, options: IOptions = {}) => {
       if (category === CATEGORIES[4] && key === '0') {
         result = _data.lang_vls.search[language.id]
       } else {
-        result = _data[category][key][language.code]
+        result = _data[category][key][language.iso]
       }
     } else if (category === CATEGORIES[6]) {
       result = _data[category][key][language.id]

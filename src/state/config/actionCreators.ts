@@ -1,5 +1,5 @@
+import { ILanguage } from '../../types/types'
 import { ActionTypes } from './constants'
-import { LANGUAGES } from '../../constants/languages'
 
 export const checkConfig = (name: string) => {
   return { type: ActionTypes.CHECK_CONFIG_REQUEST, payload: name }
@@ -17,6 +17,6 @@ export const setConfigError = () => {
   return { type: ActionTypes.SET_CONFIG_FAIL }
 }
 
-export const setLanguage = (language: keyof typeof LANGUAGES) => {
+export const setLanguage = (language: ILanguage) => {
   return { type: ActionTypes.SET_LANGUAGE_REQUEST, payload: language }
 }

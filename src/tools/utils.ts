@@ -710,6 +710,12 @@ export function parseEntries(entries: string) {
   })
 }
 
+export function parseLanguages(languages: any) {
+  return Object.entries(languages).map(([key, value]: [string, any]) => ({
+    ...value, id: key, logo: `/assets/images/default/flag-${value.logo}.svg`,
+  }))
+}
+
 export const getCurrentPosition = () => new Promise<GeolocationPosition>((res, rej) => {
   navigator.geolocation.getCurrentPosition(res, rej)
 })

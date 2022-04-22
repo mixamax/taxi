@@ -1,6 +1,5 @@
 import { appName } from '../../config'
-import { LANGUAGES } from '../../constants/languages'
-import { EStatuses } from '../../types/types'
+import { EStatuses, ILanguage } from '../../types/types'
 
 export const moduleName = 'config' as const
 
@@ -24,5 +23,5 @@ export const ActionTypes = {
 
 export interface IConfigState {
   status: EStatuses
-  language: keyof typeof LANGUAGES
+  language: ILanguage
 }

@@ -1,4 +1,4 @@
-import { setLanguage } from './../config/actionCreators'
+import { ActionTypes as ConfigActionTypes } from './../config/constants'
 import { all, put } from 'redux-saga/effects'
 import { setLoginModal } from '../modals/actionCreators'
 import { ActionTypes } from './constants'
@@ -9,6 +9,7 @@ import { EUserRoles, ITokens, IUser } from '../../types/types'
 import history from '../../tools/history'
 import { setUser } from './actionCreators'
 import { clearOrders } from '../orders/actionCreators'
+import SITE_CONSTANTS from '../../siteConstants'
 
 export const saga = function* () {
   yield all([
@@ -89,7 +90,10 @@ function* initUserSaga() {
     yield put({ type: ActionTypes.SET_TOKENS, payload: tokens })
 
     const user = yield* call<IUser | null>(API.getAuthorizedUser)
-    if (user?.u_lang) yield put(setLanguage(user?.u_lang as Parameters<typeof setLanguage>[0]))
+    if (user?.u_lang) yield put({
+      type: ConfigActionTypes.SET_LANGUAGE,
+      payload: SITE_CONSTANTS.LANGUAGES.find(i => i.id.toString() === user?.u_lang),
+    })
     yield put(setUser(user))
   } catch (error) {
     yield put({ type: ActionTypes.REMIND_PASSWORD_FAIL })

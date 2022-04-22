@@ -14,7 +14,6 @@ import { defaultProfileModal } from '../../state/modals/reducer'
 import { EWorkTypes } from '../../types/types'
 import { emailRegex, getPhoneError } from '../../tools/utils'
 import { configSelectors } from '../../state/config'
-import { LANGUAGES } from '../../constants/languages'
 
 const mapStateToProps = (state: IRootState) => ({
   user: userSelectors.user(state),
@@ -59,7 +58,7 @@ const CardDetailsModal: React.FC<IProps> = ({
       email: user?.u_email,
       phone: user?.u_phone,
       state: user?.u_state,
-      city: user?.u_city ? (window as any).data.cities[user?.u_city][LANGUAGES[language].code] : '',
+      city: user?.u_city ? (window as any).data.cities[user?.u_city][language.id] : '',
       zip: user?.u_zip,
       cardNumber: user?.u_card,
     },

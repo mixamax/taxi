@@ -568,6 +568,14 @@ export type TMoneyModes = {[key: string]: boolean | {[key: string]: boolean}}
 
 export type TEntries = { key: string, value: string }[]
 
+export interface ILanguage {
+  id: number
+  iso: string
+  logo: string
+  native: string
+  [language: string]: string | number
+}
+
 export interface IRoom {
   id: number
   label: string

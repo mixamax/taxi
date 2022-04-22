@@ -1,12 +1,14 @@
 import { ActionTypes, IConfigState } from './constants'
-import { EStatuses } from '../../types/types'
+import { EStatuses, ILanguage } from '../../types/types'
 import { Record } from 'immutable'
 import { TAction } from '../../types'
 import SITE_CONSTANTS from '../../siteConstants'
 
 export const record = Record<IConfigState>({
   status: EStatuses.Loading,
-  language: SITE_CONSTANTS.THE_LANGUAGE_OF_THE_SERVICE as IConfigState['language'],
+  language: SITE_CONSTANTS.LANGUAGES.find(
+    i => i.id.toString() === SITE_CONSTANTS.THE_LANGUAGE_OF_THE_SERVICE,
+  ) as ILanguage,
 })
 
 export default function reducer(state = new record(), action: TAction) {

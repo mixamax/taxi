@@ -36,14 +36,16 @@ function* setConfigLoadedSaga() {
   SITE_CONSTANTS.recalculate()
   CURRENCY.recalculated()
 
-  console.log('recalculated', SITE_CONSTANTS.PALETTE.primary.main)
+  setTimeout(() => {
+    (window as any).preloader?.classList.remove('active')
+  }, 1000)
 
   yield put({ type: ActionTypes.SET_CONFIG_SUCCESS })
 }
 
 function* setLanguageSaga(data: TAction) {
   try {
-    yield* call(API.editUser, { u_lang: data.payload })
+    yield* call(API.editUser, { u_lang: data.payload.id })
   } catch (error) {
     console.error(error)
   }

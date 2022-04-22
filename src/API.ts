@@ -1,4 +1,3 @@
-import { LANGUAGES } from './constants/languages'
 import { EOrderTypes, ESuggestionType, IAddressPoint, ISuggestion, IRouteInfo } from './types/types'
 import { Stringify, ValueOf } from './types/index'
 import { apiMethod, IApiMethodArguments, IResponseFields, addToFormData } from './tools/api'
@@ -471,7 +470,7 @@ export const reverseGeocode = (
         lat,
         lon: lng,
         format: 'json',
-        'accept-language': LANGUAGES[language].code,
+        'accept-language': language.iso,
       },
     },
   )
@@ -491,7 +490,7 @@ export const geocode = (
         q: query,
         limit: 1,
         format: 'json',
-        'accept-language': LANGUAGES[language].code,
+        'accept-language': language.iso,
       },
     },
   )
@@ -606,7 +605,7 @@ export const getPointSuggestions = async(targetString?: string, isIntercity?: bo
           at: isIntercity ? `${coords[0]},${coords[1]}` : undefined,
           in: isIntercity ? `countryCode:${country}` : `circle:${coords};r=${SITE_CONSTANTS.SEARCH_RADIUS * 1000}`,
           apiKey: 'cBumVVL0YkHvynJZNIL3SRtUfgxnEtPpXhvUVcE6Uh0',
-          lang: LANGUAGES[language].code,
+          lang: language.iso,
           limit: 3,
         },
       },
