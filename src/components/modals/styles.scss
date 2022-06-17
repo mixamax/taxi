@@ -839,6 +839,19 @@
         display: flex;
         align-items: center;
         flex-wrap: wrap;
+        width: 100%;
+        padding-right: 10px;
+      }
+
+      &-subinfo {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+
+        &-item {
+          display: inline-block;
+          margin-right: 10px;
+        }
       }
 
       &-name {
@@ -870,9 +883,9 @@
       &-arrow {
         border: 10px solid transparent;
         transform: rotate(45deg);
-        margin-left: 20px;
-        margin-bottom: 10px;
         transition: .2s;
+        width: 20px;
+        height: 20px;
 
         &--active {
           transform: rotate(-135deg);

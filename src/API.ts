@@ -161,6 +161,16 @@ const _getCar = (
 }
 export const getCar = apiMethod<typeof _getCar>(_getCar)
 
+const _getCars = (
+  { formData }: IApiMethodArguments,
+  ids: IUser['u_id'][],
+): Promise<ICar[]> => {
+  return axios.post(`${Config.API_URL}/car/${ids.join(',')}`, formData)
+    .then(res => res.data.data)
+    .then(res => Object.values(res.car).map(i => convertCar(i)))
+}
+export const getCars = apiMethod<typeof _getCars>(_getCars)
+
 const _getOrders = (
   { formData }: IApiMethodArguments,
   type: EOrderTypes = EOrderTypes.Active,
@@ -364,6 +374,16 @@ const _getUser = (
     .then(res => convertUser(res.user[id]) || null)
 }
 export const getUser = apiMethod<typeof _getUser>(_getUser)
+
+const _getUsers = (
+  { formData }: IApiMethodArguments,
+  ids: IUser['u_id'][],
+): Promise<IUser[]> => {
+  return axios.post(`${Config.API_URL}/user/${ids.join(',')}`, formData)
+    .then(res => res.data.data)
+    .then(res => Object.values(res.user).map(i => convertUser(i)))
+}
+export const getUsers = apiMethod<typeof _getUsers>(_getUsers)
 
 const _getAuthorizedUser = (
   { formData }: IApiMethodArguments,
