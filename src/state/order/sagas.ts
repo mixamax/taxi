@@ -68,7 +68,7 @@ function* getOrderSaga(data: TAction) {
             })
           })
       } else {
-        put({
+        yield put({
           type: ActionTypes.SET_START,
           payload: {
             latitude: order.b_start_latitude,
@@ -80,28 +80,35 @@ function* getOrderSaga(data: TAction) {
       }
 
       if (!order.b_destination_address) {
-        yield put({
-          type: ActionTypes.SET_DESTINATION,
-          payload: {
-            latitude: order.b_destination_latitude,
-            longitude: order.b_destination_longitude,
-            address: `${order.b_destination_latitude} ${order.b_destination_longitude}`,
-          },
-        })
-        API.reverseGeocode(order.b_destination_latitude?.toString(), order.b_destination_longitude?.toString())
-          .then(res => {
-            store.dispatch({
-              type: ActionTypes.SET_DESTINATION,
-              payload: {
-                latitude: order.b_destination_latitude,
-                longitude: order.b_destination_longitude,
-                address: res.display_name,
-                shortAddress: shortenAddress(
-                  res.display_name, res.address.city || res.address.town || res.address.village,
-                ),
-              },
-            })
+        if (order.b_destination_latitude === 0 && order.b_destination_longitude === 0) {
+          yield put({
+            type: ActionTypes.SET_DESTINATION,
+            payload: {},
           })
+        } else {
+          yield put({
+            type: ActionTypes.SET_DESTINATION,
+            payload: {
+              latitude: order.b_destination_latitude,
+              longitude: order.b_destination_longitude,
+              address: `${order.b_destination_latitude} ${order.b_destination_longitude}`,
+            },
+          })
+          API.reverseGeocode(order.b_destination_latitude?.toString(), order.b_destination_longitude?.toString())
+            .then(res => {
+              store.dispatch({
+                type: ActionTypes.SET_DESTINATION,
+                payload: {
+                  latitude: order.b_destination_latitude,
+                  longitude: order.b_destination_longitude,
+                  address: res.display_name,
+                  shortAddress: shortenAddress(
+                    res.display_name, res.address.city || res.address.town || res.address.village,
+                  ),
+                },
+              })
+            })
+        }
       } else if (!order.b_destination_latitude || !order.b_destination_longitude) {
         yield put({
           type: ActionTypes.SET_DESTINATION,
@@ -123,7 +130,7 @@ function* getOrderSaga(data: TAction) {
             })
           })
       } else {
-        put({
+        yield put({
           type: ActionTypes.SET_DESTINATION,
           payload: {
             latitude: order.b_destination_latitude,

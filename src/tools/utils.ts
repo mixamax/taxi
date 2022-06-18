@@ -408,10 +408,20 @@ export const convertUser = (user: any): IUser => {
   )
 }
 
+export const reverseConvertUser = (user: any): IUser => {
+  return convertTypes<IUser, any>(
+    user,
+    {
+      toStringObjectKeys: ['u_details'],
+    },
+  )
+}
+
 interface TConvertKeys {
   toFloatKeys?: string[],
   toIntKeys?: string[],
   toStringKeys?: string[],
+  toStringObjectKeys?: string[]
   toDateKeys?: string[],
   toStringDateKeys?: string[],
   toBooleanKeys?: string[],
@@ -424,6 +434,7 @@ const convertTypes = <T, R>(
     toFloatKeys = [],
     toIntKeys = [],
     toStringKeys = [],
+    toStringObjectKeys = [],
     toDateKeys = [],
     toStringDateKeys = [],
     toBooleanKeys = [],
@@ -439,6 +450,7 @@ const convertTypes = <T, R>(
     if (toFloatKeys.includes(key)) convertedObject[key] = parseFloat(value)
     else if (toIntKeys.includes(key)) convertedObject[key] = parseInt(value)
     else if (toStringKeys.includes(key)) convertedObject[key] = String(value)
+    else if (toStringObjectKeys.includes(key)) convertedObject[key] = JSON.stringify(value)
     else if (toDateKeys.includes(key)) convertedObject[key] = moment(value)
     else if (toStringDateKeys.includes(key)) convertedObject[key] = value.format(dateFormat)
     else if (toBooleanKeys.includes(key)) convertedObject[key] = Boolean(parseInt(value))

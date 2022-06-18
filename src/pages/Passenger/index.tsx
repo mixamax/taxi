@@ -367,7 +367,6 @@ const PassengerOrder: React.FC<IProps> = ({
       } else return setVoteModal(true)
     }
 
-    console.log(['96', '95'].some(item => selectedOrder?.b_comments?.includes(item)), selectedOrderDriver)
     if (['96', '95'].some(item => selectedOrder?.b_comments?.includes(item)) && !selectedOrderDriver) {
       setCandidatesModal(true)
       return
@@ -481,10 +480,13 @@ const PassengerOrder: React.FC<IProps> = ({
         throw t(TRANSLATION.MAP_FROM_NOT_SPECIFIED_ERROR)
       }
       if (
-        !to ||
-        !(
-          (to.latitude && to.longitude) ||
-          to.address
+        !(tab === TABS.MOVE.id && moveType === EMoveTypes.Handy) &&
+        (
+          !to ||
+          !(
+            (to.latitude && to.longitude) ||
+            to.address
+          )
         )
       ) {
         throw t(TRANSLATION.MAP_TO_NOT_SPECIFIED_ERROR)
@@ -573,9 +575,19 @@ const PassengerOrder: React.FC<IProps> = ({
         b_start_address: from.address,
         b_start_latitude: from.latitude,
         b_start_longitude: from.longitude,
-        b_destination_address: to.address,
-        b_destination_latitude: to.latitude,
-        b_destination_longitude: to.longitude,
+        ...(
+          (tab === TABS.MOVE.id && moveType === EMoveTypes.Apartament) ?
+            {
+              // b_destination_address: from.address,
+              // b_destination_latitude: from.latitude,
+              // b_destination_longitude: from.longitude,
+            } :
+            {
+              b_destination_address: to?.address,
+              b_destination_latitude: to?.latitude,
+              b_destination_longitude: to?.longitude,
+            }
+        ),
         ...commentObj,
         b_contact: phone,
         b_start_datetime: startTime,
@@ -791,62 +803,62 @@ const PassengerOrder: React.FC<IProps> = ({
           <DateTimeIntervalInput value={fromTimeInterval} onChange={setFromTimeInterval} />
         }
 
-        {[TABS.DELIVERY.id, TABS.MOVE.id].includes(tab) && (
-          <>
-            <GroupedInputs>
-              <Input
-                inputProps={{
-                  type: 'number',
-                  ...register('from_porch'),
-                }}
-                label={t(TRANSLATION.PORCH)}
-                error={errors.from_porch?.message}
-              />
-              <Input
-                inputProps={{
-                  type: 'number',
-                  ...register('from_floor'),
-                }}
-                label={t(TRANSLATION.FLOOR)}
-                error={errors.from_floor?.message}
-              />
-              <Input
-                inputProps={{
-                  type: 'number',
-                  ...register('from_room'),
-                }}
-                label={t(TRANSLATION.ROOM)}
-                error={errors.from_room?.message}
-              />
-            </GroupedInputs>
-            {
-              SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.fromWay &&
-              <Input
-                inputProps={{
-                  ...register('from_way'),
-                }}
-                label={t(TRANSLATION.WAY)}
-                error={errors.from_way?.message}
-              />
-            }
-            {
-              tab === TABS.DELIVERY.id && SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.fromMission &&
-              <details>
-                <summary>
-                  {t(TRANSLATION.COURIER_MISSION)}
-                </summary>
-                <Input
-                  inputProps={{
-                    placeholder: t(TRANSLATION.WRITE_COURIER_MISSION),
-                    ...register('from_mission'),
-                  }}
-                  inputType={EInputTypes.Textarea}
-                  error={errors.from_mission?.message}
-                />
-              </details>
-            }
-          </>
+        {[TABS.DELIVERY.id].includes(tab) && (
+          <GroupedInputs>
+            <Input
+              inputProps={{
+                type: 'number',
+                ...register('from_porch'),
+              }}
+              label={t(TRANSLATION.PORCH)}
+              error={errors.from_porch?.message}
+            />
+            <Input
+              inputProps={{
+                type: 'number',
+                ...register('from_floor'),
+              }}
+              label={t(TRANSLATION.FLOOR)}
+              error={errors.from_floor?.message}
+            />
+            <Input
+              inputProps={{
+                type: 'number',
+                ...register('from_room'),
+              }}
+              label={t(TRANSLATION.ROOM)}
+              error={errors.from_room?.message}
+            />
+          </GroupedInputs>
         )}
+        {
+          [TABS.DELIVERY.id, TABS.MOVE.id].includes(tab) &&
+          SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.fromWay &&
+            <Input
+              inputProps={{
+                ...register('from_way'),
+              }}
+              label={t(tab === TABS.MOVE.id ? TRANSLATION.COMMENT : TRANSLATION.WAY)}
+              error={errors.from_way?.message}
+            />
+        }
+        {
+          [TABS.DELIVERY.id].includes(tab) &&
+          SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.fromMission &&
+            <details>
+              <summary>
+                {t(TRANSLATION.COURIER_MISSION)}
+              </summary>
+              <Input
+                inputProps={{
+                  placeholder: t(TRANSLATION.WRITE_COURIER_MISSION),
+                  ...register('from_mission'),
+                }}
+                inputType={EInputTypes.Textarea}
+                error={errors.from_mission?.message}
+              />
+            </details>
+        }
         {(tab === TABS.DELIVERY.id || tab === TABS.MOTORCYCLE.id) &&
           <Input
             inputProps={{
@@ -911,7 +923,10 @@ const PassengerOrder: React.FC<IProps> = ({
           </GroupedInputs>
         )}
 
-        <LocationInput type={EPointType.To} isIntercity={isIntercity} />
+        {
+          !(tab === TABS.MOVE.id && moveType === EMoveTypes.Handy) &&
+            <LocationInput type={EPointType.To} isIntercity={isIntercity} />
+        }
 
         {
           tab === TABS.WAGON.id &&
@@ -1024,7 +1039,7 @@ const PassengerOrder: React.FC<IProps> = ({
             error={errors.customer_price?.message}
           />
         }
-        {[TABS.DELIVERY.id, TABS.MOVE.id].includes(tab) && <>
+        {[TABS.DELIVERY.id].includes(tab) &&
           <GroupedInputs>
             <Input
               inputProps={{
@@ -1051,31 +1066,32 @@ const PassengerOrder: React.FC<IProps> = ({
               error={errors.to_room?.message}
             />
           </GroupedInputs>
-          {
-            SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.toWay &&
+        }
+        {
+          ([TABS.DELIVERY.id].includes(tab) || (tab === TABS.MOVE.id && moveType !== EMoveTypes.Handy)) &&
+          SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.toWay &&
             <Input
               inputProps={{
                 ...register('to_way'),
               }}
-              label={t(TRANSLATION.WAY)}
+              label={t(tab === TABS.MOVE.id ? TRANSLATION.COMMENT : TRANSLATION.WAY)}
               error={errors.to_way?.message}
             />
-          }
-          {
-            SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.toMission &&
-              <details>
-                <summary><span>{t(TRANSLATION.COURIER_MISSION)}</span></summary>
-                <Input
-                  inputProps={{
-                    placeholder: t(TRANSLATION.WRITE_COURIER_MISSION),
-                    ...register('to_mission'),
-                  }}
-                  inputType={EInputTypes.Textarea}
-                  error={errors.to_mission?.message}
-                />
-              </details>
-          }
-        </>
+        }
+        {
+          [TABS.DELIVERY.id].includes(tab) &&
+          SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.toMission &&
+            <details>
+              <summary><span>{t(TRANSLATION.COURIER_MISSION)}</span></summary>
+              <Input
+                inputProps={{
+                  placeholder: t(TRANSLATION.WRITE_COURIER_MISSION),
+                  ...register('to_mission'),
+                }}
+                inputType={EInputTypes.Textarea}
+                error={errors.to_mission?.message}
+              />
+            </details>
         }
         {
           (tab === TABS.DELIVERY.id || tab === TABS.MOTORCYCLE.id) &&

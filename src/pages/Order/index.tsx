@@ -333,93 +333,126 @@ const Order: React.FC<IProps> = ({
                   }
                 </label>
               </div>
-              {order.b_options?.from_porch &&
-                <div className='from-delivery'>
-                  <div className='group'>
-                    <span>{t(TRANSLATION.PORCH)} <b>{order.b_options.from_porch}</b></span>
-                    <span>{t(TRANSLATION.FLOOR)} <b>{order.b_options.from_floor}</b></span>
-                    <span>{t(TRANSLATION.ROOM)} <b>{order.b_options.from_room}</b></span>
-                  </div>
-                  <span className='way'>
-                    <b>{t(TRANSLATION.WAY)}:</b>&nbsp;
-                    {order.b_options.from_way || t(TRANSLATION.NOT_SPECIFIED, { toLower: true })}
-                  </span>
-                  <span
-                    className='time'
-                  >
-                    <b>{t(TRANSLATION.TAKE)}:</b>&nbsp;
-                    {order.b_options.from_day}, {t(TRANSLATION.TIME_FROM, { toLower: true })}&nbsp;
-                    {order.b_options.from_time_from} {t(TRANSLATION.TIME_TILL, { toLower: true })}&nbsp;
-                    {order.b_options.from_time_to || t(TRANSLATION.NO_MATTER, { toLower: true })}
-                  </span>
-                  <span className='way'><b>{t(TRANSLATION.PHONE_TO_CALL)}:</b> {order.b_options.from_tel}
-                    <img
-                      src={images.phone}
-                      alt={t(TRANSLATION.PHONE)}
-                    />
-                  </span>
-                  <div className="order__separator"/>
-                </div>
-              }
+              <div className='from-delivery'>
+                {
+                  order.b_options?.from_porch &&
+                      (
+                        <div className='group'>
+                          <span>{t(TRANSLATION.PORCH)} <b>{order.b_options.from_porch}</b></span>
+                          <span>{t(TRANSLATION.FLOOR)} <b>{order.b_options.from_floor}</b></span>
+                          <span>{t(TRANSLATION.ROOM)} <b>{order.b_options.from_room}</b></span>
+                        </div>
+                      )
+                }
+                {
+                  order.b_options?.from_way && (
+                    <span className='way'>
+                      <b>{t(order.b_comments?.includes('96') ? TRANSLATION.COMMENT : TRANSLATION.WAY)}:</b>&nbsp;
+                      {order.b_options.from_way || t(TRANSLATION.NOT_SPECIFIED, { toLower: true })}
+                    </span>
+                  )
+                }
+                {
+                  !order.b_comments?.includes('96') && order.b_options?.from_day && (
+                    <span
+                      className='time'
+                    >
+                      <b>{t(TRANSLATION.TAKE)}:</b>&nbsp;
+                      {order.b_options.from_day}, {t(TRANSLATION.TIME_FROM, { toLower: true })}&nbsp;
+                      {order.b_options.from_time_from} {t(TRANSLATION.TIME_TILL, { toLower: true })}&nbsp;
+                      {order.b_options.from_time_to || t(TRANSLATION.NO_MATTER, { toLower: true })}
+                    </span>
+                  )
+                }
+                {
+                  order.b_options?.from_tel && (
+                    <span className='way'><b>{t(TRANSLATION.PHONE_TO_CALL)}:</b> {order.b_options.from_tel}
+                      <img
+                        src={images.phone}
+                        alt={t(TRANSLATION.PHONE)}
+                      />
+                    </span>
+                  )
+                }
+                {/* <div className="order__separator"/> */}
+              </div>
               {order.b_options?.object &&
                 <h3>{`${t(TRANSLATION.DELIVER_PACKAGE)}:`}</h3>}
-              <div className='to'>
-                <label>
-                  {isToAddressShort && destination?.shortAddress ? destination?.shortAddress : destination?.address}
-                </label>
-                <div className="to__buttons">
-                  {destination?.shortAddress && (
+              {(destination?.address || destination?.latitude || destination?.longitude) && (
+                <div className='to'>
+                  <label>
+                    {isToAddressShort && destination?.shortAddress ? destination?.shortAddress : destination?.address}
+                  </label>
+                  <div className="to__buttons">
+                    {destination?.shortAddress && (
+                      <img
+                        src={isToAddressShort ? images.minusIcon : images.plusIcon}
+                        onClick={() => setIsToAddressShort(prev => !prev)}
+                        alt='change address mode'
+                      />
+                    )}
                     <img
-                      src={isToAddressShort ? images.minusIcon : images.plusIcon}
-                      onClick={() => setIsToAddressShort(prev => !prev)}
-                      alt='change address mode'
-                    />
-                  )}
-                  <img
-                    src={images.markerGreen}
-                    alt="marker"
-                    className='address-marker'
-                    onClick={
-                      () => {
-                        setMapModal({
-                          isOpen: true,
-                          type: EMapModalTypes.OrderDetails,
-                          defaultCenter: destination?.latitude &&
+                      src={images.markerGreen}
+                      alt="marker"
+                      className='address-marker'
+                      onClick={
+                        () => {
+                          setMapModal({
+                            isOpen: true,
+                            type: EMapModalTypes.OrderDetails,
+                            defaultCenter: destination?.latitude &&
                             destination?.longitude ?
-                            [destination.latitude, destination.longitude] :
-                            null,
-                        })
+                              [destination.latitude, destination.longitude] :
+                              null,
+                          })
+                        }
                       }
-                    }
-                  />
-                </div>
-              </div>
-              {order.b_options?.from_porch &&
-                <div className='to-delivery'>
-                  <div className='group'>
-                    <span>{t(TRANSLATION.PORCH)} <b>{order.b_options.to_porch}</b></span>
-                    <span>{t(TRANSLATION.FLOOR)} <b>{order.b_options.to_floor}</b></span>
-                    <span>{t(TRANSLATION.ROOM)} <b>{order.b_options.to_room}</b></span>
-                  </div>
-                  <span className='way'><b>{t(TRANSLATION.WAY)}:</b> {order.b_options.to_way || t(TRANSLATION.NOT_SPECIFIED)}</span>
-                  <span
-                    className='time'
-                  >
-                    <b>
-                      {t(TRANSLATION.TAKE)}:
-                    </b>
-                    {order.b_options.to_day}, {t(TRANSLATION.TIME_FROM, { toLower: true })}&nbsp;
-                    {order.b_options.to_time_from} {t(TRANSLATION.TIME_TILL, { toLower: true })}&nbsp;
-                    {order.b_options.to_time_to || t(TRANSLATION.NO_MATTER, { toLower: true })}
-                  </span>
-                  <span className='way'><b>{t(TRANSLATION.PHONE_TO_CALL)}:</b> {order.b_options.to_tel}
-                    <img
-                      src={images.phone}
-                      alt={t(TRANSLATION.PHONE)}
                     />
-                  </span>
+                  </div>
                 </div>
-              }
+              )}
+              <div className='to-delivery'>
+                {
+                  order.b_options?.to_porch &&
+                    (
+                      <div className='group'>
+                        <span>{t(TRANSLATION.PORCH)} <b>{order.b_options.to_porch}</b></span>
+                        <span>{t(TRANSLATION.FLOOR)} <b>{order.b_options.to_floor}</b></span>
+                        <span>{t(TRANSLATION.ROOM)} <b>{order.b_options.to_room}</b></span>
+                      </div>
+                    )
+                }
+                {
+                  order.b_options?.to_way && (
+                    <span className='way'>
+                      <b>{t(order.b_comments?.includes('96') ? TRANSLATION.COMMENT : TRANSLATION.WAY)}:</b>&nbsp;
+                      {order.b_options.to_way || t(TRANSLATION.NOT_SPECIFIED, { toLower: true })}
+                    </span>
+                  )
+                }
+                {
+                  !order.b_comments?.includes('96') && order.b_options?.to_day && (
+                    <span
+                      className='time'
+                    >
+                      <b>{t(TRANSLATION.TAKE)}:</b>&nbsp;
+                      {order.b_options.to_day}, {t(TRANSLATION.TIME_FROM, { toLower: true })}&nbsp;
+                      {order.b_options.to_time_from} {t(TRANSLATION.TIME_TILL, { toLower: true })}&nbsp;
+                      {order.b_options.to_time_to || t(TRANSLATION.NO_MATTER, { toLower: true })}
+                    </span>
+                  )
+                }
+                {
+                  order.b_options?.to_tel && (
+                    <span className='way'><b>{t(TRANSLATION.PHONE_TO_CALL)}:</b> {order.b_options.to_tel}
+                      <img
+                        src={images.phone}
+                        alt={t(TRANSLATION.PHONE)}
+                      />
+                    </span>
+                  )
+                }
+              </div>
             </div>
             <div className="order__separator"/>
 

@@ -16,7 +16,7 @@ import {
   IUser,
 } from './types/types'
 import Config from './config'
-import { convertCar, convertOrder, convertUser, getHints, reverseConvertOrder } from './tools/utils'
+import { convertCar, convertOrder, convertUser, getHints, reverseConvertOrder, reverseConvertUser } from './tools/utils'
 import { t, TRANSLATION } from './localization'
 import { ERegistrationType } from './state/user/constants'
 import { userSelectors } from './state/user'
@@ -398,7 +398,7 @@ const _editUser = (
   { formData }: IApiMethodArguments,
   data: Partial<IUser>,
 ) => {
-  addToFormData(formData, { data: JSON.stringify(data) })
+  addToFormData(formData, { data: JSON.stringify(reverseConvertUser(data)) })
 
   return axios.post(`${Config.API_URL}/user`, formData)
     .then(res => res.data)

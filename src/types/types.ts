@@ -497,16 +497,19 @@ export interface IUser {
   out_passengers?: number
   /** Число чемоданов в поездке вне сервиса */
   out_luggage?: number
-  /** Самозанятый / Компания */
-  u_work_type?: EWorkTypes
-  /** Улица */
-  u_street?: string
-  /** Штат */
-  u_state?: string
-  /** ZIP код */
-  u_zip?: string
-  /** ZIP код */
-  u_card?: string
+  u_details?: {
+    /** Самозанятый / Компания */
+    work_type?: EWorkTypes
+    /** Улица */
+    street?: string
+    /** Штат */
+    state?: string
+    /** ZIP код */
+    zip?: string
+    /** Номер карты */
+    card?: string
+  }
+  //
   u_registration: Moment
   u_replies?: IReply[]
   u_choosen?: number
