@@ -113,10 +113,11 @@ const CandidatesModal: React.FC<IProps> = ({
                     </div>
                     <div className="candidate__header-info">
                       <h6 className="candidate__header-name">
-                        <span>{user?.u_name}{user?.u_family ? ` ${user?.u_family}` : ''},</span>&nbsp;
+                        <span>{user?.u_name}{user?.u_family ? ` ${user?.u_family}` : ''}(#{user?.u_id}),</span>&nbsp;
                         <span>
                           {!!car?.color && t(TRANSLATION.CAR_COLORS[car.color])}&nbsp;
-                          {!!car?.cm_id && t(TRANSLATION.CAR_MODELS[car.cm_id])}
+                          {!!car?.cm_id && t(TRANSLATION.CAR_MODELS[car.cm_id])}&nbsp;
+                          {car?.registration_plate}(#{car?.c_id})
                         </span>
                       </h6>
                       <div className="candidate__header-subinfo">
