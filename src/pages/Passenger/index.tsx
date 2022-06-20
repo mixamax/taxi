@@ -726,7 +726,7 @@ const PassengerOrder: React.FC<IProps> = ({
               )}
               <hr className="move__elevator-hr" style={{ backgroundColor: SITE_CONSTANTS.PALETTE.primary.dark }} />
             </div>
-            <label
+            {/* <label
               className="move__images"
               onClick={e => {
                 if (room === null) {
@@ -753,7 +753,7 @@ const PassengerOrder: React.FC<IProps> = ({
                   src: images.addPhoto,
                 }}
               />
-            </label>
+            </label> */}
             {room !== null && !!moveFiles[room]?.length && (
               <Slider
                 files={moveFiles[room]}
