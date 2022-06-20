@@ -9,7 +9,6 @@ import { t, TRANSLATION } from './localization'
 import { IRootState } from './state'
 import { EStatuses, EUserRoles, IUser } from './types/types'
 import { userSelectors } from './state/user'
-import Test from './pages/Test'
 import Sandbox from './pages/Sandbox'
 
 const PassengerOrder = lazy(() => import('./pages/Passenger'))
@@ -45,7 +44,6 @@ const UnavailableBase = () => {
 const AppRoutes: React.FC<{user: IUser | null}> = ({ user }) => (
   <Switch>
     <Route exact path="/" component={PassengerOrder}/>
-    <Route path="/test" component={Test}/>
     <Route path="/passenger-order" component={PassengerOrder}/>
     <Route path="/driver-order/:id" component={Order}/>
     <Route path="/driver-order" component={DriverOrder}/>

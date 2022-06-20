@@ -66,9 +66,7 @@ const Header: React.FC<IProps> = ({
     item.c_state > EBookingDriverState.Canceled || item.c_state === EBookingDriverState.Considering,
   )
 
-  const menuItems: IMenuItem[] = [
-    { label: 'test', href: '/test' },
-  ];
+  const menuItems: IMenuItem[] = [];
   (user?.u_role === EUserRoles.Driver) && menuItems.push({
     label: t('profile'),
     action: () => setProfileModal({ isOpen: true }),
