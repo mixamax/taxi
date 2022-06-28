@@ -40,25 +40,13 @@ export enum EBookingActions {
 
 const _register = (
   { formData }: IApiMethodArguments,
-  data: {
-    name: IUser['u_name'],
-    phone: IUser['u_phone'],
-    email?: IUser['u_email'],
-    role: IUser['u_role'],
-    ref_code?: string
-  },
+  data: Partial<IUser>,
 ): Promise<{
   u_id: IUser['u_id'],
   email_status: boolean,
   string: string
 } | null> => {
-  addToFormData(formData, {
-    u_name: data.name,
-    u_phone: data.phone,
-    u_email: data.email,
-    u_role: data.role,
-    ref_code: data.ref_code,
-  })
+  addToFormData(formData, reverseConvertUser(data))
 
   return axios.post(`${Config.API_URL}/register`, formData)
     .then(res => res.data)

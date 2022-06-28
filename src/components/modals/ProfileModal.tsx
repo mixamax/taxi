@@ -39,7 +39,7 @@ interface IFormValues {
   city?: string
   state?: string
   zip?: string
-  card: string
+  card?: string
 }
 
 interface IProps extends ConnectedProps<typeof connector> {

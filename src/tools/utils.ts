@@ -412,7 +412,7 @@ export const reverseConvertUser = (user: any): IUser => {
   return convertTypes<IUser, any>(
     user,
     {
-      toStringObjectKeys: ['u_details'],
+      toDetailsObjectKeys: ['u_details'],
     },
   )
 }
@@ -422,6 +422,7 @@ interface TConvertKeys {
   toIntKeys?: string[],
   toStringKeys?: string[],
   toStringObjectKeys?: string[]
+  toDetailsObjectKeys?: string[]
   toDateKeys?: string[],
   toStringDateKeys?: string[],
   toBooleanKeys?: string[],
@@ -435,6 +436,7 @@ const convertTypes = <T, R>(
     toIntKeys = [],
     toStringKeys = [],
     toStringObjectKeys = [],
+    toDetailsObjectKeys = [],
     toDateKeys = [],
     toStringDateKeys = [],
     toBooleanKeys = [],
@@ -451,6 +453,7 @@ const convertTypes = <T, R>(
     else if (toIntKeys.includes(key)) convertedObject[key] = parseInt(value)
     else if (toStringKeys.includes(key)) convertedObject[key] = String(value)
     else if (toStringObjectKeys.includes(key)) convertedObject[key] = JSON.stringify(value)
+    else if (toDetailsObjectKeys.includes(key)) convertedObject[key] = JSON.stringify([['=', [], value]])
     else if (toDateKeys.includes(key)) convertedObject[key] = moment(value)
     else if (toStringDateKeys.includes(key)) convertedObject[key] = value.format(dateFormat)
     else if (toBooleanKeys.includes(key)) convertedObject[key] = Boolean(parseInt(value))

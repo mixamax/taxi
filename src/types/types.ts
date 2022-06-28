@@ -498,6 +498,7 @@ export interface IUser {
   /** Число чемоданов в поездке вне сервиса */
   out_luggage?: number
   u_details?: {
+    city?: string
     /** Самозанятый / Компания */
     work_type?: EWorkTypes
     /** Улица */
@@ -513,6 +514,8 @@ export interface IUser {
   u_registration: Moment
   u_replies?: IReply[]
   u_choosen?: number
+  ref_code?: string
+  role: EUserRoles
 }
 
 export interface ITokens {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect/* , useRef */ } from 'react'
 import { connect, ConnectedProps } from 'react-redux'
 import { useForm } from 'react-hook-form'
 import Input, { EInputTypes } from '../../components/Input'
@@ -31,7 +31,7 @@ import moment, { Moment } from 'moment'
 import { useCachedState, useWatchWithEffect, useInterval } from '../../tools/hooks'
 import { IRootState } from '../../state'
 import {
-  EFileType, EPointType, EServices, EStatuses, IElevatorState,
+  /* EFileType, */EPointType, EServices, EStatuses, IElevatorState,
   IFile, IOrder, IRoom, IFurniture, TMoveFiles, TRoomFurniture, IOptions, ELogic,
 } from '../../types/types'
 import * as API from '../../API'
@@ -280,7 +280,7 @@ const PassengerOrder: React.FC<IProps> = ({
   const [distance, setDistance] = useState(0)
   const [moveFiles, setMoveFiles] = useState<TMoveFiles>({})
 
-  const moveImagesRef = useRef<HTMLInputElement>(null)
+  // const moveImagesRef = useRef<HTMLInputElement>(null)
 
   const roomFurniture = tab === TABS.MOVE.id && moveType === EMoveTypes.Apartament ?
     (room !== null ? furniture.house[room] : null) :
@@ -423,19 +423,19 @@ const PassengerOrder: React.FC<IProps> = ({
     } else setSelectedOrder(order.b_id)
   }
 
-  const handleMoveFilesChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (room === null) return
-    const files = e.target.files
-    setMoveFiles(prev => ({
-      ...prev,
-      [room]: (prev[room] || []).concat(files ?
-        [...files].map(item => ({
-          type: item.type.includes('video') ? EFileType.Video : EFileType.Image,
-          src: URL.createObjectURL(item),
-        })) :
-        []),
-    }))
-  }
+  // const handleMoveFilesChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (room === null) return
+  //   const files = e.target.files
+  //   setMoveFiles(prev => ({
+  //     ...prev,
+  //     [room]: (prev[room] || []).concat(files ?
+  //       [...files].map(item => ({
+  //         type: item.type.includes('video') ? EFileType.Video : EFileType.Image,
+  //         src: URL.createObjectURL(item),
+  //       })) :
+  //       []),
+  //   }))
+  // }
 
   const handleDeleteMoveFile = (src: IFile['src']) => {
     if (!room) return

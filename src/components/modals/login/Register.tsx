@@ -34,17 +34,17 @@ const mapDispatchToProps = {
 const connector = connect(mapStateToProps, mapDispatchToProps)
 
 interface IFormValues {
-  name: string
-  phone: string
-  email: string
-  street?: string
-  city?: string
-  state?: string
-  zip?: string
+  u_name: string
+  u_phone: string
+  u_email: string
   ref_code: string
   type: ERegistrationType
-  role: EUserRoles
-  cardNumber: string
+  u_role: EUserRoles
+  city?: string
+  street?: string
+  state?: string
+  zip?: string
+  card?: string
 }
 
 interface IProps extends ConnectedProps<typeof connector> {
@@ -70,22 +70,35 @@ const RegisterForm: React.FC<IProps> = ({
     mode: 'all',
     defaultValues: {
       type: ERegistrationType.Email,
-      role: !location.pathname.includes('/driver-order') ? EUserRoles.Client : EUserRoles.Driver,
+      u_role: !location.pathname.includes('/driver-order') ? EUserRoles.Client : EUserRoles.Driver,
     },
   })
 
-  const { type, phone, role } = useWatch<IFormValues>({ control })
+  const { type, u_phone, u_role } = useWatch<IFormValues>({ control })
 
   if (tab !== LOGIN_TABS_IDS[1]) return null
 
   const onSubmit = (data: IFormValues) => {
-    if (getPhoneError(phone, type === ERegistrationType.Phone)) return
-    register({ ...data, ref_code: data.ref_code || undefined, role: data.role || EUserRoles.Client })
+    if (getPhoneError(u_phone, type === ERegistrationType.Phone)) return
+    register({
+      u_name: data.u_name,
+      u_phone: data.u_phone,
+      u_email: data.u_email,
+      u_role: data.u_role || EUserRoles.Client,
+      ref_code: data.ref_code || undefined,
+      u_details: {
+        city: data.city,
+        street: data.street,
+        state: data.state,
+        zip: data.zip,
+        card: data.card,
+      },
+    })
   }
 
   return <form className="sign-up-subform" onSubmit={handleSubmit(onSubmit)}>
     {
-      role === EUserRoles.Driver && workType === null ?
+      u_role === EUserRoles.Driver && workType === null ?
         (
           <>
             <label
@@ -105,15 +118,15 @@ const RegisterForm: React.FC<IProps> = ({
           <>
             <Input
               inputProps={{
-                ...formRegister('name', { required: t(TRANSLATION.REQUIRED_FIELD) }),
+                ...formRegister('u_name', { required: t(TRANSLATION.REQUIRED_FIELD) }),
               }}
               label={t(workType === EWorkTypes.Company ? TRANSLATION.COMPANY_NAME : TRANSLATION.NAME)}
-              error={errors.name?.message}
+              error={errors.u_name?.message}
             />
             <Input
               inputProps={{
                 ...formRegister(
-                  'phone',
+                  'u_phone',
                   {
                     required: type === ERegistrationType.Phone ? t(TRANSLATION.REQUIRED_FIELD) : false,
                   },
@@ -121,12 +134,12 @@ const RegisterForm: React.FC<IProps> = ({
               }}
               label={t(TRANSLATION.PHONE)}
               inputType={EInputTypes.MaskedPhone}
-              error={getPhoneError(phone, type === ERegistrationType.Phone)}
+              error={getPhoneError(u_phone, type === ERegistrationType.Phone)}
             />
             <Input
               inputProps={{
                 ...formRegister(
-                  'email',
+                  'u_email',
                   {
                     required: type === ERegistrationType.Email ? t(TRANSLATION.REQUIRED_FIELD) : false,
                     pattern: {
@@ -137,7 +150,7 @@ const RegisterForm: React.FC<IProps> = ({
                 ),
               }}
               label={t(TRANSLATION.EMAIL)}
-              error={errors.email?.message}
+              error={errors.u_email?.message}
             />
             <Checkbox
               {...formRegister('type')}
@@ -185,7 +198,7 @@ const RegisterForm: React.FC<IProps> = ({
             />
             <Input
               inputProps={{
-                ...formRegister('cardNumber', {
+                ...formRegister('card', {
                   pattern: {
                     value: /^\d{16}$/,
                     message: t(TRANSLATION.CARD_NUMBER_PATTERN_ERROR),
@@ -194,7 +207,7 @@ const RegisterForm: React.FC<IProps> = ({
                 placeholder: 'ХХХХ-ХХХХ-ХХХХ-ХХХХ',
               }}
               label={t(TRANSLATION.CARD_NUMBER)}
-              error={errors.cardNumber?.message}
+              error={errors.card?.message}
             />
             {/* <Input
               inputProps={{
