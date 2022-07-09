@@ -195,85 +195,85 @@ export interface IOptions {
 
 export interface IOrder extends IBookingCoordinates, IBookingAddresses {
   /** Идентификатор поездки */
-  b_id: string,
+  b_id: string
   /** Идентификатор клиента */
-  u_id: string,
+  u_id: string
   /** Дата прибытия такси */
-  b_start_datetime: Moment,
+  b_start_datetime: Moment
   /** Комментарии, отсутствующие в справочнике */
-  b_custom_comment?: string,
+  b_custom_comment?: string
   /** Номер рейса */
-  b_flight_number?: string,
+  b_flight_number?: string
   /** Терминал */
-  b_terminal?: string,
+  b_terminal?: string
   /** Число пассажиров */
-  b_passengers_count: number,
+  b_passengers_count: number
   /** Число чемоданов */
-  b_luggage_count?: number,
+  b_luggage_count?: number
   /** Текст на табличке */
-  b_placard?: string,
+  b_placard?: string
   /** Идентификатор класса машины */
-  b_car_class: ECarClasses,
+  b_car_class: ECarClasses
   /** Идентификатор статуса поезки */
-  b_state: EBookingStates,
+  b_state: EBookingStates
   /** Дата создания поездки */
-  b_created: Moment,
+  b_created: Moment
   /** Подтверждена ли поездка */
-  b_confirm_state: boolean,
+  b_confirm_state: boolean
   /** Число машин */
-  b_cars_count: number,
+  b_cars_count: number
   /** Дата одобрения поездки */
-  b_approved?: Moment,
+  b_approved?: Moment
   /** Максимальное время ожидания машины в секундах */
-  b_max_waiting?: number,
+  b_max_waiting?: number
   /** Оценочное время ожидания машины в секундах */
-  b_estimate_waiting?: number,
+  b_estimate_waiting?: number
   /** Код поездки, известный клиенту для поездок 'Вызов на дороге'(только для клиента) */
-  b_driver_code?: string,
+  b_driver_code?: string
   /** Дополнительные параметры */
-  b_options?: IOptions,
+  b_options?: IOptions
   /** Контакты для связи */
-  b_contact: EContactClasses[],
+  b_contact: EContactClasses[]
   /** Идентификатор типа дальности поездки */
-  b_location_class: EBookingLocationClasses,
+  b_location_class: EBookingLocationClasses
   /** Оценочное расстояние маршрута в метрах */
-  b_distance_estimate?: number,
+  b_distance_estimate?: number
   /** Оценочная цена маршрута */
-  b_price_estimate?: number,
+  b_price_estimate?: number
   /** Валюта поездки */
-  b_currency: ECurrency,
+  b_currency: ECurrency
   /** Водители */
-  drivers?: IDriver[],
+  drivers?: IDriver[]
   /** Идентификаторы комментариев к поездкам(data.booking_comments) */
-  b_comments?: string[],
+  b_comments?: string[]
   /** Идентификаторы услуг при перевозке */
-  b_services: EServices[] | null,
+  b_services: EServices[] | null
   /** Идентификатор способа оплаты */
-  b_payment_way?: EPaymentWays,
+  b_payment_way?: EPaymentWays
   /** Идентификатор платежной карты */
-  b_payment_card?: string,
+  b_payment_card?: string
   /** Чаевые, указанные клиентом в процентах, число от 0 до 10 */
-  b_tips?: number,
+  b_tips?: number
   /** Оценка поездки */
-  b_rating: number,
+  b_rating: number
   /** Максимальная дата подтверждения */
-  b_confirmation_limit?: Moment,
+  b_confirmation_limit?: Moment
   /** Дата подтверждения */
-  b_confirmation_datetime?: Moment,
+  b_confirmation_datetime?: Moment
   /** Сумма оплаты клиентом за сервис сайта */
-  b_payment_sum?: number,
+  b_payment_sum?: number
   /** Дата оплаты */
-  b_payment_datetime?: Moment,
+  b_payment_datetime?: Moment
   /** Причина отмены поездки клиентом */
-  b_cancel_reason?: string,
+  b_cancel_reason?: string
   /** Пользователи с идентификаторами статусов отмены поездки */
   b_cancel_states?: {
     [key: string]: ECancelStates[]
-  },
+  }
   /** Дата отмены поездки */
-  b_canceled?: Moment,
+  b_canceled?: Moment
   /** Дата завершения поездки */
-  b_completed?: Moment,
+  b_completed?: Moment
   b_max_waiting_list?: {
     [key: string]: {
       /** Интервал времени в секундах */
@@ -281,15 +281,47 @@ export interface IOrder extends IBookingCoordinates, IBookingAddresses {
       /** Дата добавления */
       created: Moment
     }
-  },
+  }
   b_attempts?: Array<{
     /** Идентификатор водителя */
     u_id: string,
     /** Дата добавления */
     datetime: Moment
-  }>,
+  }>
   /** Является ли поездка голосованием */
-  b_voting?: boolean,
+  b_voting?: boolean
+  /** Дата предложения поездки клиентом поездки */
+  b_offer_datetime: Moment
+  /** Дата приема поездки на исполнение */
+  b_select_datetime: Moment
+}
+
+export interface ITrip {
+  t_id?: number
+  /** Идентификатор водителя */
+  u_id?: IUser['u_id']
+  t_start_address: string
+  t_start_latitude: number
+  t_start_longitude: number
+  t_destination_address: string
+  t_destination_latitude: number
+  t_destination_longitude: number
+  /** Максимальный возможный сдвиг начала рейса в секундах */
+  t_start_datetime_interval?: number
+  t_start_datetime: Moment
+  t_complete_datetime: Moment
+  t_start_real_datetime?: Moment
+  t_complete_real_datetime?: Moment
+  t_edit_datetime?: Moment
+  /** Идентификатор пользователя, изменившего рейс */
+  e_u_id?: IUser['u_id']
+  t_create_datetime?: Moment
+  /** Идентификатор пользователя, создавшего рейс */
+  c_u_id?: IUser['u_id']
+  t_looking_for_clients?: boolean
+  t_canceled?: boolean
+  t_options: {[key: string]: any}
+  orders: IOrder[]
 }
 
 export enum EOrderTypes {

@@ -799,8 +799,12 @@ const PassengerOrder: React.FC<IProps> = ({
 
         <LocationInput type={EPointType.From} isIntercity={isIntercity} />
 
-        {tab === TABS.WAGON.id &&
-          <DateTimeIntervalInput value={fromTimeInterval} onChange={setFromTimeInterval} />
+        {[TABS.WAGON.id, TABS.TRIP.id].includes(tab) &&
+          <DateTimeIntervalInput
+            value={fromTimeInterval}
+            onChange={setFromTimeInterval}
+            isSimple={tab === TABS.TRIP.id}
+          />
         }
 
         {[TABS.DELIVERY.id].includes(tab) && (
@@ -901,7 +905,7 @@ const PassengerOrder: React.FC<IProps> = ({
             </GroupedInputs>
           </>
         )}
-        {tab === TABS.MOVE.id && (
+        {[TABS.MOVE.id].includes(tab) && (
           <GroupedInputs>
             <Input
               inputProps={{
@@ -928,10 +932,17 @@ const PassengerOrder: React.FC<IProps> = ({
             <LocationInput type={EPointType.To} isIntercity={isIntercity} />
         }
 
+        {[TABS.WAGON.id, TABS.TRIP.id].includes(tab) && (
+          <DateTimeIntervalInput
+            value={tillTimeInterval}
+            onChange={setTillTimeInterval}
+            isSimple={tab === TABS.TRIP.id}
+          />
+        )}
+
         {
           tab === TABS.WAGON.id &&
           <>
-            <DateTimeIntervalInput value={tillTimeInterval} onChange={setTillTimeInterval} />
             <Input
               inputType={EInputTypes.Select}
               inputProps={{
@@ -1028,7 +1039,7 @@ const PassengerOrder: React.FC<IProps> = ({
           </>
         }
         {
-          SITE_CONSTANTS.ENABLE_CUSTOMER_PRICE && ![TABS.MOVE.id, TABS.WAGON.id].includes(tab) &&
+          SITE_CONSTANTS.ENABLE_CUSTOMER_PRICE && ![TABS.MOVE.id, TABS.WAGON.id, TABS.TRIP.id].includes(tab) &&
           <Input
             inputProps={{
               type: 'number',
@@ -1217,7 +1228,7 @@ const PassengerOrder: React.FC<IProps> = ({
           </>
         }
         {
-          ![TABS.DELIVERY.id, TABS.MOTORCYCLE.id, TABS.MOVE.id, TABS.WAGON.id].includes(tab) && <>
+          ![TABS.DELIVERY.id, TABS.MOTORCYCLE.id, TABS.MOVE.id, TABS.WAGON.id, TABS.TRIP.id].includes(tab) && <>
             <Separator text={t(TRANSLATION.AUTO_CLASS)} />
             <div className="taxi-cards">
               {
@@ -1275,7 +1286,7 @@ const PassengerOrder: React.FC<IProps> = ({
           // }}
           />
         </div>
-        {![TABS.DELIVERY.id, TABS.MOTORCYCLE.id, TABS.MOVE.id, TABS.WAGON.id].includes(tab) && <>
+        {![TABS.DELIVERY.id, TABS.MOTORCYCLE.id, TABS.MOVE.id, TABS.WAGON.id, TABS.TRIP.id].includes(tab) && <>
           <Separator text={t(TRANSLATION.ORDER_DETAILS)} />
           <div className="info-block">
             <div onClick={() => setPickTimeModal(true)}>
@@ -1322,17 +1333,19 @@ const PassengerOrder: React.FC<IProps> = ({
           />
         )}
 
-        <Input
-          inputProps={{
-            value: phone || '',
-          }}
-          fieldWrapperClassName="phone-input"
-          inputType={EInputTypes.MaskedPhone}
-          error={getPhoneError(phone)}
-          buttons={[{ src: images.checkMark }]}
-          defaultValue={user?.u_phone}
-          onChange={setPhone}
-        />
+        {![TABS.TRIP.id].includes(tab) && (
+          <Input
+            inputProps={{
+              value: phone || '',
+            }}
+            fieldWrapperClassName="phone-input"
+            inputType={EInputTypes.MaskedPhone}
+            error={getPhoneError(phone)}
+            buttons={[{ src: images.checkMark }]}
+            defaultValue={user?.u_phone}
+            onChange={setPhone}
+          />
+        )}
 
         <div className="order-vote">
           <Button

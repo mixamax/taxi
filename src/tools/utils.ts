@@ -1,4 +1,4 @@
-import { ECarClasses, EStatuses, IOrder, TAvailableModes, TMoneyModes, IDriver, ICar, IUser, IAddressPoint, TBlockObject } from '../types/types'
+import { ECarClasses, EStatuses, IOrder, TAvailableModes, TMoneyModes, IDriver, ICar, IUser, IAddressPoint, TBlockObject, ITrip } from '../types/types'
 import moment, { Moment } from 'moment'
 import SITE_CONSTANTS/**, { MAP_MODE } */ from '../siteConstants'
 import { t, TRANSLATION } from '../localization'
@@ -349,6 +349,35 @@ export const convertOrder = (order: any): IOrder => {
   )
 }
 
+export const convertTrip = (trip: any): ITrip => {
+  return convertTypes<any, ITrip>(
+    trip,
+    {
+      toFloatKeys: [
+        't_start_latitude',
+        't_start_longitude',
+        't_destination_latitude',
+        't_destination_longitude',
+      ],
+      toDateKeys: [
+        't_start_datetime',
+        't_complete_datetime',
+        't_start_real_datetime',
+        't_complete_real_datetime',
+        't_edit_datetime',
+        't_create_datetime',
+      ],
+      toBooleanKeys: [
+        't_looking_for_clients',
+        't_canceled',
+      ],
+      customKeys: {
+        orders: () => trip.orders?.map((item: any) => convertOrder(item)),
+      },
+    },
+  )
+}
+
 export const reverseConvertOrder = (order: IOrder): any => {
   return convertTypes<IOrder, any>(
     order,
@@ -376,6 +405,24 @@ export const reverseConvertOrder = (order: IOrder): any => {
       customKeys: {
         drivers: () => order.drivers?.map(item => reverseConvertDriver(item)),
       },
+    },
+  )
+}
+
+export const reverseConvertTrip = (order: ITrip): any => {
+  return convertTypes<ITrip, any>(
+    order,
+    {
+      toStringKeys: [
+        't_start_latitude',
+        't_start_longitude',
+        't_destination_latitude',
+        't_destination_longitude',
+      ],
+      toStringDateKeys: [
+        't_start_datetime',
+        't_complete_datetime',
+      ],
     },
   )
 }

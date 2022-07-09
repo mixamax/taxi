@@ -1,4 +1,4 @@
-import { EOrderTypes, ESuggestionType, IAddressPoint, ISuggestion, IRouteInfo } from './types/types'
+import { EOrderTypes, ESuggestionType, IAddressPoint, ISuggestion, IRouteInfo, ITrip } from './types/types'
 import { Stringify, ValueOf } from './types/index'
 import { apiMethod, IApiMethodArguments, IResponseFields, addToFormData } from './tools/api'
 import axios from 'axios'
@@ -16,7 +16,7 @@ import {
   IUser,
 } from './types/types'
 import Config from './config'
-import { convertCar, convertOrder, convertUser, getHints, reverseConvertOrder, reverseConvertUser } from './tools/utils'
+import { convertCar, convertOrder, convertTrip, convertUser, getHints, reverseConvertOrder, reverseConvertTrip, reverseConvertUser } from './tools/utils'
 import { t, TRANSLATION } from './localization'
 import { ERegistrationType } from './state/user/constants'
 import { userSelectors } from './state/user'
@@ -124,6 +124,21 @@ const _postDrive = (
 }
 export const postDrive = apiMethod<typeof _postDrive>(_postDrive)
 
+const _postTrip = (
+  { formData }: IApiMethodArguments,
+  data: ITrip,
+): Promise<IResponseFields & {
+  t_id: ITrip['t_id'],
+}> => {
+  addToFormData(formData, {
+    data: JSON.stringify(reverseConvertTrip(data)),
+  })
+
+  return axios.post(`${Config.API_URL}/trip`, formData)
+    .then(res => res.data)
+}
+export const postTrip = apiMethod<typeof _postTrip>(_postTrip)
+
 const _cancelDrive = (
   { formData }: IApiMethodArguments,
   id: IOrder['b_id'],
@@ -202,6 +217,28 @@ const _getOrders = (
     )
 }
 export const getOrders = apiMethod<typeof _getOrders>(_getOrders)
+
+const _getTrips = (
+  { formData }: IApiMethodArguments,
+  type: EOrderTypes = EOrderTypes.Active,
+): Promise<IOrder[]> => {
+  addToFormData(formData, {
+    array_type: 'list',
+  })
+
+  return axios.post(`${Config.API_URL}/trip`, formData)
+    .then(res => res.data)
+    .then(res =>
+      res.data.trip || [],
+    )
+    .then(res => res.map((item: any) => convertTrip(item)))
+    .then(res =>
+      res.sort(
+        (a: IOrder, b: IOrder) => a.b_start_datetime < b.b_start_datetime ? 1 : -1,
+      ),
+    )
+}
+export const getTrips = apiMethod<typeof _getTrips>(_getTrips)
 
 const _getOrder = (
   { formData }: IApiMethodArguments,

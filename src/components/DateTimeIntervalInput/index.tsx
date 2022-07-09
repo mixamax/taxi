@@ -10,9 +10,10 @@ import './styles.scss'
 interface IProps {
   value: IDateTime
   onChange: (newValue: IDateTime) => any
+  isSimple?: boolean
 }
 
-const DateTimeIntervalInput: React.FC<IProps> = ({ value, onChange }) => {
+const DateTimeIntervalInput: React.FC<IProps> = ({ value, onChange, isSimple }) => {
   const handleIsDateDisabledChange = () => {
     onChange({ ...value, dateDisabled: !value.dateDisabled })
   }
@@ -79,15 +80,19 @@ const DateTimeIntervalInput: React.FC<IProps> = ({ value, onChange }) => {
             onChange: handleDateChange(true),
             disabled: value.dateDisabled,
           }}
-          showDisablerCheckbox
+          showDisablerCheckbox={!isSimple}
           onDisableChange={handleIsDateDisabledChange}
           sideText={isDateInterval ? t(TRANSLATION.DATE_FROM, { toLower: true }) : undefined}
-          sideCheckbox={{
-            value: isDateInterval,
-            onClick: handleIsDateIntervalChange,
-            component: <img src={images.interval} alt={t(TRANSLATION.INTERVAL)}/>,
-          }}
-          compareVariant={isDateInterval ? undefined : value.dateComparator}
+          sideCheckbox={
+            isSimple ?
+              undefined :
+              {
+                value: isDateInterval,
+                onClick: handleIsDateIntervalChange,
+                component: <img src={images.interval} alt={t(TRANSLATION.INTERVAL)}/>,
+              }
+          }
+          compareVariant={isDateInterval || isSimple ? undefined : value.dateComparator}
           onChangeCompareVariant={handleDateComparatorChange}
           hideInput={value.dateDisabled}
         />
@@ -114,15 +119,19 @@ const DateTimeIntervalInput: React.FC<IProps> = ({ value, onChange }) => {
             onChange: handleTimeChange(true),
             disabled: value.timeDisabled,
           }}
-          showDisablerCheckbox
+          showDisablerCheckbox={!isSimple}
           onDisableChange={handleIsTimeDisabledChange}
           sideText={isTimeInterval ? t(TRANSLATION.DATE_FROM, { toLower: true }) : undefined}
-          sideCheckbox={{
-            value: isTimeInterval,
-            onClick: handleIsTimeIntervalChange,
-            component: <img src={images.interval} alt={t(TRANSLATION.INTERVAL)}/>,
-          }}
-          compareVariant={isTimeInterval ? undefined : value.timeComparator}
+          sideCheckbox={
+            isSimple ?
+              undefined :
+              {
+                value: isTimeInterval,
+                onClick: handleIsTimeIntervalChange,
+                component: <img src={images.interval} alt={t(TRANSLATION.INTERVAL)}/>,
+              }
+          }
+          compareVariant={isTimeInterval || isSimple ? undefined : value.timeComparator}
           onChangeCompareVariant={handleTimeComparatorChange}
           hideInput={value.timeDisabled}
         />
