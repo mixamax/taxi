@@ -63,7 +63,7 @@ const mapDispatchToProps = {
 
 const connector = connect(mapStateToProps, mapDispatchToProps)
 
-const host = 'jecat.1gb.ru'
+const host = 'chat.itest24.com'
 const port = 7007
 
 interface IProps extends ConnectedProps<typeof connector> {
