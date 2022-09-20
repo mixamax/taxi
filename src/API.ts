@@ -684,7 +684,7 @@ export const getPointSuggestions = async(targetString?: string, isIntercity?: bo
 }
 
 export const activateChatServer = () => {
-  return axios.get('http://jecat.1gb.ru/wschat/checksrv.php', {
+  return axios.get('https://chat.itest24.com/wschat/checksrv.php' {
     params: {
       s: 1,
     },
