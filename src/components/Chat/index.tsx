@@ -186,7 +186,7 @@ const Chat: React.FC<IProps> = ({
   [anotherUserID, order] = to.split('_')
 
   const handleSubmit = () => {
-    if (!socket) return console.error('Socket is not ready yet for send')
+    if (!socket) return console.error('Error: Socket is not ready yet for send')
 
     socket.send(JSON.stringify({
       from,
