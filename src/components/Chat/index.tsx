@@ -99,7 +99,7 @@ const Chat: React.FC<IProps> = ({
 
     let _socket = socket
     try {
-      _socket = new WebSocket(`ws://${host}:${port}`)
+      _socket = new WebSocket(`wss://${host}:${port}`)
       setSocket(_socket)
     } catch (error) {
       console.log(error)
