@@ -14,6 +14,8 @@ import {
 } from '../../../state/user'
 import { ERegistrationType, LOGIN_TABS_IDS } from '../../../state/user/constants'
 import { emailRegex, phoneRegex } from '../../../tools/utils'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from "yup"
 
 const mapStateToProps = (state: IRootState) => ({
   user: userSelectors.user(state),
@@ -56,6 +58,16 @@ const LoginForm: React.FC<IProps> = ({
 }) => {
   const [isPasswordShows, setIsPasswordShows] = useState(false)
 
+  const schema = yup.object({
+    type: yup.string().required(),
+    login: yup.string().required().when('type', {
+      is: (type: ERegistrationType) => type === ERegistrationType.Email,
+      then: yup.string().required().matches(emailRegex, t(TRANSLATION.EMAIL_ERROR)),
+      otherwise: yup.string().required().matches(phoneRegex, t(TRANSLATION.PHONE_PATTERN_ERROR)),
+    }),
+    password: yup.string().required(t(TRANSLATION.REQUIRED_FIELD)).min(4).trim(),
+  })
+
   const {
     register: formRegister,
     handleSubmit,
@@ -69,6 +81,7 @@ const LoginForm: React.FC<IProps> = ({
       login: user?.u_email || '',
       type: ERegistrationType.Email,
     },
+    resolver: yupResolver(schema),
   })
   const { login: formLogin, type } = useWatch<IFormValues>({ control })
 
@@ -96,18 +109,7 @@ const LoginForm: React.FC<IProps> = ({
   return <form className="sign-in-subform" onSubmit={handleSubmit(onSubmit)}>
     <Input
       inputProps={{
-        ...formRegister('login', {
-          required: !user ? t(TRANSLATION.REQUIRED_FIELD) : false,
-          pattern: type === ERegistrationType.Email ?
-            {
-              value: emailRegex,
-              message: t(TRANSLATION.EMAIL_ERROR),
-            } :
-            {
-              value: phoneRegex,
-              message: t(TRANSLATION.PHONE_PATTERN_ERROR),
-            },
-        }),
+        ...formRegister('login'),
         placeholder: type === ERegistrationType.Phone ? t(TRANSLATION.PHONE) : t(TRANSLATION.EMAIL),
       }}
       label={t(TRANSLATION.LOGIN)}

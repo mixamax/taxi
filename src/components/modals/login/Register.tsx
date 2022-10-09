@@ -15,6 +15,8 @@ import { connect, ConnectedProps } from 'react-redux'
 import cn from 'classnames'
 import { EUserRoles, EWorkTypes } from '../../../types/types'
 import { useLocation } from 'react-router-dom'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from "yup"
 
 const mapStateToProps = (state: IRootState) => {
   return {
@@ -52,18 +54,32 @@ interface IProps extends ConnectedProps<typeof connector> {
 }
 
 const RegisterForm: React.FC<IProps> = ({
-  user,
   status,
   tab,
   message,
-  isOpen,
   register,
-  setMessage,
-  setStatus,
 }) => {
   const [showRefCode, setShowRefCode] = useState(false)
   const [workType, setWorkType] = useState<EWorkTypes | null>(null)
   const location = useLocation()
+
+  const schema = yup.object({
+    type: yup.string().required(),
+    u_name: yup.string().required(t(TRANSLATION.REQUIRED_FIELD)).trim(),
+    u_email: yup.string().email(t(TRANSLATION.EMAIL_ERROR)).when('type', {
+      is: (type: ERegistrationType) => type === ERegistrationType.Email,
+      then: yup.string().required(t(TRANSLATION.REQUIRED_FIELD)).trim(),
+    }).trim(),
+    u_phone: yup.string().when('type', {
+      is: (type: ERegistrationType) => type === ERegistrationType.Phone,
+      then: yup.string().required(t(TRANSLATION.REQUIRED_FIELD)).trim(),
+    }),
+    street: yup.string().trim(),
+    city: yup.string().trim(),
+    state: yup.string().trim(),
+    zip: yup.string().min(5).trim(),
+    card: yup.string().min(16).max(16).trim(),
+  })
 
   const { register: formRegister, handleSubmit, formState: { errors, isValid }, control } = useForm<IFormValues>({
     criteriaMode: 'all',
@@ -72,6 +88,7 @@ const RegisterForm: React.FC<IProps> = ({
       type: ERegistrationType.Email,
       u_role: !location.pathname.includes('/driver-order') ? EUserRoles.Client : EUserRoles.Driver,
     },
+    resolver: yupResolver(schema),
   })
 
   const { type, u_phone, u_role } = useWatch<IFormValues>({ control })
@@ -125,12 +142,7 @@ const RegisterForm: React.FC<IProps> = ({
             />
             <Input
               inputProps={{
-                ...formRegister(
-                  'u_phone',
-                  {
-                    required: type === ERegistrationType.Phone ? t(TRANSLATION.REQUIRED_FIELD) : false,
-                  },
-                ),
+                ...formRegister('u_phone'),
               }}
               label={t(TRANSLATION.PHONE)}
               inputType={EInputTypes.MaskedPhone}
@@ -139,14 +151,7 @@ const RegisterForm: React.FC<IProps> = ({
             <Input
               inputProps={{
                 ...formRegister(
-                  'u_email',
-                  {
-                    required: type === ERegistrationType.Email ? t(TRANSLATION.REQUIRED_FIELD) : false,
-                    pattern: {
-                      value: emailRegex,
-                      message: t(TRANSLATION.EMAIL_ERROR),
-                    },
-                  },
+                  'u_email'
                 ),
               }}
               label={t(TRANSLATION.EMAIL)}
