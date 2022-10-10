@@ -29,6 +29,7 @@ import { IRootState } from './state'
 import * as API from './API'
 import { modalsSelectors } from './state/modals'
 import Chat from './components/Chat'
+import { Toaster } from 'react-hot-toast'
 
 const mapStateToProps = (state: IRootState) => ({
   language: configSelectors.language(state),
@@ -58,7 +59,9 @@ const App: React.FC<IProps> = ({
   initUser,
 }) => {
   if ((window as any).ReactNativeWebView) {
-    (window as any).ReactNativeWebView.postMessage(JSON.stringify({ type: 'SYSTEM', message: 'START' }))
+    (window as any).ReactNativeWebView.postMessage(
+      JSON.stringify({ type: 'SYSTEM', message: 'START' }),
+    )
   }
 
   useEffect(() => {
@@ -76,12 +79,18 @@ const App: React.FC<IProps> = ({
       }
     }
 
-    if (!!_config) { _params.delete('config') }
-    if (!!_clearConfig) { _params.delete('clearConfig') }
+    if (!!_config) {
+      _params.delete('config')
+    }
+    if (!!_clearConfig) {
+      _params.delete('clearConfig')
+    }
 
     if (_config || _clearConfig) {
       const _path = window.location.origin + window.location.pathname
-      let _newUrl = _params.toString() ? _path + '?' + _params.toString() : _path
+      let _newUrl = _params.toString() ?
+        _path + '?' + _params.toString() :
+        _path
       window.history.replaceState({}, document.title, _newUrl)
     } else {
       let _savedConfig = Config.SavedConfig
@@ -103,9 +112,21 @@ const App: React.FC<IProps> = ({
     let _tags = [],
       _domain = `${window.location.protocol}//${window.location.host}/`
 
-    _tags.push(SITE_CONSTANTS.OG_IMAGE && <meta property="og:image" content={_domain + SITE_CONSTANTS.OG_IMAGE} />)
-    _tags.push(SITE_CONSTANTS.TW_IMAGE && <meta property="twitter:image" content={_domain + SITE_CONSTANTS.TW_IMAGE} />)
-    _tags.push(<style>{`
+    _tags.push(
+      SITE_CONSTANTS.OG_IMAGE && (
+        <meta property="og:image" content={_domain + SITE_CONSTANTS.OG_IMAGE}/>
+      ),
+    )
+    _tags.push(
+      SITE_CONSTANTS.TW_IMAGE && (
+        <meta
+          property="twitter:image"
+          content={_domain + SITE_CONSTANTS.TW_IMAGE}
+        />
+      ),
+    )
+    _tags.push(
+      <style>{`
     .colored { 
       color: ${SITE_CONSTANTS.PALETTE.primary.dark}
     }
@@ -130,40 +151,43 @@ const App: React.FC<IProps> = ({
     .phone-link:hover {
       border-bottom-color: ${SITE_CONSTANTS.PALETTE.primary.dark};
     }
-    `}</style>)
+    `}</style>,
+    )
 
-    _tags = _tags.filter(item => !!item)
-    return (_tags.length > 0) ?
-      <MetaTags>
-        {_tags}
-      </MetaTags> :
-      null
+    _tags = _tags.filter((item) => !!item)
+    return _tags.length > 0 ? <MetaTags>{_tags}</MetaTags> : null
   }
 
-  return <React.Fragment key={`${language.id}_${configStatus}`}>
-    {getMetaTags()}
-    <AppRoutes />
-    {/* <PositionTracker/> */}
-    <VoteModal />
-    <TimerModal />
-    <CommentsModal />
-    <DriverModal />
-    <OnTheWayModal />
-    <CancelOrderModal />
-    <RatingModal />
-    <TieCardModal />
-    <CardDetailsModal />
-    <PlaceModal />
-    <AlarmModal />
-    <TakePassengerModal />
-    <CancelDriverOrderModal />
-    <MapModal />
-    <LoginModal />
-    <MessageModal />
-    <CandidatesModal />
-    {user && <ProfileModal />}
-    {activeChat && <Chat key={activeChat} />}
-  </React.Fragment>
+  return (
+    <React.Fragment key={`${language.id}_${configStatus}`}>
+      {getMetaTags()}
+      <AppRoutes/>
+      {/* <PositionTracker/> */}
+      <VoteModal/>
+      <TimerModal/>
+      <CommentsModal/>
+      <DriverModal/>
+      <OnTheWayModal/>
+      <CancelOrderModal/>
+      <RatingModal/>
+      <TieCardModal/>
+      <CardDetailsModal/>
+      <PlaceModal/>
+      <AlarmModal/>
+      <TakePassengerModal/>
+      <CancelDriverOrderModal/>
+      <MapModal/>
+      <LoginModal/>
+      <Toaster
+        position="bottom-center"
+        reverseOrder={false}
+      />
+      <MessageModal/>
+      <CandidatesModal/>
+      {user && <ProfileModal/>}
+      {activeChat && <Chat key={activeChat}/>}
+    </React.Fragment>
+  )
 }
 
 export default connector(App)
