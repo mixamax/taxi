@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import Input from '../../Input'
 import { t, TRANSLATION } from '../../../localization'
 import Checkbox from '../../Checkbox'
@@ -8,14 +8,14 @@ import { connect, ConnectedProps } from 'react-redux'
 import images from '../../../constants/images'
 import { IRootState } from '../../../state'
 import { EStatuses } from '../../../types/types'
-import {
-  userSelectors,
-  userActionCreators,
-} from '../../../state/user'
+import { userActionCreators, userSelectors } from '../../../state/user'
 import { ERegistrationType, LOGIN_TABS_IDS } from '../../../state/user/constants'
 import { emailRegex, phoneRegex } from '../../../tools/utils'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
+import Alert from '../../Alert/Alert'
+import { Intent } from '../../Alert'
+import { useVisibility } from '../../../hooks/useVisibility'
 
 const mapStateToProps = (state: IRootState) => ({
   user: userSelectors.user(state),
@@ -35,13 +35,13 @@ const mapDispatchToProps = {
 const connector = connect(mapStateToProps, mapDispatchToProps)
 
 interface IFormValues {
-  login: string,
-  password: string,
-  type: ERegistrationType
+    login: string,
+    password: string,
+    type: ERegistrationType
 }
 
 interface IProps extends ConnectedProps<typeof connector> {
-  isOpen: boolean,
+    isOpen: boolean,
 }
 
 const LoginForm: React.FC<IProps> = ({
@@ -57,6 +57,7 @@ const LoginForm: React.FC<IProps> = ({
   setStatus,
 }) => {
   const [isPasswordShows, setIsPasswordShows] = useState(false)
+  const [isVisible, toggleVisibility] = useVisibility(false)
 
   const schema = yup.object({
     type: yup.string().required(),
@@ -95,6 +96,12 @@ const LoginForm: React.FC<IProps> = ({
   useEffect(() => {
     isDirty && trigger()
   }, [type])
+
+  useEffect(() => {
+    if (status === EStatuses.Fail || status === EStatuses.Success) {
+      toggleVisibility()
+    }
+  }, [status])
 
   if (tab !== LOGIN_TABS_IDS[0]) return null
 
@@ -158,6 +165,17 @@ const LoginForm: React.FC<IProps> = ({
       value={ERegistrationType.Email}
       id="email"
     />
+
+    {
+      isVisible &&
+            <div className="alert-container">
+              <Alert
+                intent={status === EStatuses.Fail ? Intent.ERROR : Intent.SUCCESS}
+                message={status === EStatuses.Fail ? t(TRANSLATION.LOGIN_FAIL) : t(TRANSLATION.LOGIN_SUCCESS)}
+                onClose={toggleVisibility}
+              />
+            </div>
+    }
 
     <Button
       type="submit"

@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Input, { EInputTypes } from '../../Input'
 import { t, TRANSLATION } from '../../../localization'
 import Checkbox from '../../Checkbox'
-import { emailRegex, getPhoneError } from '../../../tools/utils'
+import { getPhoneError } from '../../../tools/utils'
 import { useForm, useWatch } from 'react-hook-form'
 import Button from '../../Button'
 import { IRootState } from '../../../state'
@@ -13,10 +13,13 @@ import {
 import { ERegistrationType, LOGIN_TABS_IDS } from '../../../state/user/constants'
 import { connect, ConnectedProps } from 'react-redux'
 import cn from 'classnames'
-import { EUserRoles, EWorkTypes } from '../../../types/types'
+import { EStatuses, EUserRoles, EWorkTypes } from '../../../types/types'
 import { useLocation } from 'react-router-dom'
 import { yupResolver } from '@hookform/resolvers/yup'
-import * as yup from "yup"
+import * as yup from 'yup'
+import Alert from '../../Alert/Alert'
+import { Intent } from '../../Alert'
+import { useVisibility } from '../../../hooks/useVisibility'
 
 const mapStateToProps = (state: IRootState) => {
   return {
@@ -62,6 +65,7 @@ const RegisterForm: React.FC<IProps> = ({
   const [showRefCode, setShowRefCode] = useState(false)
   const [workType, setWorkType] = useState<EWorkTypes | null>(null)
   const location = useLocation()
+  const [isVisible, toggleVisibility] = useVisibility(false)
 
   const schema = yup.object({
     type: yup.string().required(),
@@ -92,6 +96,12 @@ const RegisterForm: React.FC<IProps> = ({
   })
 
   const { type, u_phone, u_role } = useWatch<IFormValues>({ control })
+
+  useEffect(() => {
+    if (status === EStatuses.Fail || status === EStatuses.Success) {
+      toggleVisibility()
+    }
+  }, [status])
 
   if (tab !== LOGIN_TABS_IDS[1]) return null
 
@@ -151,7 +161,7 @@ const RegisterForm: React.FC<IProps> = ({
             <Input
               inputProps={{
                 ...formRegister(
-                  'u_email'
+                  'u_email',
                 ),
               }}
               label={t(TRANSLATION.EMAIL)}
@@ -243,13 +253,23 @@ const RegisterForm: React.FC<IProps> = ({
               fieldWrapperClassName={cn('ref-code__input', { 'ref-code__input--active': showRefCode })}
             />
 
+            {
+              isVisible &&
+                <div className="alert-container">
+                  <Alert
+                    intent={status === EStatuses.Fail ? Intent.ERROR : Intent.SUCCESS}
+                    message={status === EStatuses.Fail ? t(TRANSLATION.REGISTER_FAIL) : t(TRANSLATION.REGISTER_SUCCESS)}
+                    onClose={toggleVisibility}
+                  />
+                </div>
+            }
+
             <Button
               type="submit"
               text={t(TRANSLATION.SIGNUP)}
               className="login-modal_login-btn"
               skipHandler={true}
               disabled={!isValid}
-              label={message && t(message)}
               status={status}
             />
           </>
