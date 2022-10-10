@@ -16,7 +16,6 @@ import { ERegistrationType, LOGIN_TABS_IDS } from '../../../state/user/constants
 import { emailRegex, phoneRegex } from '../../../tools/utils'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import toast from 'react-hot-toast'
 
 const mapStateToProps = (state: IRootState) => ({
   user: userSelectors.user(state),
@@ -97,15 +96,6 @@ const LoginForm: React.FC<IProps> = ({
     isDirty && trigger()
   }, [type])
 
-  useEffect(() => {
-    if (status === EStatuses.Fail) {
-      toast.error('Упс, что то пошло не так')
-    } else if (status === EStatuses.Success) {
-      toast.success('Успешно регистрирован, письмо отправлено на почту', {
-        position: 'top-center',
-      })
-    }
-  }, [status])
   if (tab !== LOGIN_TABS_IDS[0]) return null
 
   const onSubmit = (data: IFormValues) => {
