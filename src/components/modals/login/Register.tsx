@@ -265,7 +265,7 @@ const RegisterForm: React.FC<IProps> = ({ status, tab, register }) => {
             />
           )}
 
-          {Number(u_role) === EUserRoles.Driver && (
+          {Number(u_role) === EUserRoles.Client && (
             <>
               <Checkbox
                 type="checkbox"
