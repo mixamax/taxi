@@ -504,4 +504,5 @@ export default {
   ZIP_CODE: 'zip_code',
   AND: 'and_p',
   OR: 'or_p',
+  ROLE: 'role',
 } as const
