@@ -152,18 +152,18 @@ const RegisterForm: React.FC<IProps> = ({ status, tab, register }) => {
           </>
         ) :
         (<>
-          <Input
-            inputProps={{
-              ...formRegister('u_role'),
-              disabled: false,
-            }}
-            label={t(TRANSLATION.ROLE)}
-            inputType={EInputTypes.Select}
-            options={[
-              { label: t(TRANSLATION.CLIENT), value: EUserRoles.Client },
-              { label: t(TRANSLATION.DRIVER), value: EUserRoles.Driver },
-            ]}
-          />
+          {/*   <Input
+             inputProps={{
+               ...formRegister('u_role'),
+               disabled: false,
+             }}
+             label={t(TRANSLATION.ROLE)}
+             inputType={EInputTypes.Select}
+             options={[
+               { label: t(TRANSLATION.CLIENT), value: EUserRoles.Client },
+               { label: t(TRANSLATION.DRIVER), value: EUserRoles.Driver },
+             ]}
+           /> */}
 
           <Input
             inputProps={{
@@ -265,27 +265,23 @@ const RegisterForm: React.FC<IProps> = ({ status, tab, register }) => {
             />
           )}
 
-          {Number(u_role) === EUserRoles.Client && (
-            <>
-              <Checkbox
-                type="checkbox"
-                name="ref_code_toggle"
-                label={t(TRANSLATION.PROMO_CODE)}
-                value={showRefCode ? 'checked' : ''}
-                onChange={(e) => setShowRefCode(e.target.checked)}
-                wrapperAdditionalClassName="ref-code__toggler"
-              />
+          <Checkbox
+            type="checkbox"
+            name="ref_code_toggle"
+            label={t(TRANSLATION.PROMO_CODE)}
+            value={showRefCode ? 'checked' : ''}
+            onChange={(e) => setShowRefCode(e.target.checked)}
+            wrapperAdditionalClassName="ref-code__toggler"
+          />
 
-              <Input
-                inputProps={{
-                  ...formRegister('ref_code'),
-                }}
-                fieldWrapperClassName={cn('ref-code__input', {
-                  'ref-code__input--active': showRefCode,
-                })}
-              />
-            </>
-          )}
+          <Input
+            inputProps={{
+              ...formRegister('ref_code'),
+            }}
+            fieldWrapperClassName={cn('ref-code__input', {
+              'ref-code__input--active': showRefCode,
+            })}
+          />
 
           {isVisible && (
             <div className="alert-container">
