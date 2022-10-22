@@ -15,7 +15,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import Alert from '../../Alert/Alert'
 import { Intent } from '../../Alert'
-import { useVisibility } from '../../../hooks/useVisibility'
+import { useVisibility } from '../../../tools/hooks'
 import { IResolveParams, LoginSocialGoogle } from 'reactjs-social-login'
 import { GoogleLoginButton } from 'react-social-login-buttons'
 

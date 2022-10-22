@@ -19,7 +19,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import Alert from '../../Alert/Alert'
 import { Intent } from '../../Alert'
-import { useVisibility } from '../../../hooks/useVisibility'
+import { useVisibility } from '../../../tools/hooks'
 
 const mapStateToProps = (state: IRootState) => {
   return {

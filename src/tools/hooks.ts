@@ -153,3 +153,11 @@ export const useInterval = (callback: Function, delay: number, immediately?: boo
 export const useQuery = () => {
   return Object.fromEntries(new URLSearchParams(useLocation().search).entries())
 }
+
+export const useVisibility = (defaultValue: boolean = false): [boolean, () => void] => {
+  const [visible, setVisible] = React.useState(defaultValue)
+
+  const toggleVisibility = () => setVisible(!visible)
+
+  return [visible, toggleVisibility]
+}
