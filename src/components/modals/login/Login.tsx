@@ -16,6 +16,8 @@ import * as yup from 'yup'
 import Alert from '../../Alert/Alert'
 import { Intent } from '../../Alert'
 import { useVisibility } from '../../../hooks/useVisibility'
+import { IResolveParams, LoginSocialGoogle } from 'reactjs-social-login'
+import { GoogleLoginButton } from 'react-social-login-buttons'
 
 const mapStateToProps = (state: IRootState) => ({
   user: userSelectors.user(state),
@@ -30,6 +32,7 @@ const mapDispatchToProps = {
   remindPassword: userActionCreators.remindPassword,
   setStatus: userActionCreators.setStatus,
   setMessage: userActionCreators.setMessage,
+  register: userActionCreators.register,
 }
 
 const connector = connect(mapStateToProps, mapDispatchToProps)
@@ -50,6 +53,7 @@ const LoginForm: React.FC<IProps> = ({
   tab,
   message,
   isOpen,
+  register,
   login,
   logout,
   remindPassword,
@@ -176,6 +180,27 @@ const LoginForm: React.FC<IProps> = ({
               />
             </div>
     }
+
+    <LoginSocialGoogle
+      client_id={'936989532884-lfsquh1dkbstfoo56igklk5fds9rnv5q.apps.googleusercontent.com'}
+      onLoginStart={() => {}}
+      redirect_uri={''}
+      scope="openid profile email"
+      discoveryDocs="claims_supported"
+      access_type="offline"
+      onResolve={({ provider, data }: IResolveParams) => {
+        const obj = {
+          u_name: data?.name,
+          u_email: data?.email,
+          type: ERegistrationType.Email,
+        }
+      }}
+      onReject={err => {
+        console.log(err)
+      }}
+    >
+      <GoogleLoginButton />
+    </LoginSocialGoogle>
 
     <Button
       type="submit"
