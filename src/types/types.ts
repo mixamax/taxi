@@ -654,3 +654,8 @@ export interface IElevatorState {
 }
 
 export type TBlockObject = {[key: string]: any}
+
+export interface IRegisterResponse {
+  u_id: number,
+  string: string
+}

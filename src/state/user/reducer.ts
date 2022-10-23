@@ -10,6 +10,7 @@ export const record = Record<IUserState>({
   status: EStatuses.Default,
   message: '',
   tab: LOGIN_TABS_IDS[0],
+  response: null,
 })
 
 export default function reducer(state = new record(), action: TAction) {
@@ -57,6 +58,7 @@ export default function reducer(state = new record(), action: TAction) {
       return state
         .set('status', EStatuses.Success)
         .set('message', TRANSLATION.REGISTER_SUCCESS)
+        .set('response', payload)
     case ActionTypes.REGISTER_FAIL:
       return state
         .set('status', EStatuses.Fail)

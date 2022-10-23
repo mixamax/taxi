@@ -20,6 +20,8 @@ import * as yup from 'yup'
 import Alert from '../../Alert/Alert'
 import { Intent } from '../../Alert'
 import { useVisibility } from '../../../tools/hooks'
+import axios from 'axios'
+import { WHATSAPP_BOT_KEY, WHATSAPP_BOT_URL } from '../../../config'
 
 const mapStateToProps = (state: IRootState) => {
   return {
@@ -27,6 +29,7 @@ const mapStateToProps = (state: IRootState) => {
     status: userSelectors.status(state),
     tab: userSelectors.tab(state),
     message: userSelectors.message(state),
+    response: userSelectors.registerResponse(state),
   }
 }
 
@@ -56,11 +59,20 @@ interface IProps extends ConnectedProps<typeof connector> {
   isOpen: boolean;
 }
 
-const RegisterForm: React.FC<IProps> = ({ status, tab, register }) => {
+const RegisterForm: React.FC<IProps> = ({
+  status,
+  tab,
+  register,
+  response,
+}) => {
   const [showRefCode, setShowRefCode] = useState(false)
   const [workType, setWorkType] = useState<EWorkTypes | null>(null)
   const location = useLocation()
-  const [isVisible, toggleVisibility] = useVisibility(false)
+  const [isRegistrationAlertVisible, toggleRegistrationAlertVisibility] =
+    useVisibility(false)
+  const [isWhatsappAlertVisible, toggleWhatsappAlertVisibility] =
+    useVisibility(false)
+  const [shouldSendToWhatsapp, setShouldSendToWhatsapp] = useState(false)
 
   const schema = yup.object({
     type: yup.string().required(),
@@ -103,9 +115,36 @@ const RegisterForm: React.FC<IProps> = ({ status, tab, register }) => {
 
   const { type, u_phone, u_role } = useWatch<IFormValues>({ control })
 
+  let whatsappResponseMessage = ''
+
   useEffect(() => {
     if (status === EStatuses.Fail || status === EStatuses.Success) {
-      toggleVisibility()
+      toggleRegistrationAlertVisibility()
+    }
+
+    if (status === EStatuses.Success && type === ERegistrationType.Phone && shouldSendToWhatsapp) {
+      if (response) {
+        axios.post(WHATSAPP_BOT_URL,
+          {
+            phone: u_phone,
+            code: response.string,
+          },
+          {
+            headers: {
+              'x-api-key': WHATSAPP_BOT_KEY,
+            },
+          },
+        ).then((response) => {
+          console.log(response)
+          whatsappResponseMessage = response.data
+        }).catch((err) => {
+          console.log(err)
+          whatsappResponseMessage = err
+        }).finally(() => {
+          toggleRegistrationAlertVisibility()
+          toggleWhatsappAlertVisibility()
+        })
+      }
     }
   }, [status])
 
@@ -151,8 +190,9 @@ const RegisterForm: React.FC<IProps> = ({ status, tab, register }) => {
             </button>
           </>
         ) :
-        (<>
-          {/*   <Input
+        (
+          <>
+            {/*   <Input
              inputProps={{
                ...formRegister('u_role'),
                disabled: false,
@@ -165,149 +205,174 @@ const RegisterForm: React.FC<IProps> = ({ status, tab, register }) => {
              ]}
            /> */}
 
-          <Input
-            inputProps={{
-              ...formRegister('u_name', {
-                required: t(TRANSLATION.REQUIRED_FIELD),
-              }),
-            }}
-            label={t(
-              workType === EWorkTypes.Company ?
-                TRANSLATION.COMPANY_NAME :
-                TRANSLATION.NAME,
-            )}
-            error={errors.u_name?.message}
-          />
-          <Input
-            inputProps={{
-              ...formRegister('u_phone'),
-            }}
-            label={t(TRANSLATION.PHONE)}
-            inputType={EInputTypes.MaskedPhone}
-            error={getPhoneError(u_phone, type === ERegistrationType.Phone)}
-          />
-          <Input
-            inputProps={{
-              ...formRegister('u_email'),
-            }}
-            label={t(TRANSLATION.EMAIL)}
-            error={errors.u_email?.message}
-          />
-          <Checkbox
-            {...formRegister('type')}
-            type="radio"
-            label={t(TRANSLATION.PHONE)}
-            value={ERegistrationType.Phone}
-            id="phone"
-          />
-          <Checkbox
-            {...formRegister('type')}
-            type="radio"
-            label={t(TRANSLATION.EMAIL)}
-            value={ERegistrationType.Email}
-            id="email"
-          />
-
-          {Number(u_role) === EUserRoles.Driver && (
             <Input
               inputProps={{
-                ...formRegister('street'),
-              }}
-              label={t(TRANSLATION.STREET_ADDRESS)}
-              error={errors.street?.message}
-              fieldWrapperClassName="street"
-            />
-          )}
-
-          {Number(u_role) === EUserRoles.Driver && (
-            <Input
-              inputProps={{
-                ...formRegister('city'),
-              }}
-              label={t(TRANSLATION.CITY)}
-              error={errors.city?.message}
-            />
-          )}
-
-          {Number(u_role) === EUserRoles.Driver && (
-            <Input
-              inputProps={{
-                ...formRegister('state'),
-              }}
-              label={t(TRANSLATION.STATE)}
-              error={errors.state?.message}
-            />
-          )}
-
-          {Number(u_role) === EUserRoles.Driver && (
-            <Input
-              inputProps={{
-                ...formRegister('zip'),
-              }}
-              label={t(TRANSLATION.ZIP_CODE)}
-              error={errors.zip?.message}
-            />
-          )}
-
-          {Number(u_role) === EUserRoles.Driver && (
-            <Input
-              inputProps={{
-                ...formRegister('card', {
-                  pattern: {
-                    value: /^\d{16}$/,
-                    message: t(TRANSLATION.CARD_NUMBER_PATTERN_ERROR),
-                  },
+                ...formRegister('u_name', {
+                  required: t(TRANSLATION.REQUIRED_FIELD),
                 }),
-                placeholder: 'ХХХХ-ХХХХ-ХХХХ-ХХХХ',
               }}
-              label={t(TRANSLATION.CARD_NUMBER)}
-              error={errors.card?.message}
+              label={t(
+                workType === EWorkTypes.Company ?
+                  TRANSLATION.COMPANY_NAME :
+                  TRANSLATION.NAME,
+              )}
+              error={errors.u_name?.message}
             />
-          )}
+            <Input
+              inputProps={{
+                ...formRegister('u_phone'),
+              }}
+              label={t(TRANSLATION.PHONE)}
+              inputType={EInputTypes.Default}
+              error={getPhoneError(u_phone, type === ERegistrationType.Phone)}
+            />
 
-          <Checkbox
-            type="checkbox"
-            name="ref_code_toggle"
-            label={t(TRANSLATION.PROMO_CODE)}
-            value={showRefCode ? 'checked' : ''}
-            onChange={(e) => setShowRefCode(e.target.checked)}
-            wrapperAdditionalClassName="ref-code__toggler"
-          />
-
-          <Input
-            inputProps={{
-              ...formRegister('ref_code'),
-            }}
-            fieldWrapperClassName={cn('ref-code__input', {
-              'ref-code__input--active': showRefCode,
-            })}
-          />
-
-          {isVisible && (
-            <div className="alert-container">
-              <Alert
-                intent={
-                  status === EStatuses.Fail ? Intent.ERROR : Intent.SUCCESS
-                }
-                message={
-                  status === EStatuses.Fail ?
-                    t(TRANSLATION.REGISTER_FAIL) :
-                    t(TRANSLATION.REGISTER_SUCCESS)
-                }
-                onClose={toggleVisibility}
+            {type === ERegistrationType.Phone && (
+              <Checkbox
+                type="checkbox"
+                label={'Send to Whatsapp'}
+                id="shouldSendToWhatsapp"
+                disabled={type !== ERegistrationType.Phone}
+                wrapperAdditionalClassName="send_to_whatsapp_checkbox"
+                value={shouldSendToWhatsapp ? 'checked' : ''}
+                onChange={(e) => {
+                  setShouldSendToWhatsapp(e.target.checked)
+                }}
               />
-            </div>
-          )}
+            )}
 
-          <Button
-            type="submit"
-            text={t(TRANSLATION.SIGNUP)}
-            className="login-modal_login-btn"
-            skipHandler={true}
-            disabled={!isValid}
-            status={status}
-          />
-        </>
+            <Input
+              inputProps={{
+                ...formRegister('u_email'),
+              }}
+              label={t(TRANSLATION.EMAIL)}
+              error={errors.u_email?.message}
+            />
+            <Checkbox
+              {...formRegister('type')}
+              type="radio"
+              label={t(TRANSLATION.PHONE)}
+              value={ERegistrationType.Phone}
+              id="phone"
+            />
+            <Checkbox
+              {...formRegister('type')}
+              type="radio"
+              label={t(TRANSLATION.EMAIL)}
+              value={ERegistrationType.Email}
+              id="email"
+            />
+
+            {Number(u_role) === EUserRoles.Driver && (
+              <Input
+                inputProps={{
+                  ...formRegister('street'),
+                }}
+                label={t(TRANSLATION.STREET_ADDRESS)}
+                error={errors.street?.message}
+                fieldWrapperClassName="street"
+              />
+            )}
+
+            {Number(u_role) === EUserRoles.Driver && (
+              <Input
+                inputProps={{
+                  ...formRegister('city'),
+                }}
+                label={t(TRANSLATION.CITY)}
+                error={errors.city?.message}
+              />
+            )}
+
+            {Number(u_role) === EUserRoles.Driver && (
+              <Input
+                inputProps={{
+                  ...formRegister('state'),
+                }}
+                label={t(TRANSLATION.STATE)}
+                error={errors.state?.message}
+              />
+            )}
+
+            {Number(u_role) === EUserRoles.Driver && (
+              <Input
+                inputProps={{
+                  ...formRegister('zip'),
+                }}
+                label={t(TRANSLATION.ZIP_CODE)}
+                error={errors.zip?.message}
+              />
+            )}
+
+            {Number(u_role) === EUserRoles.Driver && (
+              <Input
+                inputProps={{
+                  ...formRegister('card', {
+                    pattern: {
+                      value: /^\d{16}$/,
+                      message: t(TRANSLATION.CARD_NUMBER_PATTERN_ERROR),
+                    },
+                  }),
+                  placeholder: 'ХХХХ-ХХХХ-ХХХХ-ХХХХ',
+                }}
+                label={t(TRANSLATION.CARD_NUMBER)}
+                error={errors.card?.message}
+              />
+            )}
+
+            <Checkbox
+              type="checkbox"
+              name="ref_code_toggle"
+              label={t(TRANSLATION.PROMO_CODE)}
+              value={showRefCode ? 'checked' : ''}
+              onChange={(e) => setShowRefCode(e.target.checked)}
+              wrapperAdditionalClassName="ref-code__toggler"
+            />
+
+            <Input
+              inputProps={{
+                ...formRegister('ref_code'),
+              }}
+              fieldWrapperClassName={cn('ref-code__input', {
+                'ref-code__input--active': showRefCode,
+              })}
+            />
+
+            {isRegistrationAlertVisible && (
+              <div className="alert-container">
+                <Alert
+                  intent={
+                    status === EStatuses.Fail ? Intent.ERROR : Intent.SUCCESS
+                  }
+                  message={
+                    status === EStatuses.Fail ?
+                      t(TRANSLATION.REGISTER_FAIL) :
+                      t(TRANSLATION.REGISTER_SUCCESS)
+                  }
+                  onClose={toggleRegistrationAlertVisibility}
+                />
+              </div>
+            )}
+
+            {isWhatsappAlertVisible && (
+              <div className="alert-container">
+                <Alert
+                  intent={Intent.INFO}
+                  message={whatsappResponseMessage}
+                  onClose={toggleWhatsappAlertVisibility}
+                />
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              text={t(TRANSLATION.SIGNUP)}
+              className="login-modal_login-btn"
+              skipHandler={true}
+              disabled={!isValid}
+              status={status}
+            />
+          </>
         )}
     </form>
   )

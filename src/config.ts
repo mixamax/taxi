@@ -5,6 +5,9 @@ export const appName = 'taxi-web'
 
 export const API_URL = 'https://ibronevik.ru/taxi/api/v1'
 
+export const WHATSAPP_BOT_URL = 'http://89.223.68.250:3000/send-message'
+export const WHATSAPP_BOT_KEY = 'test1234'
+
 let _configName: string
 
 export default class Config {
