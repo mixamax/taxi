@@ -20,6 +20,7 @@ import * as yup from 'yup'
 import Alert from '../../Alert/Alert'
 import { Intent } from '../../Alert'
 import { useVisibility } from '../../../tools/hooks'
+import { ISelectOption } from '../../../types'
 
 const mapStateToProps = (state: IRootState) => {
   return {
@@ -50,6 +51,12 @@ interface IFormValues {
   state?: string;
   zip?: string;
   card?: string;
+  car_name: string
+  car_model: string | null
+  seats: string
+  car_number: string
+  car_color: string
+  car_classes: string
 }
 
 interface IProps extends ConnectedProps<typeof connector> {
@@ -61,6 +68,12 @@ const RegisterForm: React.FC<IProps> = ({ status, tab, register }) => {
   const [workType, setWorkType] = useState<EWorkTypes | null>(null)
   const location = useLocation()
   const [isVisible, toggleVisibility] = useVisibility(false)
+
+  const [data, setData] = useState<{
+    car_models: any
+    car_colors: any
+    car_classes: any
+  } | null>(null)
 
   const schema = yup.object({
     type: yup.string().required(),
@@ -109,6 +122,18 @@ const RegisterForm: React.FC<IProps> = ({ status, tab, register }) => {
     }
   }, [status])
 
+  useEffect(() => {
+    let newData = (window as any).data
+
+    if (newData && (data === null || data === undefined)) {
+      setData({
+        car_models: newData.car_models,
+        car_colors: newData.car_colors,
+        car_classes: newData.car_classes,
+      })
+    }
+  }, [])
+
   if (tab !== LOGIN_TABS_IDS[1]) return null
 
   const onSubmit = (data: IFormValues) => {
@@ -127,6 +152,44 @@ const RegisterForm: React.FC<IProps> = ({ status, tab, register }) => {
         card: data.card,
       },
     })
+  }
+
+  const prepareOptions = (data: any, key: string) => {
+    let options: ISelectOption[] = []
+
+    if (!data) {
+      return options
+    }
+
+    Object.keys(data).forEach((datum: any) => {
+      options.push({
+        value: datum,
+        label: t(key[datum]),
+      })
+    })
+
+    return options
+  }
+
+  const seatsOptions = () => {
+    return [
+      {
+        label: '1',
+        value: 1,
+      },
+      {
+        label: '2',
+        value: 2,
+      },
+      {
+        label: '3',
+        value: 3,
+      },
+      {
+        label: '4',
+        value: 4,
+      },
+    ]
   }
 
   return (
@@ -152,18 +215,18 @@ const RegisterForm: React.FC<IProps> = ({ status, tab, register }) => {
           </>
         ) :
         (<>
-          {/*   <Input
-             inputProps={{
-               ...formRegister('u_role'),
-               disabled: false,
-             }}
-             label={t(TRANSLATION.ROLE)}
-             inputType={EInputTypes.Select}
-             options={[
-               { label: t(TRANSLATION.CLIENT), value: EUserRoles.Client },
-               { label: t(TRANSLATION.DRIVER), value: EUserRoles.Driver },
-             ]}
-           /> */}
+          {/* <Input
+            inputProps={{
+              ...formRegister('u_role'),
+              disabled: false,
+            }}
+            label={'role'}
+            inputType={EInputTypes.Select}
+            options={[
+              { label: t(TRANSLATION.CLIENT), value: EUserRoles.Client },
+              { label: t(TRANSLATION.DRIVER), value: EUserRoles.Driver },
+            ]}
+          /> */}
 
           <Input
             inputProps={{
@@ -282,6 +345,57 @@ const RegisterForm: React.FC<IProps> = ({ status, tab, register }) => {
               'ref-code__input--active': showRefCode,
             })}
           />
+
+          {Number(u_role) === EUserRoles.Driver && (
+            <Input
+              label='Car models'
+              options={prepareOptions(data?.car_models, TRANSLATION.CAR_MODELS)}
+              inputProps={{
+                ...formRegister('car_model'),
+                placeholder: 'Mercedes-Benz',
+              }}
+              inputType={EInputTypes.Select}
+            />
+          )}
+
+          {Number(u_role) === EUserRoles.Driver && (
+            <Input
+              label={t(TRANSLATION.SEATS)}
+              inputProps={{
+                ...formRegister('seats'),
+                placeholder: '4',
+                defaultValue: 4,
+              }}
+              inputType={EInputTypes.Select}
+              options={seatsOptions()}
+            />
+          )}
+
+          {Number(u_role) === EUserRoles.Driver && (
+            <Input
+              label={'Car number'}
+              inputProps={{ ...formRegister('car_number') }}
+            />
+          )}
+
+          {Number(u_role) === EUserRoles.Driver && (
+            <Input
+              label={'Car color'}
+              inputProps={{ ...formRegister('car_color') }}
+              inputType={EInputTypes.Select}
+              options={prepareOptions(data?.car_colors, TRANSLATION.CAR_COLORS)}
+            />
+          )}
+
+          {Number(u_role) === EUserRoles.Driver && (
+            <Input
+              label={'Car classes'}
+              inputProps={{ ...formRegister('car_classes') }}
+              inputType={EInputTypes.Select}
+              options={prepareOptions(data?.car_classes, TRANSLATION.CAR_CLASSES)}
+            />
+          )}
+
 
           {isVisible && (
             <div className="alert-container">
