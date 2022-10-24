@@ -352,7 +352,6 @@ const RegisterForm: React.FC<IProps> = ({ status, tab, register }) => {
               options={prepareOptions(data?.car_models, TRANSLATION.CAR_MODELS)}
               inputProps={{
                 ...formRegister('car_model'),
-                placeholder: 'Mercedes-Benz',
               }}
               inputType={EInputTypes.Select}
             />
@@ -363,7 +362,6 @@ const RegisterForm: React.FC<IProps> = ({ status, tab, register }) => {
               label={t(TRANSLATION.SEATS)}
               inputProps={{
                 ...formRegister('seats'),
-                placeholder: '4',
                 defaultValue: 4,
               }}
               inputType={EInputTypes.Select}
