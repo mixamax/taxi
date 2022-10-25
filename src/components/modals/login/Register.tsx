@@ -161,7 +161,11 @@ const RegisterForm: React.FC<IProps> = ({ status, tab, register }) => {
       return options
     }
 
-    Object.keys(data).forEach((datum: any) => {
+    Object.keys(data).forEach((datum: any, index: number) => {
+      if (key === TRANSLATION.CAR_CLASSES && index === 0) {
+        return
+      }
+
       options.push({
         value: datum,
         label: t(key[datum]),
@@ -172,24 +176,14 @@ const RegisterForm: React.FC<IProps> = ({ status, tab, register }) => {
   }
 
   const seatsOptions = () => {
-    return [
-      {
-        label: '1',
-        value: 1,
-      },
-      {
-        label: '2',
-        value: 2,
-      },
-      {
-        label: '3',
-        value: 3,
-      },
-      {
-        label: '4',
-        value: 4,
-      },
-    ]
+    return Array(20).fill(0).map((_, i) => {
+      let value = String(i + 1)
+
+      return {
+        value,
+        label: value,
+      }
+    })
   }
 
   return (
