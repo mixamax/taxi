@@ -7,7 +7,7 @@ import Button from '../../Button'
 import { connect, ConnectedProps } from 'react-redux'
 import images from '../../../constants/images'
 import { IRootState } from '../../../state'
-import { EStatuses } from '../../../types/types'
+import { EStatuses, EUserRoles } from '../../../types/types'
 import { userActionCreators, userSelectors } from '../../../state/user'
 import { ERegistrationType, LOGIN_TABS_IDS } from '../../../state/user/constants'
 import { emailRegex, phoneRegex } from '../../../tools/utils'
@@ -18,6 +18,7 @@ import { Intent } from '../../Alert'
 import { useVisibility } from '../../../tools/hooks'
 import { IResolveParams, LoginSocialGoogle } from 'reactjs-social-login'
 import { GoogleLoginButton } from 'react-social-login-buttons'
+import { useLocation } from 'react-router-dom'
 
 const mapStateToProps = (state: IRootState) => ({
   user: userSelectors.user(state),
@@ -62,6 +63,11 @@ const LoginForm: React.FC<IProps> = ({
 }) => {
   const [isPasswordShows, setIsPasswordShows] = useState(false)
   const [isVisible, toggleVisibility] = useVisibility(false)
+  const location = useLocation()
+
+  const role = !location.pathname.includes('/driver-order') ?
+    EUserRoles.Client :
+    EUserRoles.Driver
 
   const schema = yup.object({
     type: yup.string().required(),
@@ -181,26 +187,28 @@ const LoginForm: React.FC<IProps> = ({
             </div>
     }
 
-    <LoginSocialGoogle
-      client_id={'936989532884-lfsquh1dkbstfoo56igklk5fds9rnv5q.apps.googleusercontent.com'}
-      onLoginStart={() => {}}
-      redirect_uri={''}
-      scope="openid profile email"
-      discoveryDocs="claims_supported"
-      access_type="offline"
-      onResolve={({ provider, data }: IResolveParams) => {
-        const obj = {
-          u_name: data?.name,
-          u_email: data?.email,
-          type: ERegistrationType.Email,
-        }
-      }}
-      onReject={err => {
-        console.log(err)
-      }}
-    >
-      <GoogleLoginButton />
-    </LoginSocialGoogle>
+    {Number(role) !== EUserRoles.Driver && (
+      <LoginSocialGoogle
+        client_id={'936989532884-lfsquh1dkbstfoo56igklk5fds9rnv5q.apps.googleusercontent.com'}
+        onLoginStart={() => {}}
+        redirect_uri={''}
+        scope="openid profile email"
+        discoveryDocs="claims_supported"
+        access_type="offline"
+        onResolve={({ provider, data }: IResolveParams) => {
+          const obj = {
+            u_name: data?.name,
+            u_email: data?.email,
+            type: ERegistrationType.Email,
+          }
+        }}
+        onReject={err => {
+          console.log(err)
+        }}
+      >
+        <GoogleLoginButton />
+      </LoginSocialGoogle>
+    )}
 
     <Button
       type="submit"

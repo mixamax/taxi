@@ -22,6 +22,7 @@ import { Intent } from '../../Alert'
 import { useVisibility } from '../../../tools/hooks'
 import axios from 'axios'
 import { WHATSAPP_BOT_KEY, WHATSAPP_BOT_URL } from '../../../config'
+import { ISelectOption } from '../../../types'
 
 const mapStateToProps = (state: IRootState) => {
   return {
@@ -53,6 +54,12 @@ interface IFormValues {
   state?: string;
   zip?: string;
   card?: string;
+  car_name: string
+  car_model: string | null
+  seats: string
+  car_number: string
+  car_color: string
+  car_classes: string
 }
 
 interface IProps extends ConnectedProps<typeof connector> {
@@ -68,11 +75,15 @@ const RegisterForm: React.FC<IProps> = ({
   const [showRefCode, setShowRefCode] = useState(false)
   const [workType, setWorkType] = useState<EWorkTypes | null>(null)
   const location = useLocation()
-  const [isRegistrationAlertVisible, toggleRegistrationAlertVisibility] =
-    useVisibility(false)
-  const [isWhatsappAlertVisible, toggleWhatsappAlertVisibility] =
-    useVisibility(false)
+  const [isRegistrationAlertVisible, toggleRegistrationAlertVisibility] = useVisibility(false)
+  const [isWhatsappAlertVisible, toggleWhatsappAlertVisibility] = useVisibility(false)
   const [shouldSendToWhatsapp, setShouldSendToWhatsapp] = useState(false)
+
+  const [data, setData] = useState<{
+    car_models: any
+    car_colors: any
+    car_classes: any
+  } | null>(null)
 
   const schema = yup.object({
     type: yup.string().required(),
@@ -148,6 +159,18 @@ const RegisterForm: React.FC<IProps> = ({
     }
   }, [status])
 
+  useEffect(() => {
+    let newData = (window as any).data
+
+    if (newData && (data === null || data === undefined)) {
+      setData({
+        car_models: newData.car_models,
+        car_colors: newData.car_colors,
+        car_classes: newData.car_classes,
+      })
+    }
+  }, [])
+
   if (tab !== LOGIN_TABS_IDS[1]) return null
 
   const onSubmit = (data: IFormValues) => {
@@ -165,6 +188,38 @@ const RegisterForm: React.FC<IProps> = ({
         zip: data.zip,
         card: data.card,
       },
+    })
+  }
+
+  const prepareOptions = (data: any, key: string) => {
+    let options: ISelectOption[] = []
+
+    if (!data) {
+      return options
+    }
+
+    Object.keys(data).forEach((datum: any, index: number) => {
+      if (key === TRANSLATION.CAR_CLASSES && index === 0) {
+        return
+      }
+
+      options.push({
+        value: datum,
+        label: t(key[datum]),
+      })
+    })
+
+    return options
+  }
+
+  const seatsOptions = () => {
+    return Array(20).fill(0).map((_, i) => {
+      let value = String(i + 1)
+
+      return {
+        value,
+        label: value,
+      }
     })
   }
 
@@ -190,189 +245,238 @@ const RegisterForm: React.FC<IProps> = ({
             </button>
           </>
         ) :
-        (
-          <>
-            {/*   <Input
-             inputProps={{
-               ...formRegister('u_role'),
-               disabled: false,
-             }}
-             label={t(TRANSLATION.ROLE)}
-             inputType={EInputTypes.Select}
-             options={[
-               { label: t(TRANSLATION.CLIENT), value: EUserRoles.Client },
-               { label: t(TRANSLATION.DRIVER), value: EUserRoles.Driver },
-             ]}
-           /> */}
 
-            <Input
-              inputProps={{
-                ...formRegister('u_name', {
-                  required: t(TRANSLATION.REQUIRED_FIELD),
-                }),
-              }}
-              label={t(
-                workType === EWorkTypes.Company ?
-                  TRANSLATION.COMPANY_NAME :
-                  TRANSLATION.NAME,
-              )}
-              error={errors.u_name?.message}
-            />
-            <Input
-              inputProps={{
-                ...formRegister('u_phone'),
-              }}
-              label={t(TRANSLATION.PHONE)}
-              inputType={EInputTypes.Default}
-              error={getPhoneError(u_phone, type === ERegistrationType.Phone)}
-            />
+        (<>
+          {/* <Input
+            inputProps={{
+              ...formRegister('u_role'),
+              disabled: false,
+            }}
+            label={'role'}
+            inputType={EInputTypes.Select}
+            options={[
+              { label: t(TRANSLATION.CLIENT), value: EUserRoles.Client },
+              { label: t(TRANSLATION.DRIVER), value: EUserRoles.Driver },
+            ]}
+          /> */}
 
-            {type === ERegistrationType.Phone && (
-              <Checkbox
-                type="checkbox"
-                label={'Send to Whatsapp'}
-                id="shouldSendToWhatsapp"
-                disabled={type !== ERegistrationType.Phone}
-                wrapperAdditionalClassName="send_to_whatsapp_checkbox"
-                value={shouldSendToWhatsapp ? 'checked' : ''}
-                onChange={(e) => {
-                  setShouldSendToWhatsapp(e.target.checked)
-                }}
-              />
+          <Input
+            inputProps={{
+              ...formRegister('u_name', {
+                required: t(TRANSLATION.REQUIRED_FIELD),
+              }),
+            }}
+            label={t(
+              workType === EWorkTypes.Company ?
+                TRANSLATION.COMPANY_NAME :
+                TRANSLATION.NAME,
             )}
+            error={errors.u_name?.message}
+          />
+          <Input
+            inputProps={{
+              ...formRegister('u_phone'),
+            }}
+            label={t(TRANSLATION.PHONE)}
+            inputType={EInputTypes.Default}
+            error={getPhoneError(u_phone, type === ERegistrationType.Phone)}
+          />
 
-            <Input
-              inputProps={{
-                ...formRegister('u_email'),
-              }}
-              label={t(TRANSLATION.EMAIL)}
-              error={errors.u_email?.message}
-            />
-            <Checkbox
-              {...formRegister('type')}
-              type="radio"
-              label={t(TRANSLATION.PHONE)}
-              value={ERegistrationType.Phone}
-              id="phone"
-            />
-            <Checkbox
-              {...formRegister('type')}
-              type="radio"
-              label={t(TRANSLATION.EMAIL)}
-              value={ERegistrationType.Email}
-              id="email"
-            />
-
-            {Number(u_role) === EUserRoles.Driver && (
-              <Input
-                inputProps={{
-                  ...formRegister('street'),
-                }}
-                label={t(TRANSLATION.STREET_ADDRESS)}
-                error={errors.street?.message}
-                fieldWrapperClassName="street"
-              />
-            )}
-
-            {Number(u_role) === EUserRoles.Driver && (
-              <Input
-                inputProps={{
-                  ...formRegister('city'),
-                }}
-                label={t(TRANSLATION.CITY)}
-                error={errors.city?.message}
-              />
-            )}
-
-            {Number(u_role) === EUserRoles.Driver && (
-              <Input
-                inputProps={{
-                  ...formRegister('state'),
-                }}
-                label={t(TRANSLATION.STATE)}
-                error={errors.state?.message}
-              />
-            )}
-
-            {Number(u_role) === EUserRoles.Driver && (
-              <Input
-                inputProps={{
-                  ...formRegister('zip'),
-                }}
-                label={t(TRANSLATION.ZIP_CODE)}
-                error={errors.zip?.message}
-              />
-            )}
-
-            {Number(u_role) === EUserRoles.Driver && (
-              <Input
-                inputProps={{
-                  ...formRegister('card', {
-                    pattern: {
-                      value: /^\d{16}$/,
-                      message: t(TRANSLATION.CARD_NUMBER_PATTERN_ERROR),
-                    },
-                  }),
-                  placeholder: 'ХХХХ-ХХХХ-ХХХХ-ХХХХ',
-                }}
-                label={t(TRANSLATION.CARD_NUMBER)}
-                error={errors.card?.message}
-              />
-            )}
-
+          {type === ERegistrationType.Phone && (
             <Checkbox
               type="checkbox"
-              name="ref_code_toggle"
-              label={t(TRANSLATION.PROMO_CODE)}
-              value={showRefCode ? 'checked' : ''}
-              onChange={(e) => setShowRefCode(e.target.checked)}
-              wrapperAdditionalClassName="ref-code__toggler"
+              label={'Send to Whatsapp'}
+              id="shouldSendToWhatsapp"
+              disabled={type !== ERegistrationType.Phone}
+              wrapperAdditionalClassName="send_to_whatsapp_checkbox"
+              value={shouldSendToWhatsapp ? 'checked' : ''}
+              onChange={(e) => {
+                setShouldSendToWhatsapp(e.target.checked)
+              }}
             />
+          )}
 
+          <Input
+            inputProps={{
+              ...formRegister('u_email'),
+            }}
+            label={t(TRANSLATION.EMAIL)}
+            error={errors.u_email?.message}
+          />
+          <Checkbox
+            {...formRegister('type')}
+            type="radio"
+            label={t(TRANSLATION.PHONE)}
+            value={ERegistrationType.Phone}
+            id="phone"
+          />
+          <Checkbox
+            {...formRegister('type')}
+            type="radio"
+            label={t(TRANSLATION.EMAIL)}
+            value={ERegistrationType.Email}
+            id="email"
+          />
+
+          {Number(u_role) === EUserRoles.Driver && (
             <Input
               inputProps={{
-                ...formRegister('ref_code'),
+                ...formRegister('street'),
               }}
-              fieldWrapperClassName={cn('ref-code__input', {
-                'ref-code__input--active': showRefCode,
-              })}
+              label={t(TRANSLATION.STREET_ADDRESS)}
+              error={errors.street?.message}
+              fieldWrapperClassName="street"
             />
+          )}
 
-            {isRegistrationAlertVisible && (
-              <div className="alert-container">
-                <Alert
-                  intent={
-                    status === EStatuses.Fail ? Intent.ERROR : Intent.SUCCESS
-                  }
-                  message={
-                    status === EStatuses.Fail ?
-                      t(TRANSLATION.REGISTER_FAIL) :
-                      t(TRANSLATION.REGISTER_SUCCESS)
-                  }
-                  onClose={toggleRegistrationAlertVisibility}
-                />
-              </div>
-            )}
-
-            {isWhatsappAlertVisible && (
-              <div className="alert-container">
-                <Alert
-                  intent={Intent.INFO}
-                  message={whatsappResponseMessage}
-                  onClose={toggleWhatsappAlertVisibility}
-                />
-              </div>
-            )}
-
-            <Button
-              type="submit"
-              text={t(TRANSLATION.SIGNUP)}
-              className="login-modal_login-btn"
-              skipHandler={true}
-              disabled={!isValid}
-              status={status}
+          {Number(u_role) === EUserRoles.Driver && (
+            <Input
+              inputProps={{
+                ...formRegister('city'),
+              }}
+              label={t(TRANSLATION.CITY)}
+              error={errors.city?.message}
             />
-          </>
+          )}
+
+          {Number(u_role) === EUserRoles.Driver && (
+            <Input
+              inputProps={{
+                ...formRegister('state'),
+              }}
+              label={t(TRANSLATION.STATE)}
+              error={errors.state?.message}
+            />
+          )}
+
+          {Number(u_role) === EUserRoles.Driver && (
+            <Input
+              inputProps={{
+                ...formRegister('zip'),
+              }}
+              label={t(TRANSLATION.ZIP_CODE)}
+              error={errors.zip?.message}
+            />
+          )}
+
+          {Number(u_role) === EUserRoles.Driver && (
+            <Input
+              inputProps={{
+                ...formRegister('card', {
+                  pattern: {
+                    value: /^\d{16}$/,
+                    message: t(TRANSLATION.CARD_NUMBER_PATTERN_ERROR),
+                  },
+                }),
+                placeholder: 'ХХХХ-ХХХХ-ХХХХ-ХХХХ',
+              }}
+              label={t(TRANSLATION.CARD_NUMBER)}
+              error={errors.card?.message}
+            />
+          )}
+
+          <Checkbox
+            type="checkbox"
+            name="ref_code_toggle"
+            label={t(TRANSLATION.PROMO_CODE)}
+            value={showRefCode ? 'checked' : ''}
+            onChange={(e) => setShowRefCode(e.target.checked)}
+            wrapperAdditionalClassName="ref-code__toggler"
+          />
+
+          <Input
+            inputProps={{
+              ...formRegister('ref_code'),
+            }}
+            fieldWrapperClassName={cn('ref-code__input', {
+              'ref-code__input--active': showRefCode,
+            })}
+          />
+
+          {Number(u_role) === EUserRoles.Driver && (
+            <Input
+              label='Car models'
+              options={prepareOptions(data?.car_models, TRANSLATION.CAR_MODELS)}
+              inputProps={{
+                ...formRegister('car_model'),
+              }}
+              inputType={EInputTypes.Select}
+            />
+          )}
+
+          {Number(u_role) === EUserRoles.Driver && (
+            <Input
+              label={t(TRANSLATION.SEATS)}
+              inputProps={{
+                ...formRegister('seats'),
+                defaultValue: 4,
+              }}
+              inputType={EInputTypes.Select}
+              options={seatsOptions()}
+            />
+          )}
+
+          {Number(u_role) === EUserRoles.Driver && (
+            <Input
+              label={'Car number'}
+              inputProps={{ ...formRegister('car_number') }}
+            />
+          )}
+
+          {Number(u_role) === EUserRoles.Driver && (
+            <Input
+              label={'Car color'}
+              inputProps={{ ...formRegister('car_color') }}
+              inputType={EInputTypes.Select}
+              options={prepareOptions(data?.car_colors, TRANSLATION.CAR_COLORS)}
+            />
+          )}
+
+          {Number(u_role) === EUserRoles.Driver && (
+            <Input
+              label={'Car classes'}
+              inputProps={{ ...formRegister('car_classes') }}
+              inputType={EInputTypes.Select}
+              options={prepareOptions(data?.car_classes, TRANSLATION.CAR_CLASSES)}
+            />
+          )}
+
+
+          {isRegistrationAlertVisible && (
+            <div className="alert-container">
+              <Alert
+                intent={
+                  status === EStatuses.Fail ? Intent.ERROR : Intent.SUCCESS
+                }
+                message={
+                  status === EStatuses.Fail ?
+                    t(TRANSLATION.REGISTER_FAIL) :
+                    t(TRANSLATION.REGISTER_SUCCESS)
+                }
+                onClose={toggleRegistrationAlertVisibility}
+              />
+            </div>
+          )}
+
+          {isWhatsappAlertVisible && (
+            <div className="alert-container">
+              <Alert
+                intent={Intent.INFO}
+                message={whatsappResponseMessage}
+                onClose={toggleWhatsappAlertVisibility}
+              />
+            </div>
+          )}
+
+          <Button
+            type="submit"
+            text={t(TRANSLATION.SIGNUP)}
+            className="login-modal_login-btn"
+            skipHandler={true}
+            disabled={!isValid}
+            status={status}
+          />
+        </>
         )}
     </form>
   )
