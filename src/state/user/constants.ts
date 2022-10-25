@@ -1,7 +1,7 @@
 import { ArrayValue } from './../../types/index'
 import { appName } from '../../config'
 import { TRANSLATION } from '../../localization'
-import { EStatuses, ITokens, IUser } from '../../types/types'
+import { EStatuses, IRegisterResponse, ITokens, IUser } from '../../types/types'
 
 export const moduleName = 'user' as const
 
@@ -55,5 +55,6 @@ export interface IUserState {
   tokens: ITokens | null,
   status: EStatuses,
   message: string,
-  tab: TLoginTab
+  tab: TLoginTab,
+  response: IRegisterResponse | null,
 }

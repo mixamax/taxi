@@ -20,6 +20,8 @@ import * as yup from 'yup'
 import Alert from '../../Alert/Alert'
 import { Intent } from '../../Alert'
 import { useVisibility } from '../../../tools/hooks'
+import axios from 'axios'
+import { WHATSAPP_BOT_KEY, WHATSAPP_BOT_URL } from '../../../config'
 import { ISelectOption } from '../../../types'
 
 const mapStateToProps = (state: IRootState) => {
@@ -28,6 +30,7 @@ const mapStateToProps = (state: IRootState) => {
     status: userSelectors.status(state),
     tab: userSelectors.tab(state),
     message: userSelectors.message(state),
+    response: userSelectors.registerResponse(state),
   }
 }
 
@@ -63,11 +66,18 @@ interface IProps extends ConnectedProps<typeof connector> {
   isOpen: boolean;
 }
 
-const RegisterForm: React.FC<IProps> = ({ status, tab, register }) => {
+const RegisterForm: React.FC<IProps> = ({
+  status,
+  tab,
+  register,
+  response,
+}) => {
   const [showRefCode, setShowRefCode] = useState(false)
   const [workType, setWorkType] = useState<EWorkTypes | null>(null)
   const location = useLocation()
-  const [isVisible, toggleVisibility] = useVisibility(false)
+  const [isRegistrationAlertVisible, toggleRegistrationAlertVisibility] = useVisibility(false)
+  const [isWhatsappAlertVisible, toggleWhatsappAlertVisibility] = useVisibility(false)
+  const [shouldSendToWhatsapp, setShouldSendToWhatsapp] = useState(false)
 
   const [data, setData] = useState<{
     car_models: any
@@ -116,9 +126,36 @@ const RegisterForm: React.FC<IProps> = ({ status, tab, register }) => {
 
   const { type, u_phone, u_role } = useWatch<IFormValues>({ control })
 
+  let whatsappResponseMessage = ''
+
   useEffect(() => {
     if (status === EStatuses.Fail || status === EStatuses.Success) {
-      toggleVisibility()
+      toggleRegistrationAlertVisibility()
+    }
+
+    if (status === EStatuses.Success && type === ERegistrationType.Phone && shouldSendToWhatsapp) {
+      if (response) {
+        axios.post(WHATSAPP_BOT_URL,
+          {
+            phone: u_phone,
+            code: response.string,
+          },
+          {
+            headers: {
+              'x-api-key': WHATSAPP_BOT_KEY,
+            },
+          },
+        ).then((response) => {
+          console.log(response)
+          whatsappResponseMessage = response.data
+        }).catch((err) => {
+          console.log(err)
+          whatsappResponseMessage = err
+        }).finally(() => {
+          toggleRegistrationAlertVisibility()
+          toggleWhatsappAlertVisibility()
+        })
+      }
     }
   }, [status])
 
@@ -208,6 +245,7 @@ const RegisterForm: React.FC<IProps> = ({ status, tab, register }) => {
             </button>
           </>
         ) :
+
         (<>
           {/* <Input
             inputProps={{
@@ -240,9 +278,24 @@ const RegisterForm: React.FC<IProps> = ({ status, tab, register }) => {
               ...formRegister('u_phone'),
             }}
             label={t(TRANSLATION.PHONE)}
-            inputType={EInputTypes.MaskedPhone}
+            inputType={EInputTypes.Default}
             error={getPhoneError(u_phone, type === ERegistrationType.Phone)}
           />
+
+          {type === ERegistrationType.Phone && (
+            <Checkbox
+              type="checkbox"
+              label={'Send to Whatsapp'}
+              id="shouldSendToWhatsapp"
+              disabled={type !== ERegistrationType.Phone}
+              wrapperAdditionalClassName="send_to_whatsapp_checkbox"
+              value={shouldSendToWhatsapp ? 'checked' : ''}
+              onChange={(e) => {
+                setShouldSendToWhatsapp(e.target.checked)
+              }}
+            />
+          )}
+
           <Input
             inputProps={{
               ...formRegister('u_email'),
@@ -389,7 +442,7 @@ const RegisterForm: React.FC<IProps> = ({ status, tab, register }) => {
           )}
 
 
-          {isVisible && (
+          {isRegistrationAlertVisible && (
             <div className="alert-container">
               <Alert
                 intent={
@@ -400,7 +453,17 @@ const RegisterForm: React.FC<IProps> = ({ status, tab, register }) => {
                     t(TRANSLATION.REGISTER_FAIL) :
                     t(TRANSLATION.REGISTER_SUCCESS)
                 }
-                onClose={toggleVisibility}
+                onClose={toggleRegistrationAlertVisibility}
+              />
+            </div>
+          )}
+
+          {isWhatsappAlertVisible && (
+            <div className="alert-container">
+              <Alert
+                intent={Intent.INFO}
+                message={whatsappResponseMessage}
+                onClose={toggleWhatsappAlertVisibility}
               />
             </div>
           )}

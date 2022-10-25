@@ -50,8 +50,8 @@ function* loginSaga(data: TAction) {
 function* registerSaga(data: TAction) {
   yield put({ type: ActionTypes.REGISTER_START })
   try {
-    yield* call<any>(API.register, data.payload)
-    yield put({ type: ActionTypes.REGISTER_SUCCESS })
+    let response = yield* call<any>(API.register, data.payload)
+    yield put({ type: ActionTypes.REGISTER_SUCCESS, payload: response })
   } catch (error) {
     console.error(error)
     yield put({ type: ActionTypes.REGISTER_FAIL })
