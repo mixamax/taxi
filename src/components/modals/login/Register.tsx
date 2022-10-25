@@ -112,6 +112,7 @@ const RegisterForm: React.FC<IProps> = ({
     handleSubmit,
     formState: { errors, isValid },
     control,
+    setValue,
   } = useForm<IFormValues>({
     criteriaMode: 'all',
     mode: 'all',
@@ -135,7 +136,7 @@ const RegisterForm: React.FC<IProps> = ({
 
     if (status === EStatuses.Success && type === ERegistrationType.Phone && shouldSendToWhatsapp) {
       if (response) {
-        axios.post(WHATSAPP_BOT_URL,
+        axios.post(`${WHATSAPP_BOT_URL}/send-message`,
           {
             phone: u_phone,
             code: response.string,
@@ -170,6 +171,14 @@ const RegisterForm: React.FC<IProps> = ({
       })
     }
   }, [])
+
+  useEffect(() => {
+    if (type !== ERegistrationType.Email) {
+      setValue('u_email', '')
+    } if (type !== ERegistrationType.Phone) {
+      setValue('u_phone', '')
+    }
+  }, [type])
 
   if (tab !== LOGIN_TABS_IDS[1]) return null
 

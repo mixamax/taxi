@@ -31,6 +31,7 @@
     "css-loader": "3.4.2",
     "dotenv": "8.2.0",
     "dotenv-expand": "5.1.0",
+    "env-cmd": "^10.1.0",
     "eslint-config-react-app": "^5.2.1",
     "eslint-plugin-flowtype": "4.6.0",
     "eslint-plugin-import": "2.20.1",
@@ -101,9 +102,9 @@
     "yup": "^0.32.11"
   },
   "scripts": {
-    "start": "node scripts/start.js",
-    "build": "node scripts/build.js",
-    "test": "node scripts/test.js",
+    "start": "env-cmd node scripts/start.js",
+    "build": "env-cmd node scripts/build.js",
+    "test": "env-cmd node scripts/test.js",
     "prepare-build": "npm version patch && node pre-build.js"
   },
   "browserslist": {
