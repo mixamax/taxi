@@ -64,7 +64,7 @@ const LoginForm: React.FC<IProps> = ({
   const [isPasswordShows, setIsPasswordShows] = useState(false)
   const [isVisible, toggleVisibility] = useVisibility(false)
   const location = useLocation()
-  const googleClientId = process.env.REACT_APP_GOOGLE_LOGIN_CLIENT_ID || ''
+  const googleClientId = '936989532884-lfsquh1dkbstfoo56igklk5fds9rnv5q.apps.googleusercontent.com'
 
   const role = !location.pathname.includes('/driver-order') ?
     EUserRoles.Client :
