@@ -32,6 +32,26 @@ export default function reducer(state = new record(), action: TAction) {
       return state
         .set('status', EStatuses.Fail)
         .set('message', TRANSLATION.LOGIN_FAIL)
+    case ActionTypes.LOGIN_WHATSAPP:
+      return state
+        .set('status', EStatuses.Whatsapp)
+        .set('message', 'Whatsapp message sent')
+
+    case ActionTypes.GOOGLE_LOGIN_START:
+      return state
+        .set('status', EStatuses.Loading)
+        .set('message', '')
+        .set('user', null)
+        .set('tokens', null)
+    case ActionTypes.GOOGLE_LOGIN_SUCCESS:
+      return state
+        .set('status', EStatuses.Success)
+        .set('user', payload.user)
+        .set('tokens', payload.tokens)
+    case ActionTypes.GOOGLE_LOGIN_FAIL:
+      return state
+        .set('status', EStatuses.Fail)
+        .set('message', TRANSLATION.LOGIN_FAIL)
 
     case ActionTypes.LOGOUT_START:
       return state

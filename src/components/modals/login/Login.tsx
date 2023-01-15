@@ -18,7 +18,8 @@ import { Intent } from '../../Alert'
 import { useVisibility } from '../../../tools/hooks'
 import { IResolveParams, LoginSocialGoogle } from 'reactjs-social-login'
 import { GoogleLoginButton } from 'react-social-login-buttons'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
+
 
 const mapStateToProps = (state: IRootState) => ({
   user: userSelectors.user(state),
@@ -29,6 +30,7 @@ const mapStateToProps = (state: IRootState) => ({
 
 const mapDispatchToProps = {
   login: userActionCreators.login,
+  googleLogin: userActionCreators.googleLogin,
   logout: userActionCreators.logout,
   remindPassword: userActionCreators.remindPassword,
   setStatus: userActionCreators.setStatus,
@@ -40,7 +42,7 @@ const connector = connect(mapStateToProps, mapDispatchToProps)
 
 interface IFormValues {
     login: string,
-    password: string,
+    password: string | undefined,
     type: ERegistrationType
 }
 
@@ -48,10 +50,12 @@ interface IProps extends ConnectedProps<typeof connector> {
     isOpen: boolean,
 }
 
+
 const LoginForm: React.FC<IProps> = ({
   user,
   status,
   tab,
+  googleLogin,
   message,
   isOpen,
   register,
@@ -63,8 +67,9 @@ const LoginForm: React.FC<IProps> = ({
 }) => {
   const [isPasswordShows, setIsPasswordShows] = useState(false)
   const [isVisible, toggleVisibility] = useVisibility(false)
+  const [isWhatsappAlertVisible, toggleWhatsappAlertVisibility] = useVisibility(false)
   const location = useLocation()
-  const googleClientId = '936989532884-lfsquh1dkbstfoo56igklk5fds9rnv5q.apps.googleusercontent.com'
+  const googleClientId = '973943716904-b33r11ijgi08m5etsg5ndv409shh1tjl.apps.googleusercontent.com'
 
   const role = !location.pathname.includes('/driver-order') ?
     EUserRoles.Client :
@@ -77,8 +82,8 @@ const LoginForm: React.FC<IProps> = ({
       then: yup.string().required().matches(emailRegex, t(TRANSLATION.EMAIL_ERROR)),
       otherwise: yup.string().required().matches(phoneRegex, t(TRANSLATION.PHONE_PATTERN_ERROR)),
     }),
-    password: yup.string().required(t(TRANSLATION.REQUIRED_FIELD)).min(4).trim(),
   })
+
 
   const {
     register: formRegister,
@@ -105,12 +110,47 @@ const LoginForm: React.FC<IProps> = ({
   }, [isOpen])
 
   useEffect(() => {
+    let auth_hash = getParamFromURL('auth_hash')
+    if(auth_hash){
+      if (typeof auth_hash === 'string') {
+        googleLogin({
+          data: {},
+          auth_hash: decodeURIComponent(auth_hash),
+        })
+      }
+    } else {
+      let u_email = getParamFromURL('u_email')
+      let u_name = getParamFromURL('u_name')
+      if(u_email && u_name) {
+        if (typeof u_email === 'string' && typeof u_name === 'string') {
+          googleLogin({
+            data: {
+              u_name: u_name,
+              u_phone: '',
+              u_email: u_email,
+              type: ERegistrationType.Email,
+              u_role: EUserRoles.Client,
+              ref_code: '',
+              u_details: {},
+              st: '1',
+            },
+            auth_hash: null,
+          })
+        }
+      }
+    }
+  }, [])
+
+  useEffect(() => {
     isDirty && trigger()
   }, [type])
+
 
   useEffect(() => {
     if (status === EStatuses.Fail || status === EStatuses.Success) {
       toggleVisibility()
+    } else if (status === EStatuses.Whatsapp) {
+      toggleWhatsappAlertVisibility()
     }
   }, [status])
 
@@ -124,11 +164,21 @@ const LoginForm: React.FC<IProps> = ({
     }
   }
 
+  const getParamFromURL = (param: string) => {
+    let results = new RegExp('[\?&]' + param + '=([^&#]*)').exec(window.location.href)
+    if (results == null){
+      return null
+    }
+    else {
+      return decodeURI(results[1]) || 0
+    }
+  }
+
   return <form className="sign-in-subform" onSubmit={handleSubmit(onSubmit)}>
     <Input
       inputProps={{
         ...formRegister('login'),
-        placeholder: type === ERegistrationType.Phone ? t(TRANSLATION.PHONE) : t(TRANSLATION.EMAIL),
+        placeholder: type === ERegistrationType.Phone || ERegistrationType.Whatsapp ? t(TRANSLATION.PHONE) : t(TRANSLATION.EMAIL),
       }}
       label={t(TRANSLATION.LOGIN)}
       error={errors.login?.message}
@@ -136,7 +186,7 @@ const LoginForm: React.FC<IProps> = ({
     />
     <Input
       inputProps={{
-        ...formRegister('password', { required: !user ? t(TRANSLATION.REQUIRED_FIELD) : false }),
+        ...formRegister('password'),
         type: isPasswordShows ? 'text' : 'password',
         placeholder: t(TRANSLATION.PASSWORD),
       }}
@@ -176,39 +226,68 @@ const LoginForm: React.FC<IProps> = ({
       value={ERegistrationType.Email}
       id="email"
     />
+    <Checkbox
+      {...formRegister('type')}
+      type="radio"
+      label={'Whatsapp'}
+      value={ERegistrationType.Whatsapp}
+      id="whatsapp"
+    />
 
     {
       isVisible &&
-            <div className="alert-container">
-              <Alert
-                intent={status === EStatuses.Fail ? Intent.ERROR : Intent.SUCCESS}
-                message={status === EStatuses.Fail ? t(TRANSLATION.LOGIN_FAIL) : t(TRANSLATION.LOGIN_SUCCESS)}
-                onClose={toggleVisibility}
-              />
-            </div>
+          <div className="alert-container">
+            <Alert
+              intent={status === EStatuses.Fail ? Intent.ERROR : Intent.SUCCESS}
+              message={status === EStatuses.Fail ? t(TRANSLATION.LOGIN_FAIL) : t(TRANSLATION.LOGIN_SUCCESS)}
+              onClose={toggleVisibility}
+            />
+          </div>
+    }
+
+    {
+      isWhatsappAlertVisible &&
+          <div className="alert-container">
+            <Alert
+              intent={Intent.SUCCESS}
+              message={'Check your Whatsapp!'}
+              onClose={toggleWhatsappAlertVisibility}
+            />
+          </div>
     }
 
     {Number(role) !== EUserRoles.Driver && (
-      <LoginSocialGoogle
-        client_id={googleClientId}
-        onLoginStart={() => {}}
-        redirect_uri={''}
-        scope="openid profile email"
-        discoveryDocs="claims_supported"
-        access_type="offline"
-        onResolve={({ provider, data }: IResolveParams) => {
-          const obj = {
-            u_name: data?.name,
-            u_email: data?.email,
-            type: ERegistrationType.Email,
-          }
-        }}
-        onReject={err => {
-          console.log(err)
-        }}
-      >
-        <GoogleLoginButton />
-      </LoginSocialGoogle>
+    // <LoginSocialGoogle
+    //   client_id={googleClientId}
+    //   onLoginStart={() => {
+    //     window.location.href = 'https://ibronevik.ru/taxi/google/'
+    //   }}
+    //   redirect_uri={'https://ibronevik.ru/taxi/google/state'}
+    //   scope="openid profile email"
+    //   discoveryDocs="claims_supported"
+    //   access_type="online"
+    //   onResolve={(data) => {
+    //     console.log(data)
+    //     // const obj = {
+    //     //   u_name: data?.name,
+    //     //   u_phone: '',
+    //     //   u_email: 'moj14frffefff@gmail.com',          // TODO: заменить на data?.email
+    //     //   type: ERegistrationType.Email,
+    //     //   u_role: EUserRoles.Client,
+    //     //   ref_code: '',
+    //     //   u_details: {},
+    //     //   st: '1',
+    //     // }
+    //     //googleLogin(obj)
+    //   }}
+    //   onReject={err => {
+    //     console.log(err)
+    //   }}
+    // >
+      <a href={'https://accounts.google.com/o/oauth2/v2/auth?response_type=code&access_type=online&client_id=973943716904-b33r11ijgi08m5etsg5ndv409shh1tjl.apps.googleusercontent.com&redirect_uri=https%3A%2F%2Fibronevik.ru%2Ftaxi%2Fc%2F0%2Fgoogle%2F&state&scope=email%20profile&approval_prompt=auto'}>
+        <GoogleLoginButton/>
+      </a>
+    // </LoginSocialGoogle>
     )}
 
     <Button

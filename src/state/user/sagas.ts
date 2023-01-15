@@ -14,6 +14,7 @@ import SITE_CONSTANTS from '../../siteConstants'
 export const saga = function* () {
   yield all([
     takeEvery(ActionTypes.LOGIN_REQUEST, loginSaga),
+    takeEvery(ActionTypes.GOOGLE_LOGIN_REQUEST, googleLoginSaga),
     takeEvery(ActionTypes.REGISTER_REQUEST, registerSaga),
     takeEvery(ActionTypes.LOGOUT_REQUEST, logoutSaga),
     takeEvery(ActionTypes.REMIND_PASSWORD_REQUEST, remindPasswordSaga),
@@ -27,6 +28,13 @@ function* loginSaga(data: TAction) {
     const result = yield* call<PromiseReturn<ReturnType<typeof API.login>>>(API.login, data.payload)
 
     if (!result) throw new Error('Wrong login response')
+
+    if(result.data !== null && result.data === 'code sent') {
+      yield put({ type: ActionTypes.LOGIN_WHATSAPP })
+      return
+    }
+
+    if (result.user === null) throw new Error('Wrong login response')
 
     localStorage.setItem('tokens', JSON.stringify(result.tokens))
 
@@ -44,6 +52,35 @@ function* loginSaga(data: TAction) {
   } catch (error) {
     console.error(error)
     yield put({ type: ActionTypes.LOGIN_FAIL })
+  }
+}
+
+function* googleLoginSaga(data: TAction) {
+  yield put({ type: ActionTypes.GOOGLE_LOGIN_START })
+  try {
+
+    const result = yield* call<PromiseReturn<ReturnType<typeof API.googleLogin>>>(API.googleLogin, data.payload)
+    console.log('1111')
+    console.log(result)
+
+    if (!result) throw new Error('Wrong login response')
+
+    localStorage.setItem('tokens', JSON.stringify(result.tokens))
+
+    if(result.user.u_role === EUserRoles.Client || result.user.u_role === EUserRoles.Agent) {
+      history.push('/passenger-order')
+    } else if(result.user.u_role === EUserRoles.Driver) {
+      history.push('/driver-order')
+    }
+
+    yield put({
+      type: ActionTypes.GOOGLE_LOGIN_SUCCESS,
+      payload: result,
+    })
+    yield put(setLoginModal(false))
+  } catch (error) {
+    console.error(error)
+    yield put({ type: ActionTypes.GOOGLE_LOGIN_FAIL })
   }
 }
 

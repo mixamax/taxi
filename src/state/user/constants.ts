@@ -13,10 +13,16 @@ export const ActionTypes = {
   REGISTER_SUCCESS: `${prefix}/REGISTER_SUCCESS`,
   REGISTER_FAIL: `${prefix}/REGISTER_FAIL`,
 
+  GOOGLE_LOGIN_REQUEST: `${prefix}/GOOGLE_LOGIN_REQUEST`,
+  GOOGLE_LOGIN_START: `${prefix}/GOOGLE_LOGIN_START`,
+  GOOGLE_LOGIN_SUCCESS: `${prefix}/GOOGLE_LOGIN_SUCCESS`,
+  GOOGLE_LOGIN_FAIL: `${prefix}/GOOGLE_LOGIN_FAIL`,
+
   LOGIN_REQUEST: `${prefix}/LOGIN_REQUEST`,
   LOGIN_START: `${prefix}/LOGIN_START`,
   LOGIN_SUCCESS: `${prefix}/LOGIN_SUCCESS`,
   LOGIN_FAIL: `${prefix}/LOGIN_FAIL`,
+  LOGIN_WHATSAPP: `${prefix}/LOGIN_WHATSAPP`,
 
   LOGOUT_REQUEST: `${prefix}/LOGOUT_REQUEST`,
   LOGOUT_START: `${prefix}/LOGOUT_START`,
@@ -39,7 +45,8 @@ export const ActionTypes = {
 
 export enum ERegistrationType {
   Email = 'e-mail',
-  Phone = 'phone'
+  Phone = 'phone',
+  Whatsapp = 'whatsapp',
 }
 
 export const LOGIN_TABS = [

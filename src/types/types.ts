@@ -548,6 +548,8 @@ export interface IUser {
   u_choosen?: number
   ref_code?: string
   role: EUserRoles
+  // Машин пользователя (если он является водителем)
+  u_car: any
 }
 
 export interface ITokens {
@@ -568,7 +570,8 @@ export enum EStatuses {
   Default,
   Loading,
   Success,
-  Fail
+  Fail,
+  Whatsapp ,
 }
 
 export interface IRouteInfo {

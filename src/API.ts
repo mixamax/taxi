@@ -1,10 +1,10 @@
-import { EOrderTypes, ESuggestionType, IAddressPoint, ISuggestion, IRouteInfo, ITrip } from './types/types'
-import { Stringify, ValueOf } from './types/index'
-import { apiMethod, IApiMethodArguments, IResponseFields, addToFormData } from './tools/api'
-import axios from 'axios'
 import {
   EBookingDriverState,
+  EOrderTypes,
   EPaymentWays,
+  ESuggestionType,
+  EUserRoles,
+  IAddressPoint,
   IBookingAddresses,
   IBookingCoordinates,
   IBookingCoordinatesLatitude,
@@ -12,11 +12,26 @@ import {
   ICar,
   IOrder,
   IPlaceResponse,
+  IRouteInfo,
+  ISuggestion,
   ITokens,
+  ITrip,
   IUser,
 } from './types/types'
+import { Stringify, ValueOf } from './types/index'
+import { addToFormData, apiMethod, IApiMethodArguments, IResponseFields } from './tools/api'
+import axios from 'axios'
 import Config from './config'
-import { convertCar, convertOrder, convertTrip, convertUser, getHints, reverseConvertOrder, reverseConvertTrip, reverseConvertUser } from './tools/utils'
+import {
+  convertCar,
+  convertOrder,
+  convertTrip,
+  convertUser,
+  getHints,
+  reverseConvertOrder,
+  reverseConvertTrip,
+  reverseConvertUser,
+} from './tools/utils'
 import { t, TRANSLATION } from './localization'
 import { ERegistrationType } from './state/user/constants'
 import { userSelectors } from './state/user'
@@ -26,31 +41,43 @@ import SITE_CONSTANTS from './siteConstants'
 import getCountryISO3 from './tools/countryISO2To3'
 
 export enum EBookingActions {
-  SetConfirmState = 'set_confirm_state',
-  SetWaitingTime = 'set_waiting_time',
-  SetPerformer = 'set_performer',
-  SetArriveState = 'set_arrive_state',
-  SetStartState = 'set_start_state',
-  SetCompleteState = 'set_complete_state',
-  SetCancelState = 'set_cancel_state',
-  SetRate = 'set_rate',
-  SetTips = 'set_tips',
-  Edit = 'edit',
+    SetConfirmState = 'set_confirm_state',
+    SetWaitingTime = 'set_waiting_time',
+    SetPerformer = 'set_performer',
+    SetArriveState = 'set_arrive_state',
+    SetStartState = 'set_start_state',
+    SetCompleteState = 'set_complete_state',
+    SetCancelState = 'set_cancel_state',
+    SetRate = 'set_rate',
+    SetTips = 'set_tips',
+    Edit = 'edit',
 }
 
 const _register = (
   { formData }: IApiMethodArguments,
   data: Partial<IUser>,
 ): Promise<{
-  u_id: IUser['u_id'],
-  email_status: boolean,
-  string: string
+    u_id: IUser['u_id'],
+    email_status: boolean,
+    string: string
 } | null> => {
   addToFormData(formData, reverseConvertUser(data))
-
+  if (data.u_role === EUserRoles.Driver) addToFormData(formData, { 'st': 1 })
   return axios.post(`${Config.API_URL}/register`, formData)
     .then(res => res.data)
-    .then(res => res.status === 'error' ? Promise.reject() : res.data)
+    .then(res => {
+      if (res.status === 'error') return Promise.reject()
+      if (data.u_role !== EUserRoles.Driver) return res.data
+      const carFormData = new FormData()
+      addToFormData(carFormData, {
+        token: res.data.token,
+        u_hash: res.data.u_hash,
+        data: JSON.stringify(data.u_car),
+      })
+      return axios.post(`${Config.API_URL}/user/${res.data.u_id}/car`, carFormData).then(carRes => {
+        return (res.data)
+      })
+    })
 }
 /**
  * @returns email_status - if email is specified
@@ -61,11 +88,11 @@ export const register = apiMethod<typeof _register>(_register, { authRequired: f
 const _login = (
   { formData }: IApiMethodArguments,
   data: {
-    login: IUser['u_email'] | IUser['u_phone'],
-    password: string,
-    type: ERegistrationType
-  },
-): Promise<{user: IUser, tokens: ITokens} | null> => {
+        login: IUser['u_email'] | IUser['u_phone'],
+        password: string | undefined,
+        type: ERegistrationType
+    },
+): Promise<{ user: IUser | null, tokens: ITokens | null, data: string | null } | null> => {
   addToFormData(formData, {
     ...data,
   })
@@ -73,6 +100,13 @@ const _login = (
   return axios.post(`${Config.API_URL}/auth`, formData)
     .then(res => res.data)
     .then(res => {
+      if(res.data === 'code sent') {
+        return {
+          user: null,
+          tokens: null,
+          data: res.data,
+        }
+      }
       if (!res?.auth_hash) {
         return Promise.reject()
       }
@@ -81,17 +115,77 @@ const _login = (
         auth_hash: res?.auth_hash,
       })
       return axios.post(`${Config.API_URL}/token`, tokenFormData)
-        .then(tokenRes => tokenRes.data.data)
+        .then(tokenRes => tokenRes)
         .then(tokenRes => ({
           user: convertUser(res.auth_user),
           tokens: {
-            token: tokenRes.token,
-            u_hash: tokenRes.u_hash,
+            token: tokenRes.data.data.token,
+            u_hash: tokenRes.data.data.u_hash,
           },
+          data: null,
         }))
     })
 }
 export const login = apiMethod<typeof _login>(_login, { authRequired: false })
+
+const _googleLogin = (
+  { formData }: IApiMethodArguments,
+  data: {
+         u_name: string,
+         u_phone: string,
+         u_email: IUser['u_email'],
+         type: ERegistrationType,
+         u_role: EUserRoles,
+         ref_code: string,
+         u_details: any,
+         st: string | undefined,
+     } | {},
+  auth_hash: any,
+): Promise<{ user: IUser, tokens: ITokens } | null> => {
+  if(auth_hash === null) {
+    addToFormData(formData, {
+      ...data,
+    })
+    return axios.post(`${Config.API_URL}/register`, formData)
+      .then(res => res.data)
+      .then(res => {
+        if (!res?.data?.token || !res?.data?.u_hash) {
+          return Promise.reject()
+        }
+        const tokenFormData = new FormData()
+        addToFormData(tokenFormData, {
+          token: res?.data?.token,
+          u_hash: res?.data?.u_hash,
+        })
+        return axios.post(`${Config.API_URL}/token/authorized`, tokenFormData)
+          .then(userRes => userRes.data)
+          .then(userRes => ({
+            user: convertUser(userRes.auth_user),
+            tokens: {
+              token: userRes.data.token,
+              u_hash: userRes.data.u_hash,
+            },
+          }))
+      })
+  } else {
+    const tokenFormData = new FormData()
+    addToFormData(tokenFormData, {
+      auth_hash:  auth_hash.auth_hash,
+    })
+    return axios.post(`${Config.API_URL}/token`, tokenFormData)
+      .then(tokenRes => tokenRes.data)
+      .then(tokenRes => {
+        return {
+          user: convertUser(tokenRes.auth_user),
+          tokens: {
+            token: tokenRes.data.token,
+            u_hash: tokenRes.data.u_hash,
+          },
+        }
+      })
+  }
+}
+export const googleLogin = apiMethod<typeof _googleLogin>(_googleLogin, { authRequired: false })
 
 const _logout = (
   { formData }: IApiMethodArguments,
@@ -112,8 +206,8 @@ const _postDrive = (
   { formData }: IApiMethodArguments,
   data: IOrder,
 ): Promise<IResponseFields & {
-  b_id: IOrder['b_id'],
-  b_driver_code: IOrder['b_driver_code']
+    b_id: IOrder['b_id'],
+    b_driver_code: IOrder['b_driver_code']
 }> => {
   addToFormData(formData, {
     data: JSON.stringify(reverseConvertOrder(data)),
@@ -128,7 +222,7 @@ const _postTrip = (
   { formData }: IApiMethodArguments,
   data: ITrip,
 ): Promise<IResponseFields & {
-  t_id: ITrip['t_id'],
+    t_id: ITrip['t_id'],
 }> => {
   addToFormData(formData, {
     data: JSON.stringify(reverseConvertTrip(data)),
@@ -283,26 +377,26 @@ const _takeOrder = (
   { formData }: IApiMethodArguments,
   id: IOrder['b_id'],
   options: {
-    votingNumber: number
-    performers_price: number
-  },
+        votingNumber: number
+        performers_price: number
+    },
   candidate?: boolean,
 ): Promise<{
-  /** Индекс водителя */
-  c_index: string,
-  /** Текущее число машин поездки с booking_driver_states=3,4,5,6 */
-  current_cars_count: string,
-  /** Необходимое число машин поездки */
-  b_cars_count: string,
-  /** Если изменился статус поезки */
-  b_state?: '1->2' | null
+    /** Индекс водителя */
+    c_index: string,
+    /** Текущее число машин поездки с booking_driver_states=3,4,5,6 */
+    current_cars_count: string,
+    /** Необходимое число машин поездки */
+    b_cars_count: string,
+    /** Если изменился статус поезки */
+    b_state?: '1->2' | null
 }> => {
   const userID = userSelectors.user(store.getState())?.u_id
   if (!userID) Promise.reject(t(TRANSLATION.WRONG_USER_ROLE))
 
   return getUserCar(userID as string)
     .then(car => {
-      if(!car) return Promise.reject(t(TRANSLATION.NOT_LINKED_CAR))
+      if (!car) return Promise.reject(t(TRANSLATION.NOT_LINKED_CAR))
 
       addToFormData(formData, {
         action: EBookingActions.SetPerformer,
@@ -434,13 +528,13 @@ const _setOutDrive = (
   { formData }: IApiMethodArguments,
   isFinished: boolean,
   addresses?: {
-    fromAddress?: string,
-    fromLatitude?: string,
-    fromLongitude?: string,
-    toAddress?: string,
-    toLatitude?: string,
-    toLongitude?: string,
-  },
+        fromAddress?: string,
+        fromLatitude?: string,
+        fromLongitude?: string,
+        toAddress?: string,
+        toLatitude?: string,
+        toLongitude?: string,
+    },
   passengers?: IOrder['b_passengers_count'],
 ): Promise<IResponseFields> => {
   addToFormData(formData, {
@@ -541,7 +635,7 @@ export const geocode = (
   )
     .then(res =>
       res.data[0] &&
-      ({ ...res.data[0], lat: parseFloat(res.data[0].lat), lon: parseFloat(res.data[0].lon) }),
+            ({ ...res.data[0], lat: parseFloat(res.data[0].lat), lon: parseFloat(res.data[0].lon) }),
     )
 }
 
@@ -590,22 +684,22 @@ export const notifyPosition = (point: IAddressPoint) => {
 
 export const getPointSuggestions = async(targetString?: string, isIntercity?: boolean): Promise<ISuggestion[]> => {
   const commonSuggestions: ISuggestion[] =
-    getHints(targetString)
-      .map(item => ({
-        type: ESuggestionType.PointUserTop,
-        point: {
-          address: item,
-        },
-      }))
-      .concat(
         getHints(targetString)
           .map(item => ({
-            type: ESuggestionType.PointUnofficial,
+            type: ESuggestionType.PointUserTop,
             point: {
               address: item,
             },
-          })),
-      )
+          }))
+          .concat(
+            getHints(targetString)
+              .map(item => ({
+                type: ESuggestionType.PointUnofficial,
+                point: {
+                  address: item,
+                },
+              })),
+          )
   if (!targetString) {
     return commonSuggestions
   }

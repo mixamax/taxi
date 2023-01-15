@@ -134,30 +134,30 @@ const RegisterForm: React.FC<IProps> = ({
       toggleRegistrationAlertVisibility()
     }
 
-    if (status === EStatuses.Success && type === ERegistrationType.Phone && shouldSendToWhatsapp) {
-      if (response) {
-        axios.post(`${WHATSAPP_BOT_URL}/send-message`,
-          {
-            phone: u_phone,
-            code: response.string,
-          },
-          {
-            headers: {
-              'x-api-key': WHATSAPP_BOT_KEY,
-            },
-          },
-        ).then((response) => {
-          console.log(response)
-          whatsappResponseMessage = response.data
-        }).catch((err) => {
-          console.log(err)
-          whatsappResponseMessage = err
-        }).finally(() => {
-          toggleRegistrationAlertVisibility()
-          toggleWhatsappAlertVisibility()
-        })
-      }
-    }
+    // if (status === EStatuses.Success && type === ERegistrationType.Phone && shouldSendToWhatsapp) {
+    //   if (response) {
+    //     axios.post(`${WHATSAPP_BOT_URL}/send-message`,
+    //       {
+    //         phone: u_phone,
+    //         code: response.string,
+    //       },
+    //       {
+    //         headers: {
+    //           'x-api-key': WHATSAPP_BOT_KEY,
+    //         },
+    //       },
+    //     ).then((response) => {
+    //       console.log(response)
+    //       whatsappResponseMessage = response.data
+    //     }).catch((err) => {
+    //       console.log(err)
+    //       whatsappResponseMessage = err
+    //     }).finally(() => {
+    //       toggleRegistrationAlertVisibility()
+    //       toggleWhatsappAlertVisibility()
+    //     })
+    //   }
+    // }
   }, [status])
 
   useEffect(() => {
@@ -196,6 +196,15 @@ const RegisterForm: React.FC<IProps> = ({
         state: data.state,
         zip: data.zip,
         card: data.card,
+      },
+      u_car: {
+        cm_id: data.car_model,
+        seats: data.seats,
+        registration_plate: data.car_number,
+        color: data.car_color,
+        photo: '',
+        details: {},
+        cc_id: data.car_classes,
       },
     })
   }
@@ -291,19 +300,19 @@ const RegisterForm: React.FC<IProps> = ({
             error={getPhoneError(u_phone, type === ERegistrationType.Phone)}
           />
 
-          {type === ERegistrationType.Phone && (
-            <Checkbox
-              type="checkbox"
-              label={'Send to Whatsapp'}
-              id="shouldSendToWhatsapp"
-              disabled={type !== ERegistrationType.Phone}
-              wrapperAdditionalClassName="send_to_whatsapp_checkbox"
-              value={shouldSendToWhatsapp ? 'checked' : ''}
-              onChange={(e) => {
-                setShouldSendToWhatsapp(e.target.checked)
-              }}
-            />
-          )}
+          {/*{type === ERegistrationType.Phone && (*/}
+          {/*  <Checkbox*/}
+          {/*    type="checkbox"*/}
+          {/*    label={'Send to Whatsapp'}*/}
+          {/*    id="shouldSendToWhatsapp"*/}
+          {/*    disabled={type !== ERegistrationType.Phone}*/}
+          {/*    wrapperAdditionalClassName="send_to_whatsapp_checkbox"*/}
+          {/*    value={shouldSendToWhatsapp ? 'checked' : ''}*/}
+          {/*    onChange={(e) => {*/}
+          {/*      setShouldSendToWhatsapp(e.target.checked)*/}
+          {/*    }}*/}
+          {/*  />*/}
+          {/*)}*/}
 
           <Input
             inputProps={{

@@ -9,6 +9,10 @@ export const login = (payload: Parameters<typeof API.login>[0]) => {
   return { type: ActionTypes.LOGIN_REQUEST, payload }
 }
 
+export const googleLogin = (payload: Parameters<typeof API.googleLogin>[0]) => {
+  return { type: ActionTypes.GOOGLE_LOGIN_REQUEST, payload }
+}
+
 export const logout = () => {
   return { type: ActionTypes.LOGOUT_REQUEST }
 }
