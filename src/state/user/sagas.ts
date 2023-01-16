@@ -60,8 +60,6 @@ function* googleLoginSaga(data: TAction) {
   try {
 
     const result = yield* call<PromiseReturn<ReturnType<typeof API.googleLogin>>>(API.googleLogin, data.payload)
-    console.log('1111')
-    console.log(result)
 
     if (!result) throw new Error('Wrong login response')
 

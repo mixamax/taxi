@@ -130,21 +130,24 @@ export const login = apiMethod<typeof _login>(_login, { authRequired: false })
 
 const _googleLogin = (
   { formData }: IApiMethodArguments,
-  data: {
-         u_name: string,
-         u_phone: string,
-         u_email: IUser['u_email'],
-         type: ERegistrationType,
-         u_role: EUserRoles,
-         ref_code: string,
-         u_details: any,
-         st: string | undefined,
-     } | {},
-  auth_hash: any,
+  auth: {
+      data: {
+          u_name: string,
+          u_phone: string,
+          u_email: IUser['u_email'],
+          type: ERegistrationType,
+          u_role: EUserRoles,
+          ref_code: string,
+          u_details: any,
+          st: string | undefined,
+      } | null
+      auth_hash: string | null
+  },
 ): Promise<{ user: IUser, tokens: ITokens } | null> => {
-  if(auth_hash === null) {
+  console.log(auth.auth_hash)
+  if(auth.auth_hash === null) {
     addToFormData(formData, {
-      ...data,
+      ...auth.data,
     })
     return axios.post(`${Config.API_URL}/register`, formData)
       .then(res => res.data)
@@ -170,7 +173,7 @@ const _googleLogin = (
   } else {
     const tokenFormData = new FormData()
     addToFormData(tokenFormData, {
-      auth_hash:  auth_hash.auth_hash,
+      auth_hash:  auth.auth_hash,
     })
     return axios.post(`${Config.API_URL}/token`, tokenFormData)
       .then(tokenRes => tokenRes.data)
@@ -190,7 +193,7 @@ export const googleLogin = apiMethod<typeof _googleLogin>(_googleLogin, { authRe
 const _logout = (
   { formData }: IApiMethodArguments,
 ): Promise<any> => {
-  return axios.post(`${Config.API_URL}/logout`)
+  return axios.post(`${Config.API_URL}/logout/?`)
 }
 export const logout = apiMethod<typeof _logout>(_logout, { authRequired: false })
 

@@ -114,7 +114,7 @@ const LoginForm: React.FC<IProps> = ({
     if(auth_hash){
       if (typeof auth_hash === 'string') {
         googleLogin({
-          data: {},
+          data: null,
           auth_hash: decodeURIComponent(auth_hash),
         })
       }
