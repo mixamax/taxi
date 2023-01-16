@@ -144,7 +144,6 @@ const _googleLogin = (
       auth_hash: string | null
   },
 ): Promise<{ user: IUser, tokens: ITokens } | null> => {
-  console.log(auth.auth_hash)
   if(auth.auth_hash === null) {
     addToFormData(formData, {
       ...auth.data,
@@ -162,13 +161,15 @@ const _googleLogin = (
         })
         return axios.post(`${Config.API_URL}/token/authorized`, tokenFormData)
           .then(userRes => userRes.data)
-          .then(userRes => ({
-            user: convertUser(userRes.auth_user),
-            tokens: {
-              token: userRes.data.token,
-              u_hash: userRes.data.u_hash,
-            },
-          }))
+          .then(userRes => {
+            return {
+              user: convertUser(userRes.auth_user),
+              tokens: {
+                token: userRes.data.token,
+                u_hash: userRes.data.u_hash,
+              },
+            }
+          })
       })
   } else {
     const tokenFormData = new FormData()

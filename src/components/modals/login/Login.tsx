@@ -125,7 +125,7 @@ const LoginForm: React.FC<IProps> = ({
         if (typeof u_email === 'string' && typeof u_name === 'string') {
           googleLogin({
             data: {
-              u_name: decodeURIComponent(u_name),
+              u_name: decodeURIComponent(u_name).replaceAll('+', ' '),
               u_phone: '',
               u_email: decodeURIComponent(u_email),
               type: ERegistrationType.Email,
