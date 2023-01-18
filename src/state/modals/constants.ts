@@ -18,6 +18,7 @@ export const ActionTypes = {
   SET_SEATS_MODAL: `${prefix}/SET_PLACE_MODAL`,
   SET_LOGIN_MODAL: `${prefix}/SET_LOGIN_MODAL`,
   SET_ALARM_MODAL: `${prefix}/SET_ALARM_MODAL`,
+  SET_WACODE_MODAL: `${prefix}/SET_WACODE_MODAL`,
   SET_TAKE_PASSENGER_MODAL: `${prefix}/SET_TAKE_PASSENGER_MODAL`,
   UPDATE_TAKE_PASSENGER_MODAL: `${prefix}/UPDATE_TAKE_PASSENGER_MODAL`,
   SET_TAKE_PASSENGER_MODAL_FROM_REQUEST: `${prefix}/SET_TAKE_PASSENGER_MODAL_FROM_REQUEST`,
@@ -51,7 +52,12 @@ export interface IModalsState {
   isVoteModalOpen: boolean,
   isSeatsModalOpen: boolean,
   isLoginModalOpen: boolean,
-  isCandidatesModalOpen: boolean,
+  isCandidatesModalOpen: boolean
+  WACodeModal: {
+    isOpen: boolean,
+    login: any,
+    data: any,
+  },
   alarmModal: {
     isOpen: boolean,
     seconds: number,

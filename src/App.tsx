@@ -29,6 +29,7 @@ import { IRootState } from './state'
 import * as API from './API'
 import { modalsSelectors } from './state/modals'
 import Chat from './components/Chat'
+import WACodeModal from './components/modals/login/WACodeModal'
 
 const mapStateToProps = (state: IRootState) => ({
   language: configSelectors.language(state),
@@ -171,6 +172,7 @@ const App: React.FC<IProps> = ({
       <RatingModal/>
       <TieCardModal/>
       <CardDetailsModal/>
+      <WACodeModal />
       <PlaceModal/>
       <AlarmModal/>
       <TakePassengerModal/>

@@ -19,6 +19,10 @@ import { useVisibility } from '../../../tools/hooks'
 import { IResolveParams, LoginSocialGoogle } from 'reactjs-social-login'
 import { GoogleLoginButton } from 'react-social-login-buttons'
 import { useLocation, useParams } from 'react-router-dom'
+import { modalsActionCreators, modalsReducer, modalsSelectors } from '../../../state/modals'
+import { setLoginModal, setWACodeModal } from '../../../state/modals/actionCreators'
+import { isWACodeModalOpen } from '../../../state/modals/selectors'
+import { log } from 'util'
 
 
 const mapStateToProps = (state: IRootState) => ({
@@ -26,22 +30,25 @@ const mapStateToProps = (state: IRootState) => ({
   status: userSelectors.status(state),
   tab: userSelectors.tab(state),
   message: userSelectors.message(state),
+  isWAOpen: modalsSelectors.isWACodeModalOpen,
 })
 
 const mapDispatchToProps = {
   login: userActionCreators.login,
+  setLoginModal: modalsActionCreators.setLoginModal,
   googleLogin: userActionCreators.googleLogin,
   logout: userActionCreators.logout,
   remindPassword: userActionCreators.remindPassword,
   setStatus: userActionCreators.setStatus,
   setMessage: userActionCreators.setMessage,
   register: userActionCreators.register,
+  setWAOpen: modalsActionCreators.setWACodeModal,
 }
 
 const connector = connect(mapStateToProps, mapDispatchToProps)
 
 interface IFormValues {
-    login: string,
+    login: string | undefined,
     password: string | undefined,
     type: ERegistrationType
 }
@@ -59,14 +66,17 @@ const LoginForm: React.FC<IProps> = ({
   message,
   isOpen,
   register,
+  setWAOpen,
   login,
   logout,
   remindPassword,
   setMessage,
   setStatus,
+  setLoginModal,
 }) => {
   const [isPasswordShows, setIsPasswordShows] = useState(false)
   const [isVisible, toggleVisibility] = useVisibility(false)
+  const [isPasswordVisible, togglePasswordVisibility] = useVisibility(true)
   const [isWhatsappAlertVisible, toggleWhatsappAlertVisibility] = useVisibility(false)
   const location = useLocation()
   const googleClientId = '973943716904-b33r11ijgi08m5etsg5ndv409shh1tjl.apps.googleusercontent.com'
@@ -78,7 +88,7 @@ const LoginForm: React.FC<IProps> = ({
   const schema = yup.object({
     type: yup.string().required(),
     login: yup.string().required().when('type', {
-      is: (type: ERegistrationType) => type === ERegistrationType.Email,
+      is: (type: ERegistrationType) => (type === ERegistrationType.Email),
       then: yup.string().required().matches(emailRegex, t(TRANSLATION.EMAIL_ERROR)),
       otherwise: yup.string().required().matches(phoneRegex, t(TRANSLATION.PHONE_PATTERN_ERROR)),
     }),
@@ -98,7 +108,7 @@ const LoginForm: React.FC<IProps> = ({
       login: user?.u_email || '',
       type: ERegistrationType.Email,
     },
-    resolver: yupResolver(schema),
+    resolver: yupResolver(user ? yup.object() : schema),
   })
   const { login: formLogin, type } = useWatch<IFormValues>({ control })
 
@@ -111,7 +121,7 @@ const LoginForm: React.FC<IProps> = ({
 
   useEffect(() => {
     let auth_hash = getParamFromURL('auth_hash')
-    if(auth_hash){
+    if (auth_hash) {
       if (typeof auth_hash === 'string') {
         googleLogin({
           data: null,
@@ -121,7 +131,7 @@ const LoginForm: React.FC<IProps> = ({
     } else {
       let u_email = getParamFromURL('u_email')
       let u_name = getParamFromURL('u_name')
-      if(u_email && u_name) {
+      if (u_email && u_name) {
         if (typeof u_email === 'string' && typeof u_name === 'string') {
           googleLogin({
             data: {
@@ -145,6 +155,14 @@ const LoginForm: React.FC<IProps> = ({
     isDirty && trigger()
   }, [type])
 
+  useEffect(() => {
+    if (type === ERegistrationType.Whatsapp && isPasswordVisible) {
+      togglePasswordVisibility()
+    } else if (!isPasswordVisible) {
+      togglePasswordVisibility()
+    }
+  }, [type])
+
 
   useEffect(() => {
     if (status === EStatuses.Fail || status === EStatuses.Success) {
@@ -160,16 +178,25 @@ const LoginForm: React.FC<IProps> = ({
     if (user) {
       logout()
     } else {
-      login(data)
+      if(data) {
+        login(data)
+        if(type === ERegistrationType.Whatsapp) {
+          setLoginModal(false)
+          setWAOpen({
+            isOpen: true,
+            login: login,
+            data: data,
+          })
+        }
+      }
     }
   }
 
   const getParamFromURL = (param: string) => {
     let results = new RegExp('[\?&]' + param + '=([^&#]*)').exec(window.location.href)
-    if (results == null){
+    if (results == null) {
       return null
-    }
-    else {
+    } else {
       return decodeURI(results[1]) || 0
     }
   }
@@ -178,39 +205,41 @@ const LoginForm: React.FC<IProps> = ({
     <Input
       inputProps={{
         ...formRegister('login'),
-        placeholder: type === ERegistrationType.Phone || ERegistrationType.Whatsapp ? t(TRANSLATION.PHONE) : t(TRANSLATION.EMAIL),
+        placeholder: type === ERegistrationType.Phone || type === ERegistrationType.Whatsapp ? t(TRANSLATION.PHONE) : t(TRANSLATION.EMAIL),
       }}
       label={t(TRANSLATION.LOGIN)}
       error={errors.login?.message}
       key={type}
     />
-    <Input
-      inputProps={{
-        ...formRegister('password'),
-        type: isPasswordShows ? 'text' : 'password',
-        placeholder: t(TRANSLATION.PASSWORD),
-      }}
-      label={t(TRANSLATION.PASSWORD)}
-      error={errors.password?.message}
-      buttons={[
-        {
-          src: isPasswordShows ? images.closedEye : images.openedEye,
-          onClick: () => setIsPasswordShows(prev => !prev),
-        },
-        {
-          ...(!user ?
-            {
-              className: 'restore-password-block__button',
-              onClick: () => formLogin && remindPassword(formLogin),
-              disabled: !formLogin || !!errors?.login,
-              text: t(TRANSLATION.RESTORE_PASSWORD),
-              skipHandler: true,
-            } :
-            {}
-          ),
-        },
-      ].filter(item => Object.values(item).length)}
-    />
+    {isPasswordVisible &&
+          <Input
+            inputProps={{
+              ...formRegister('password'),
+              type: isPasswordShows ? 'text' : 'password',
+              placeholder: t(TRANSLATION.PASSWORD),
+            }}
+            label={t(TRANSLATION.PASSWORD)}
+            error={errors.password?.message}
+            buttons={[
+              {
+                src: isPasswordShows ? images.closedEye : images.openedEye,
+                onClick: () => setIsPasswordShows(prev => !prev),
+              },
+              {
+                ...(!user ?
+                  {
+                    className: 'restore-password-block__button',
+                    onClick: () => formLogin && remindPassword(formLogin),
+                    disabled: !formLogin || !!errors?.login,
+                    text: t(TRANSLATION.RESTORE_PASSWORD),
+                    skipHandler: true,
+                  } :
+                  {}
+                ),
+              },
+            ].filter(item => Object.values(item).length)}
+          />
+    }
 
     <Checkbox
       {...formRegister('type')}

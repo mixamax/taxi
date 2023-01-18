@@ -18,6 +18,7 @@
     right: 0;
     bottom: 0;
     z-index: 500;
+
     &--active {
       display: flex;
     }
@@ -99,9 +100,11 @@
     flex: 1 0 auto;
     text-align: center;
     font-weight: normal;
+
     &--fail {
       color: red;
     }
+
     &--success {
       color: lightgreen;
     }
@@ -110,16 +113,19 @@
 
 .cancel-order-modal {
   padding: 15px;
+
   .reason-item {
     border-bottom: 1px solid #BABABA;
     box-shadow: 0 1px 1px #FFFFFF;
     cursor: pointer;
     color: #686868;
     padding: 20px;
+
     &--active {
       background-color: #e1f8ff;
     }
   }
+
   .button:first-child {
     margin-bottom: 15px;
   }
@@ -207,9 +213,11 @@
 
         .comment-buttons {
           display: flex;
+
           .ok-btn {
             flex-grow: 1;
           }
+
           .voice-btn {
             button {
               color: black !important;
@@ -321,12 +329,12 @@
   }
 
   .cancell-button {
-      flex: 1;
+    flex: 1;
 
-      button {
-        background: linear-gradient(90deg, #FF8008 0%, #FFC837 100%);
-      }
+    button {
+      background: linear-gradient(90deg, #FF8008 0%, #FFC837 100%);
     }
+  }
 }
 
 .rating-modal {
@@ -672,8 +680,9 @@
   }
 }
 
-.vote-modal {
+.whatsapp-modal {
   //height: 374px;
+  z-index: 610;
 
   .groupped-buttons {
     display: flex;
@@ -690,7 +699,7 @@
         }
       }
 
-      .timer-block {
+      .code-block {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -728,7 +737,72 @@
       border-radius: 14px;
       text-transform: none !important;
     }
-    
+
+    &.cancel button {
+      background: linear-gradient(107.25deg, #FFE34E 10.86%, #FFF500 102.23%);
+      border: 2px solid #FBD300;
+      color: #414141 !important;
+    }
+  }
+}
+
+.vote-modal {
+  //height: 374px;
+
+  .groupped-buttons {
+    display: flex;
+    width: 100%;
+  }
+
+  form {
+    fieldset {
+      legend {
+        img {
+          position: absolute;
+          right: 45px;
+          top: 2px;
+        }
+      }
+
+      .vote-block {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        &_timer-img {
+          margin: 10px 0 12px 0;
+        }
+
+        article {
+          display: flex;
+          align-items: center;
+          font-weight: 300;
+          font-size: 20px;
+          line-height: 23px;
+          text-align: center;
+
+          span {
+            font-style: normal;
+            font-weight: normal;
+            font-size: 57px;
+            line-height: 67px;
+            margin: 0 13px
+          }
+        }
+      }
+    }
+  }
+
+  &-btn {
+    width: 100%;
+    margin-bottom: 12px;
+
+    button {
+      background: linear-gradient(90deg, #EC4C60 0%, #991B0E 100%);
+      border-radius: 14px;
+      text-transform: none !important;
+    }
+
     &.cancel button {
       background: linear-gradient(107.25deg, #FFE34E 10.86%, #FFF500 102.23%);
       border: 2px solid #FBD300;
@@ -874,7 +948,7 @@
 
       &-replies {
         margin: 0;
-        
+
         @media (max-width: 768px) {
           font-size: 15px;
         }
@@ -938,6 +1012,7 @@
         img {
           width: 30px;
         }
+
         margin-right: 15px;
       }
     }
@@ -964,6 +1039,7 @@
 
 .delete-file-modal {
   background-color: transparentize(#fff, .1);
+
   &__text {
     margin: 20px auto;
     display: block;

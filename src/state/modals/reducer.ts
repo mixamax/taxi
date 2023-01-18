@@ -20,6 +20,11 @@ export const defaultMapModal = {
   type: EMapModalTypes.Client,
   defaultCenter: null,
 }
+export const defaultWACodeModal = {
+  isOpen: false,
+  login: null,
+  data: null,
+}
 export const defaultTakePassengerModal = {
   isOpen: false,
   from: null,
@@ -45,6 +50,7 @@ export const record = Record<IModalsState>({
   isTieCardModalOpen: false,
   isCardDetailsModalOpen: false,
   isVoteModalOpen: false,
+  WACodeModal: { ...defaultWACodeModal },
   isSeatsModalOpen: false,
   isLoginModalOpen: false,
   isDriverCancelModalOpen: false,
@@ -97,6 +103,9 @@ export default function reducer(state = new record(), action: TAction) {
     case ActionTypes.SET_CANDIDATES_MODAL:
       return state
         .set('isCandidatesModalOpen', payload)
+    case ActionTypes.SET_WACODE_MODAL:
+      return state
+        .set('WACodeModal', payload)
     case ActionTypes.SET_ALARM_MODAL:
       return state
         .set('alarmModal', { ...payload, seconds: payload.seconds || (payload.isOpen ? ALARM_SECONDS : 0) })
