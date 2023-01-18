@@ -75,6 +75,7 @@ const WACodeModal: React.FC<IProps> = ({
                   let data = payload.data
                   data.password = code
                   payload.login(data)
+                  setCode('')
                   setWACodeModal({ ...defaultWACodeModal })
                 }}
               />
