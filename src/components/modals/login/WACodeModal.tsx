@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { connect, ConnectedProps } from 'react-redux'
 import Button from '../../Button'
 import '../styles.scss'
-import * as API from '../../../API'
-import { t, TRANSLATION } from '../../../localization'
-import SITE_CONSTANTS from '../../../siteConstants'
 import { IRootState } from '../../../state'
-import { clientOrderSelectors } from '../../../state/clientOrder'
-import { ordersSelectors } from '../../../state/orders'
-import moment from 'moment'
 import { modalsActionCreators, modalsSelectors } from '../../../state/modals'
-import { useInterval } from '../../../tools/hooks'
-import images from '../../../constants/images'
 import Overlay from '../Overlay'
-import { EColorTypes } from '../../../types/types'
 import { userSelectors } from '../../../state/user'
 import Input from '../../Input'
 import { defaultWACodeModal } from '../../../state/modals/reducer'
+import * as yup from 'yup'
+import { useForm, useWatch } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { t, TRANSLATION } from '../../../localization'
+
+
+interface IFormValues {
+  code: number,
+}
 
 const mapStateToProps = (state: IRootState) => ({
   payload: modalsSelectors.isWACodeModalOpen(state),
@@ -37,10 +37,30 @@ interface IProps extends ConnectedProps<typeof connector> {
 const WACodeModal: React.FC<IProps> = ({
   payload,
   setWACodeModal,
-  setCancelModal,
 }) => {
 
-  const [code, setCode] = useState('')
+  const schema = yup.object({
+    code: yup.number().required(),
+  })
+
+
+  const {
+    register: formRegister,
+    handleSubmit,
+    formState: { errors, isDirty },
+    control,
+  } = useForm<IFormValues>({
+    criteriaMode: 'all',
+    mode: 'all',
+    resolver: yupResolver(schema),
+  })
+
+  const onSubmit = (formData : IFormValues) => {
+    let data = payload.data
+    data.password = formData.code
+    payload.login(data)
+    setWACodeModal({ ...defaultWACodeModal })
+  }
 
   return (
     <Overlay
@@ -50,34 +70,29 @@ const WACodeModal: React.FC<IProps> = ({
       <div
         className="modal whatsapp-modal"
       >
-        <form>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <fieldset>
             <div className="code-block">
-              <p>Message with code sent to you. Check your Whatsapp.</p>
+              <p>{t(TRANSLATION.CODEINFO)}</p>
               <Input
                 // inputProps={{
                 //   ...formRegister('password'),
                 //   type: isPasswordShows ? 'text' : 'password',
                 //   placeholder: t(TRANSLATION.PASSWORD),
                 // }}
-                onChange={(e) => {
-                  setCode(e)
+                error={errors.code?.message ? t(TRANSLATION.CODEERROR) : ''}
+                inputProps={{
+                  ...formRegister('code'),
                 }}
-                label={'Write your code here'}
+                label={t(TRANSLATION.CODEWRITE)}
               />
 
               <Button
-                type={'button'}
+                type={'submit'}
                 skipHandler={true}
-                text={'Login'}
+                disabled={!!Object.values(errors).length}
+                text={t(TRANSLATION.SIGN_IN)}
                 className="whatsapp-modal-btn"
-                onClick={() => {
-                  let data = payload.data
-                  data.password = code
-                  payload.login(data)
-                  setCode('')
-                  setWACodeModal({ ...defaultWACodeModal })
-                }}
               />
             </div>
           </fieldset>

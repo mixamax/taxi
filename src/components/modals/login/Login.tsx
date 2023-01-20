@@ -16,13 +16,9 @@ import * as yup from 'yup'
 import Alert from '../../Alert/Alert'
 import { Intent } from '../../Alert'
 import { useVisibility } from '../../../tools/hooks'
-import { IResolveParams, LoginSocialGoogle } from 'reactjs-social-login'
 import { GoogleLoginButton } from 'react-social-login-buttons'
-import { useLocation, useParams } from 'react-router-dom'
-import { modalsActionCreators, modalsReducer, modalsSelectors } from '../../../state/modals'
-import { setLoginModal, setWACodeModal } from '../../../state/modals/actionCreators'
-import { isWACodeModalOpen } from '../../../state/modals/selectors'
-import { log } from 'util'
+import { useLocation } from 'react-router-dom'
+import { modalsActionCreators,  modalsSelectors } from '../../../state/modals'
 
 
 const mapStateToProps = (state: IRootState) => ({
@@ -165,7 +161,7 @@ const LoginForm: React.FC<IProps> = ({
 
 
   useEffect(() => {
-    if (status === EStatuses.Fail || status === EStatuses.Success) {
+    if ((status === EStatuses.Fail || status === EStatuses.Success) && type !== ERegistrationType.Whatsapp) {
       toggleVisibility()
     } else if (status === EStatuses.Whatsapp) {
       setLoginModal(false)
