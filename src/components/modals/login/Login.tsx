@@ -75,9 +75,9 @@ const LoginForm: React.FC<IProps> = ({
   setLoginModal,
 }) => {
   const [isPasswordShows, setIsPasswordShows] = useState(false)
+  const [dataToLogin, setDataToLogin] = useState({})
   const [isVisible, toggleVisibility] = useVisibility(false)
   const [isPasswordVisible, togglePasswordVisibility] = useVisibility(true)
-  const [isWhatsappAlertVisible, toggleWhatsappAlertVisibility] = useVisibility(false)
   const location = useLocation()
   const googleClientId = '973943716904-b33r11ijgi08m5etsg5ndv409shh1tjl.apps.googleusercontent.com'
 
@@ -168,26 +168,24 @@ const LoginForm: React.FC<IProps> = ({
     if (status === EStatuses.Fail || status === EStatuses.Success) {
       toggleVisibility()
     } else if (status === EStatuses.Whatsapp) {
-      toggleWhatsappAlertVisibility()
+      setLoginModal(false)
+      setWAOpen({
+        isOpen: true,
+        login: login,
+        data: dataToLogin,
+      })
     }
   }, [status])
 
   if (tab !== LOGIN_TABS_IDS[0]) return null
 
   const onSubmit = (data: IFormValues) => {
+    setDataToLogin(data)
     if (user) {
       logout()
     } else {
-      if(data) {
+      if (data) {
         login(data)
-        if(type === ERegistrationType.Whatsapp) {
-          setLoginModal(false)
-          setWAOpen({
-            isOpen: true,
-            login: login,
-            data: data,
-          })
-        }
       }
     }
   }
@@ -274,49 +272,35 @@ const LoginForm: React.FC<IProps> = ({
           </div>
     }
 
-    {
-      isWhatsappAlertVisible &&
-          <div className="alert-container">
-            <Alert
-              intent={Intent.SUCCESS}
-              message={'Check your Whatsapp!'}
-              onClose={toggleWhatsappAlertVisibility}
-            />
-          </div>
-    }
-
     {Number(role) !== EUserRoles.Driver && (
-    // <LoginSocialGoogle
-    //   client_id={googleClientId}
-    //   onLoginStart={() => {
-    //     window.location.href = 'https://ibronevik.ru/taxi/google/'
-    //   }}
-    //   redirect_uri={'https://ibronevik.ru/taxi/google/state'}
-    //   scope="openid profile email"
-    //   discoveryDocs="claims_supported"
-    //   access_type="online"
-    //   onResolve={(data) => {
-    //     console.log(data)
-    //     // const obj = {
-    //     //   u_name: data?.name,
-    //     //   u_phone: '',
-    //     //   u_email: 'moj14frffefff@gmail.com',          // TODO: заменить на data?.email
-    //     //   type: ERegistrationType.Email,
-    //     //   u_role: EUserRoles.Client,
-    //     //   ref_code: '',
-    //     //   u_details: {},
-    //     //   st: '1',
-    //     // }
-    //     //googleLogin(obj)
-    //   }}
-    //   onReject={err => {
-    //     console.log(err)
-    //   }}
-    // >
-      <a href={'https://accounts.google.com/o/oauth2/v2/auth?response_type=code&access_type=online&client_id=973943716904-b33r11ijgi08m5etsg5ndv409shh1tjl.apps.googleusercontent.com&redirect_uri=https%3A%2F%2Fibronevik.ru%2Ftaxi%2Fc%2F0%2Fgoogle%2F&state&scope=email%20profile&approval_prompt=auto'}>
-        <GoogleLoginButton/>
+      // <LoginSocialGoogle
+      //   client_id={googleClientId}
+      //   onLoginStart={() => {}}
+      //   redirect_uri={''}
+      //   scope="profile email"
+      //   access_type="online"
+      //   onResolve={(data) => {
+      //     console.log(data)
+      //   // const obj = {
+      //   //   u_name: data?.name,
+      //   //   u_phone: '',
+      //   //   u_email: 'moj14frffefff@gmail.com',          // TODO: заменить на data?.email
+      //   //   type: ERegistrationType.Email,
+      //   //   u_role: EUserRoles.Client,
+      //   //   ref_code: '',
+      //   //   u_details: {},
+      //   //   st: '1',
+      //   // }
+      //   //googleLogin(obj)
+      //   }}
+      //   onReject={err => {
+      //     console.log(err)
+      //   }}
+      // >
+      <a href={`https://accounts.google.com/o/oauth2/v2/auth?response_type=code&access_type=offline&client_id=${googleClientId}&redirect_uri=https%3A%2F%2Fibronevik.ru%2Ftaxi%2Fc%2F0%2Fgoogle%2F&state&scope=email%20profile&prompt=select_account`}>
+        <GoogleLoginButton />
       </a>
-    // </LoginSocialGoogle>
+
     )}
 
     <Button
