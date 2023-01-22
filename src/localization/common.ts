@@ -504,8 +504,7 @@ export default {
   ZIP_CODE: 'zip_code',
   AND: 'and_p',
   OR: 'or_p',
-  CODEINFO: 'code_get_information',
-  CODEWRITE: 'code_write_here',
-  CODEERROR: 'code_error',
-
+  CODE_INFO: 'code_get_information',
+  CODE_WRITE: 'code_write_here',
+  CODE_ERROR: 'code_error',
 } as const

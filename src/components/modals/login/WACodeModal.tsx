@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { connect, ConnectedProps } from 'react-redux'
 import Button from '../../Button'
 import '../styles.scss'
@@ -12,6 +12,10 @@ import * as yup from 'yup'
 import { useForm, useWatch } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { t, TRANSLATION } from '../../../localization'
+import { EStatuses } from '../../../types/types'
+import { useVisibility } from '../../../tools/hooks'
+import Alert from '../../Alert/Alert'
+import { Intent } from '../../Alert'
 
 
 interface IFormValues {
@@ -21,6 +25,7 @@ interface IFormValues {
 const mapStateToProps = (state: IRootState) => ({
   payload: modalsSelectors.isWACodeModalOpen(state),
   user: userSelectors.user(state),
+  status: userSelectors.status(state),
 })
 
 const mapDispatchToProps = {
@@ -37,18 +42,30 @@ interface IProps extends ConnectedProps<typeof connector> {
 const WACodeModal: React.FC<IProps> = ({
   payload,
   setWACodeModal,
+  status,
 }) => {
+
+  const [isVisible, toggleVisibility] = useVisibility(false)
 
   const schema = yup.object({
     code: yup.number().required(),
   })
+  useEffect(() => {
+    if(status === EStatuses.Fail && !isVisible) {
+      toggleVisibility()
+    } else if (status === EStatuses.Success) {
+      reset({})
+      if(isVisible) toggleVisibility()
+      setWACodeModal({ ...defaultWACodeModal })
+    }
+  }, [status])
 
 
   const {
     register: formRegister,
     handleSubmit,
     formState: { errors, isDirty },
-    control,
+    reset,
   } = useForm<IFormValues>({
     criteriaMode: 'all',
     mode: 'all',
@@ -59,7 +76,7 @@ const WACodeModal: React.FC<IProps> = ({
     let data = payload.data
     data.password = formData.code
     payload.login(data)
-    setWACodeModal({ ...defaultWACodeModal })
+
   }
 
   return (
@@ -73,19 +90,31 @@ const WACodeModal: React.FC<IProps> = ({
         <form onSubmit={handleSubmit(onSubmit)}>
           <fieldset>
             <div className="code-block">
-              <p>{t(TRANSLATION.CODEINFO)}</p>
+              <p>{t(TRANSLATION.CODE_INFO)}</p>
               <Input
                 // inputProps={{
                 //   ...formRegister('password'),
                 //   type: isPasswordShows ? 'text' : 'password',
                 //   placeholder: t(TRANSLATION.PASSWORD),
                 // }}
-                error={errors.code?.message ? t(TRANSLATION.CODEERROR) : ''}
+                error={errors.code?.message ? t(TRANSLATION.CODE_ERROR) : ''}
                 inputProps={{
                   ...formRegister('code'),
                 }}
-                label={t(TRANSLATION.CODEWRITE)}
+
+                label={t(TRANSLATION.CODE_WRITE)}
               />
+
+              {
+                isVisible &&
+                  <div className="alert-container">
+                    <Alert
+                      intent={Intent.ERROR}
+                      message={t(TRANSLATION.LOGIN_FAIL)}
+                      onClose={toggleVisibility}
+                    />
+                  </div>
+              }
 
               <Button
                 type={'submit'}
