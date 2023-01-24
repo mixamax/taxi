@@ -58,6 +58,7 @@ import { IBigTruckService } from '../../constants/bigTruckServices'
 import Checkbox from '../../components/Checkbox'
 import RadioCheckbox from '../../components/RadioCheckbox'
 import { withLayout } from '../../HOCs/withLayout'
+import { string } from 'prop-types'
 
 const mapStateToProps = (state: IRootState) => ({
   seats: clientOrderSelectors.seats(state),
@@ -1329,7 +1330,11 @@ const PassengerOrder: React.FC<IProps> = ({
               value: email || '',
             }}
             defaultValue={user?.u_email}
-            onChange={setEmail}
+            onChange={(e) => {
+              if (typeof e === 'string') {
+                setEmail(e)
+              }
+            }}
           />
         )}
 
@@ -1343,7 +1348,11 @@ const PassengerOrder: React.FC<IProps> = ({
             error={getPhoneError(phone)}
             buttons={[{ src: images.checkMark }]}
             defaultValue={user?.u_phone}
-            onChange={setPhone}
+            onChange={(e) => {
+              if (typeof e === 'string') {
+                setPhone(e)
+              }
+            }}
           />
         )}
 

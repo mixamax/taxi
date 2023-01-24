@@ -95,13 +95,16 @@ export interface IBookingCoordinatesLatitude {
   /** Широта цели поездки */
   b_destination_latitude?: number,
 }
+
 export interface IBookingCoordinatesLongitude {
   /** Долгота начальной точки поездки */
   b_start_longitude?: number,
   /** Долгота цели поездки */
   b_destination_longitude?: number,
 }
-export interface IBookingCoordinates extends IBookingCoordinatesLatitude, IBookingCoordinatesLongitude {}
+
+export interface IBookingCoordinates extends IBookingCoordinatesLatitude, IBookingCoordinatesLongitude {
+}
 
 export interface ICarOptions {
   performers_price: number
@@ -320,7 +323,7 @@ export interface ITrip {
   c_u_id?: IUser['u_id']
   t_looking_for_clients?: boolean
   t_canceled?: boolean
-  t_options: {[key: string]: any}
+  t_options: { [key: string]: any }
   orders: IOrder[]
 }
 
@@ -508,7 +511,7 @@ export interface IUser {
   /** Пользователь о себе */
   u_description?: string
   /** Идентификатор навигации, выбранной пользователем(data.gps_softwares) */
-  u_gps_software?:	string
+  u_gps_software?: string
   /** Выполняет ли поездку вне сервиса */
   out_drive?: boolean
   /** Адрес цели поездки вне сервиса */
@@ -541,6 +544,8 @@ export interface IUser {
     zip?: string
     /** Номер карты */
     card?: string
+    document_type?: string
+    document_img?: string | File
   }
   //
   u_registration: Moment
@@ -571,7 +576,7 @@ export enum EStatuses {
   Loading,
   Success,
   Fail,
-  Whatsapp ,
+  Whatsapp,
 }
 
 export interface IRouteInfo {
@@ -604,8 +609,8 @@ export enum EColorTypes {
   Accent
 }
 
-export type TAvailableModes = {[key: string]: { subs?: string[]} }
-export type TMoneyModes = {[key: string]: boolean | {[key: string]: boolean}}
+export type TAvailableModes = { [key: string]: { subs?: string[] } }
+export type TMoneyModes = { [key: string]: boolean | { [key: string]: boolean } }
 
 export type TEntries = { key: string, value: string }[]
 
@@ -614,6 +619,7 @@ export interface ILanguage {
   iso: string
   logo: string
   native: string
+
   [language: string]: string | number
 }
 
@@ -632,7 +638,7 @@ export interface IFile {
   src: string
 }
 
-export type TRoomFurniture = {[id: number]: number}
+export type TRoomFurniture = { [id: number]: number }
 
 export interface IFurniture {
   house: {
@@ -642,21 +648,23 @@ export interface IFurniture {
 }
 
 export type TColor = string
+
 export interface IPaletteColor {
   main: TColor
   light: TColor
   dark: TColor
 }
 
-export type TMoveFiles = {[id: number]: IFile[]}
+export type TMoveFiles = { [id: number]: IFile[] }
 
-export type TElevatorState = {[id: string]: number}
+export type TElevatorState = { [id: string]: number }
+
 export interface IElevatorState {
   elevator?: boolean
   steps: TElevatorState
 }
 
-export type TBlockObject = {[key: string]: any}
+export type TBlockObject = { [key: string]: any }
 
 export interface IRegisterResponse {
   u_id: number,

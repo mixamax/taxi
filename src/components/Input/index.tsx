@@ -15,9 +15,12 @@ import RadioCheckbox from '../RadioCheckbox'
 
 const getSuggestionClass = (type: ESuggestionType = ESuggestionType.PointOfficial) => {
   switch (type) {
-    case ESuggestionType.PointOfficial: return 'official'
-    case ESuggestionType.PointUnofficial: return 'unofficial'
-    case ESuggestionType.PointUserTop: return 'user-top'
+    case ESuggestionType.PointOfficial:
+      return 'official'
+    case ESuggestionType.PointUnofficial:
+      return 'unofficial'
+    case ESuggestionType.PointUserTop:
+      return 'user-top'
   }
 }
 
@@ -25,7 +28,8 @@ export enum EInputTypes {
   Default,
   Textarea,
   Select,
-  MaskedPhone
+  MaskedPhone,
+  File,
 }
 
 interface ISideCheckbox {
@@ -43,9 +47,10 @@ interface IProps {
   onSuggestionClick?: (value: ISuggestion) => any
   options?: ISelectOption[]
   inputProps?: React.ComponentProps<'input'> | React.ComponentProps<'select'> | React.ComponentProps<'textarea'> | InputMaskProps
-  onChange?: (newValue: string) => any
+  onChange?: (newValue: string | File) => any
   fieldWrapperClassName?: string
   oneline?: boolean
+  fileName?: string
   showDisablerCheckbox?: boolean
   onDisableChange?: (value: boolean) => any
   defaultValue?: string
@@ -70,6 +75,7 @@ const Input: React.FC<IProps> = (
     showDisablerCheckbox,
     defaultValue,
     sideText,
+    fileName,
     sideCheckbox,
     compareVariant,
     hideInput,
@@ -103,8 +109,13 @@ const Input: React.FC<IProps> = (
         inputProps.onBlur && inputProps.onBlur(e)
       },
       onChange: (e: any) => {
-        onChange && onChange(e.target.value)
-        inputProps.onChange && inputProps.onChange(e as any)
+        if (inputType === EInputTypes.File) {
+          onChange && onChange(e.target.files[0])
+          inputProps.onChange && inputProps.onChange(e as any)
+        } else {
+          onChange && onChange(e.target.value)
+          inputProps.onChange && inputProps.onChange(e as any)
+        }
       },
       id,
       disabled: isDisabled || isDefaultValueUsed || inputProps.disabled,
@@ -119,15 +130,16 @@ const Input: React.FC<IProps> = (
             {...properties}
           />
         )
-      case EInputTypes.Select: return (
-        <select
-          ref={mergedRef}
-          {...inputProps as React.ComponentProps<'select'>}
-          {...properties}
-        >
-          {options?.map((item, index) => <option value={item.value} key={index}>{item.label}</option>)}
-        </select>
-      )
+      case EInputTypes.Select:
+        return (
+          <select
+            ref={mergedRef}
+            {...inputProps as React.ComponentProps<'select'>}
+            {...properties}
+          >
+            {options?.map((item, index) => <option value={item.value} key={index}>{item.label}</option>)}
+          </select>
+        )
       case EInputTypes.MaskedPhone:
         return (
           <InputMask
@@ -137,6 +149,18 @@ const Input: React.FC<IProps> = (
             mask={SITE_CONSTANTS.DEFAULT_PHONE_MASK}
             {...properties}
           />
+        )
+      case EInputTypes.File:
+        return (
+          <label className="input-file">
+            <span className="input-file-text">{fileName}</span>
+            <input
+              ref={mergedRef}
+              {...inputProps as React.ComponentProps<'input'>}
+              {...properties}
+              type="file"
+            />
+          </label>
         )
       default:
         return (
@@ -204,7 +228,9 @@ const Input: React.FC<IProps> = (
           `}
         </style>
       </MetaTags>
-      <div className={cn('input__header', { 'input__header--empty': !showDisablerCheckbox && !defaultValue && !label && !sideCheckbox })}>
+      <div
+        className={cn('input__header', { 'input__header--empty': !showDisablerCheckbox && !defaultValue && !label && !sideCheckbox })}
+      >
         <div className="input__header-item">
           {showDisablerCheckbox && (
             <RadioCheckbox
@@ -218,7 +244,9 @@ const Input: React.FC<IProps> = (
                 checked={isDefaultValueUsed}
                 onChange={handleIsDefaultValueUsedChange}
               />
-              <span onClick={handleIsDefaultValueUsedChange}>{t(TRANSLATION.USE_THE)} {isDefaultValueUsed ? '' : defaultValue}</span>
+              <span
+                onClick={handleIsDefaultValueUsedChange}
+              >{t(TRANSLATION.USE_THE)} {isDefaultValueUsed ? '' : defaultValue}</span>
             </div>
           )}
           {
@@ -262,7 +290,7 @@ const Input: React.FC<IProps> = (
                   {buttons.map((item, index) => (
                     (item as React.ComponentProps<'img'>).src ?
                       (
-                    // eslint-disable-next-line jsx-a11y/alt-text
+                        // eslint-disable-next-line jsx-a11y/alt-text
                         <img key={index} {...item as React.ComponentProps<'img'>} />
                       ) :
                       (
@@ -270,7 +298,9 @@ const Input: React.FC<IProps> = (
                       )
                   ))}
                 </div>}
-                <div className={cn('input__suggestions', { 'input__suggestions--active': isFocused && suggestions?.length })}>
+                <div
+                  className={cn('input__suggestions', { 'input__suggestions--active': isFocused && suggestions?.length })}
+                >
                   {suggestions && suggestions.map((item, index) => (
                     <div
                       key={index}
@@ -290,8 +320,8 @@ const Input: React.FC<IProps> = (
             </div>
             {
               compareVariant !== undefined &&
-            onChangeCompareVariant &&
-            <CompareVariants value={compareVariant} onChange={onChangeCompareVariant} />
+              onChangeCompareVariant &&
+              <CompareVariants value={compareVariant} onChange={onChangeCompareVariant}/>
             }
             {!!error && <p className="input__error">{error}</p>}
           </>

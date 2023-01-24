@@ -1,5 +1,57 @@
 $border-color: #858585;
 
+
+.input-file {
+  position: relative;
+  display: inline-block;
+
+  .input-file-text {
+    padding: 0 10px;
+    line-height: 40px;
+    text-align: left;
+    height: 40px;
+    display: block;
+    float: left;
+    width: 200px;
+    box-sizing: border-box;
+    border-radius: 6px 0px 0 6px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+
+  input[type=file] {
+    position: absolute;
+    z-index: -1;
+    opacity: 0;
+    display: block;
+    width: 0;
+    height: 0;
+    border: none;
+  }
+
+  /* Focus */
+
+  input[type=file]:focus + .input-file-btn {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+  }
+
+  /* Hover/active */
+  :hover .input-file-btn {
+    background-color: #59be6e;
+  }
+
+  :active .input-file-btn {
+    background-color: #2E703A;
+  }
+
+  /* Disabled */
+  input[type=file]:disabled + .input-file-btn {
+    background-color: #eee;
+  }
+}
+
 select {
   display: flex;
   align-items: center;
@@ -35,6 +87,7 @@ textarea {
       display: flex;
       gap: 6px;
       align-items: center;
+
       & * {
         cursor: pointer;
       }
@@ -60,6 +113,7 @@ textarea {
       .input__header {
         margin-bottom: 0;
       }
+
       .input__side-text-wrapper {
         flex: 1;
       }
@@ -86,6 +140,7 @@ textarea {
     display: flex;
     align-items: center;
     gap: 10px;
+
     .input__wrapper {
       flex: 1;
     }
@@ -106,6 +161,7 @@ textarea {
       filter: none;
       opacity: 1;
       background: #EFEFEF;
+
       & * {
         cursor: default;
       }
@@ -115,7 +171,7 @@ textarea {
   &__buttons {
     display: flex;
 
-    &>* {
+    & > * {
       margin: 0 5px;
     }
 
