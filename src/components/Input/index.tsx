@@ -47,7 +47,7 @@ interface IProps {
   onSuggestionClick?: (value: ISuggestion) => any
   options?: ISelectOption[]
   inputProps?: React.ComponentProps<'input'> | React.ComponentProps<'select'> | React.ComponentProps<'textarea'> | InputMaskProps
-  onChange?: (newValue: string | File) => any
+  onChange?: (newValue: string | File[]) => any
   fieldWrapperClassName?: string
   oneline?: boolean
   fileName?: string
@@ -88,6 +88,7 @@ const Input: React.FC<IProps> = (
   const [isFocused, setIsFocused] = useState(false)
   const [isDisabled, setIsDisabled] = useState(inputProps.disabled || false)
   const [isDefaultValueUsed, setIsDefaultValueUsed] = useState(false)
+  const [files, setFiles] = useState<File[]>([])
 
   const id = useMemo(() => inputProps.id || Math.random().toString().slice(2), [])
 
@@ -110,7 +111,7 @@ const Input: React.FC<IProps> = (
       },
       onChange: (e: any) => {
         if (inputType === EInputTypes.File) {
-          onChange && onChange(e.target.files[0])
+          onChange && onChange(e.target.files)
           inputProps.onChange && inputProps.onChange(e as any)
         } else {
           onChange && onChange(e.target.value)
@@ -119,6 +120,17 @@ const Input: React.FC<IProps> = (
       },
       id,
       disabled: isDisabled || isDefaultValueUsed || inputProps.disabled,
+    }
+
+    const addImageToRaw = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files && e.target.files[0]) {
+        setFiles([...files, e.target.files[0]])
+        e.target.value = ''
+      }
+    }
+
+    const removeImg = (file: File) => {
+      setFiles([...files.filter((e) => e !== file)])
     }
 
     switch (inputType) {
@@ -152,15 +164,26 @@ const Input: React.FC<IProps> = (
         )
       case EInputTypes.File:
         return (
-          <label className="input-file">
-            <span className="input-file-text">{fileName}</span>
-            <input
-              ref={mergedRef}
-              {...inputProps as React.ComponentProps<'input'>}
-              {...properties}
-              type="file"
-            />
-          </label>
+          <div className="input-file">
+            {files.map((file: File, index: number) =>
+              (<div
+                className="input-file-uploaded"
+                key={index}
+                onClick={(e) => {
+                  removeImg(file)
+                }}
+              >
+                <img src={URL.createObjectURL(file)}></img>
+              </div>),
+            )}
+            <label className="input-file-add">
+              <input
+                type={'file'}
+                onChange={addImageToRaw}
+              ></input>
+              <img alt={'add photo'} src={images.addPhoto}></img>
+            </label>
+          </div>
         )
       default:
         return (

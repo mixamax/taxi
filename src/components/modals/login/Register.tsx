@@ -426,14 +426,15 @@ const RegisterForm: React.FC<IProps> = ({
         {Number(u_role) === EUserRoles.Driver && (
           <Input
             onChange={(e) => {
-              if (e instanceof File)
-                setFileName(e.name)
+              if (typeof e !== 'string')
+                setFileName(e[0].name)
             }}
             label={'Document photo'}
             fileName={fileName}
             inputProps={{
               ...formRegister('document_img'),
               accept: 'image/png, image/jpeg, image/jpg',
+              multiple: true,
             }}
             inputType={EInputTypes.File}
             error={errors.document_img?.message}
