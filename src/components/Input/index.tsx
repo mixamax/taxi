@@ -98,6 +98,18 @@ const Input: React.FC<IProps> = (
   if ((inputProps as InputMaskProps).inputRef) refs.push((inputProps as InputMaskProps).inputRef)
   const mergedRef = useMergedRef(...refs)
 
+  const addImageToRaw = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFiles([e.target.files[0]])
+      // e.target.value = ''
+    }
+  }
+
+  const removeImg = (file: File) => {
+    setFiles([...files.filter((e) => e !== file)])
+    onChange && onChange('')
+  }
+
   const getInputByType = () => {
     const properties = {
       className: cn('input', inputProps.className),
@@ -113,6 +125,7 @@ const Input: React.FC<IProps> = (
         if (inputType === EInputTypes.File) {
           onChange && onChange(e.target.files)
           inputProps.onChange && inputProps.onChange(e as any)
+          addImageToRaw(e)
         } else {
           onChange && onChange(e.target.value)
           inputProps.onChange && inputProps.onChange(e as any)
@@ -120,17 +133,6 @@ const Input: React.FC<IProps> = (
       },
       id,
       disabled: isDisabled || isDefaultValueUsed || inputProps.disabled,
-    }
-
-    const addImageToRaw = (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.files && e.target.files[0]) {
-        setFiles([...files, e.target.files[0]])
-        e.target.value = ''
-      }
-    }
-
-    const removeImg = (file: File) => {
-      setFiles([...files.filter((e) => e !== file)])
     }
 
     switch (inputType) {
@@ -179,8 +181,9 @@ const Input: React.FC<IProps> = (
             <label className="input-file-add">
               <input
                 type={'file'}
-                onChange={addImageToRaw}
-              ></input>
+                {...inputProps as React.ComponentProps<'input'>}
+                {...properties}
+              />
               <img alt={'add photo'} src={images.addPhoto}></img>
             </label>
           </div>
