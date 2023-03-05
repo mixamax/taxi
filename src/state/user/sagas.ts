@@ -2,6 +2,7 @@ import { ActionTypes as ConfigActionTypes } from './../config/constants'
 import { all, put } from 'redux-saga/effects'
 import { setLoginModal } from '../modals/actionCreators'
 import { ActionTypes } from './constants'
+import { uploadRegisterFiles } from './helpers'
 import { call, takeEvery } from '../../tools/sagaUtils'
 import * as API from './../../API'
 import { PromiseReturn, TAction } from '../../types'
@@ -85,7 +86,11 @@ function* googleLoginSaga(data: TAction) {
 function* registerSaga(data: TAction) {
   yield put({ type: ActionTypes.REGISTER_START })
   try {
-    let response = yield* call<any>(API.register, data.payload)
+    const { uploads, ...payload } = data.payload
+    let response = yield* call<any>(API.register, payload)
+
+    yield* call<any>(uploadRegisterFiles, { filesToUpload: uploads, response })
+
     yield put({ type: ActionTypes.REGISTER_SUCCESS, payload: response })
   } catch (error) {
     console.error(error)

@@ -546,6 +546,7 @@ export interface IUser {
     card?: string
     document_type?: string
     document_img?: string | File
+    document_2_img?: string | File
   }
   //
   u_registration: Moment
@@ -555,6 +556,9 @@ export interface IUser {
   role: EUserRoles
   // Машин пользователя (если он является водителем)
   u_car: any
+  token?: string
+  u_hash?: string
+  uploads?: any[]
 }
 
 export interface ITokens {
@@ -668,5 +672,14 @@ export type TBlockObject = { [key: string]: any }
 
 export interface IRegisterResponse {
   u_id: number,
-  string: string
+  string: string,
+  token?: string,
+  u_hash?: string
+}
+
+export type IFileUpload = {
+  base64: string,
+  name?: string,
+  u_id?: string,
+  private?: 0 | 1
 }

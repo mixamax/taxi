@@ -500,7 +500,14 @@ const convertTypes = <T, R>(
     else if (toIntKeys.includes(key)) convertedObject[key] = parseInt(value)
     else if (toStringKeys.includes(key)) convertedObject[key] = String(value)
     else if (toStringObjectKeys.includes(key)) convertedObject[key] = JSON.stringify(value)
-    else if (toDetailsObjectKeys.includes(key)) convertedObject[key] = JSON.stringify([['=', [], value]])
+    else if (toDetailsObjectKeys.includes(key)) {
+      const detailsArr = []
+      for (let [itemKey, itemValue] of Object.entries(value)) {
+        detailsArr.push(['=', [itemKey], itemValue])
+      }
+      console.log(detailsArr)
+      convertedObject[key] = detailsArr
+    }
     else if (toDateKeys.includes(key)) convertedObject[key] = moment(value)
     else if (toStringDateKeys.includes(key)) convertedObject[key] = value.format(dateFormat)
     else if (toBooleanKeys.includes(key)) convertedObject[key] = Boolean(parseInt(value))
@@ -835,3 +842,10 @@ export const mapBlockObject = (rawObject: TBlockObject) => {
 
   return object
 }
+
+export const getBase64 = (file: any) => new Promise((resolve, reject) => {
+  const reader = new FileReader()
+  reader.readAsDataURL(file)
+  reader.onload = () => resolve(reader.result)
+  reader.onerror = error => reject(error)
+})

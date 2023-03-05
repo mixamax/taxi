@@ -55,7 +55,9 @@ interface IFormValues {
   zip?: string;
   card?: string;
   document_type?: string;
-  document_img?: any;
+  passport?: any;
+  doc1?: any
+  doc2?: any
   car_name: string
   car_model: string | null
   seats: string
@@ -110,7 +112,7 @@ const RegisterForm: React.FC<IProps> = ({
     card: yup.string().min(16).max(16).trim(),
     document_img: yup
       .mixed()
-      .required('You need to provide a file')
+      // .required('You need to provide a file')
       .test('type', 'Only the following formats are accepted: .jpeg, .jpg, .png, ', (value) => {
         if(value && value[0]) {
           return (
@@ -201,6 +203,18 @@ const RegisterForm: React.FC<IProps> = ({
 
   const onSubmit = (data: IFormValues) => {
     if (getPhoneError(u_phone, type === ERegistrationType.Phone)) return
+
+    let upload: any[] = []
+    if (data.passport) {
+      upload.push({ name: 'passport', file: data.passport[0] })
+    }
+    if (data.doc1) {
+      upload.push({ name: 'doc1', file: data.doc1[0] })
+    }
+    if (data.doc2) {
+      upload.push({ name: 'doc2', file: data.doc2[0] })
+    }
+    
     register({
       u_name: data.u_name,
       u_phone: data.u_phone,
@@ -213,8 +227,6 @@ const RegisterForm: React.FC<IProps> = ({
         state: data.state,
         zip: data.zip,
         card: data.card,
-        document_type: data.document_type,
-        document_img: data.document_img,
       },
       u_car: {
         cm_id: data.car_model,
@@ -225,6 +237,7 @@ const RegisterForm: React.FC<IProps> = ({
         details: {},
         cc_id: data.car_classes,
       },
+      uploads: upload
     })
   }
 
@@ -259,6 +272,8 @@ const RegisterForm: React.FC<IProps> = ({
       }
     })
   }
+
+  const isDriver = Number(u_role) === EUserRoles.Driver
 
   return (
     <form className="sign-up-subform" onSubmit={handleSubmit(onSubmit)}>
@@ -355,7 +370,7 @@ const RegisterForm: React.FC<IProps> = ({
           id="email"
         />
 
-        {Number(u_role) === EUserRoles.Driver && (
+        {isDriver && (
           <Input
             inputProps={{
               ...formRegister('street'),
@@ -366,7 +381,7 @@ const RegisterForm: React.FC<IProps> = ({
           />
         )}
 
-        {Number(u_role) === EUserRoles.Driver && (
+        {isDriver && (
           <Input
             inputProps={{
               ...formRegister('city'),
@@ -376,7 +391,7 @@ const RegisterForm: React.FC<IProps> = ({
           />
         )}
 
-        {Number(u_role) === EUserRoles.Driver && (
+        {isDriver && (
           <Input
             inputProps={{
               ...formRegister('state'),
@@ -386,7 +401,7 @@ const RegisterForm: React.FC<IProps> = ({
           />
         )}
 
-        {Number(u_role) === EUserRoles.Driver && (
+        {isDriver && (
           <Input
             inputProps={{
               ...formRegister('zip'),
@@ -396,7 +411,7 @@ const RegisterForm: React.FC<IProps> = ({
           />
         )}
 
-        {Number(u_role) === EUserRoles.Driver && (
+        {isDriver && (
           <Input
             inputProps={{
               ...formRegister('card', {
@@ -412,7 +427,7 @@ const RegisterForm: React.FC<IProps> = ({
           />
         )}
 
-        {Number(u_role) === EUserRoles.Driver && (
+        {/* {isDriver && (
           <Input
             label='Document type'
             options={prepareOptions(data?.car_models, TRANSLATION.CAR_MODELS)} //TODO: изменить на типы документов
@@ -421,23 +436,53 @@ const RegisterForm: React.FC<IProps> = ({
             }}
             inputType={EInputTypes.Select}
           />
-        )}
+        )} */}
 
-        {Number(u_role) === EUserRoles.Driver && (
+        {isDriver && (
           <Input
             onChange={(e) => {
-              if (typeof e !== 'string')
-                setFileName(e[0].name)
+              if (!e) setValue('passport', null)
             }}
-            label={'Document photo'}
+            label='Passport photo'
             fileName={fileName}
             inputProps={{
-              ...formRegister('document_img'),
+              ...formRegister('passport'),
               accept: 'image/png, image/jpeg, image/jpg',
-              multiple: true,
             }}
             inputType={EInputTypes.File}
-            error={errors.document_img?.message}
+            error={errors.passport?.message}
+          />
+        )}
+
+        {isDriver && (
+          <Input
+            onChange={(e) => {
+              if (!e) setValue('doc1', null)
+            }}
+            label='Driver license'
+            fileName={fileName}
+            inputProps={{
+              ...formRegister('doc1'),
+              accept: 'image/png, image/jpeg, image/jpg',
+            }}
+            inputType={EInputTypes.File}
+            error={errors.doc1?.message}
+          />
+        )}
+
+        {isDriver && (
+          <Input
+            onChange={(e) => {
+              if (!e) setValue('doc2', null)
+            }}
+            label='License'
+            fileName={fileName}
+            inputProps={{
+              ...formRegister('doc2'),
+              accept: 'image/png, image/jpeg, image/jpg',
+            }}
+            inputType={EInputTypes.File}
+            error={errors.doc2?.message}
           />
         )}
 
@@ -459,7 +504,7 @@ const RegisterForm: React.FC<IProps> = ({
           })}
         />
 
-        {Number(u_role) === EUserRoles.Driver && (
+        {isDriver && (
           <Input
             label='Car models'
             options={prepareOptions(data?.car_models, TRANSLATION.CAR_MODELS)}
@@ -470,7 +515,7 @@ const RegisterForm: React.FC<IProps> = ({
           />
         )}
 
-        {Number(u_role) === EUserRoles.Driver && (
+        {isDriver && (
           <Input
             label={t(TRANSLATION.SEATS)}
             inputProps={{
@@ -482,14 +527,14 @@ const RegisterForm: React.FC<IProps> = ({
           />
         )}
 
-        {Number(u_role) === EUserRoles.Driver && (
+        {isDriver && (
           <Input
             label={'Car number'}
             inputProps={{ ...formRegister('car_number') }}
           />
         )}
 
-        {Number(u_role) === EUserRoles.Driver && (
+        {isDriver && (
           <Input
             label={'Car color'}
             inputProps={{ ...formRegister('car_color') }}
@@ -498,7 +543,7 @@ const RegisterForm: React.FC<IProps> = ({
           />
         )}
 
-        {Number(u_role) === EUserRoles.Driver && (
+        {isDriver && (
           <Input
             label={'Car classes'}
             inputProps={{ ...formRegister('car_classes') }}

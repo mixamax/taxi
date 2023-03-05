@@ -17,9 +17,11 @@ import {
   ITokens,
   ITrip,
   IUser,
+  IFileUpload
 } from './types/types'
 import { Stringify, ValueOf } from './types/index'
 import { addToFormData, apiMethod, IApiMethodArguments, IResponseFields } from './tools/api'
+import { getBase64 } from './tools/utils'
 import axios from 'axios'
 import Config from './config'
 import {
@@ -52,6 +54,27 @@ export enum EBookingActions {
     SetTips = 'set_tips',
     Edit = 'edit',
 }
+
+const _uploadFile = (
+  { formData }: IApiMethodArguments,
+  data: any
+): Promise<{
+  dl_id: string
+} | null> => {
+  return getBase64(data.file)
+    .then(base64 => {
+      addToFormData(formData, {
+        token: data.token,
+        u_hash: data.u_hash,
+        file: JSON.stringify({ base64, u_id: data.u_id }),
+        private: 0
+      })
+      return formData
+    })
+    .then(form => axios.post(`${Config.API_URL}/dropbox/file`, form))
+}
+
+export const uploadFile = apiMethod<typeof _uploadFile>(_uploadFile, { authRequired: false })
 
 const _register = (
   { formData }: IApiMethodArguments,
@@ -521,12 +544,17 @@ const _editUser = (
   { formData }: IApiMethodArguments,
   data: Partial<IUser>,
 ) => {
-  addToFormData(formData, { data: JSON.stringify(reverseConvertUser(data)) })
+  const { token, u_hash, u_id, ...userData } = data
+  if (token && u_hash && u_id) addToFormData(formData, { token, u_hash, u_id })
+  addToFormData(formData, {
+    data: JSON.stringify(reverseConvertUser(userData))
+  })
 
   return axios.post(`${Config.API_URL}/user`, formData)
     .then(res => res.data)
 }
 export const editUser = apiMethod<typeof _editUser>(_editUser)
+export const editUserAfterRegister = apiMethod<typeof _editUser>(_editUser, { authRequired: false })
 
 const _setOutDrive = (
   { formData }: IApiMethodArguments,
