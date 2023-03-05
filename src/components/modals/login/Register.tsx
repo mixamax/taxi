@@ -70,6 +70,12 @@ interface IProps extends ConnectedProps<typeof connector> {
   isOpen: boolean;
 }
 
+type TFilesMap = {
+  passport: any[]
+  doc1: any[]
+  doc2: any[]
+}
+
 const RegisterForm: React.FC<IProps> = ({
   status,
   tab,
@@ -82,7 +88,7 @@ const RegisterForm: React.FC<IProps> = ({
   const [isRegistrationAlertVisible, toggleRegistrationAlertVisibility] = useVisibility(false)
   const [isWhatsappAlertVisible, toggleWhatsappAlertVisibility] = useVisibility(false)
   const [shouldSendToWhatsapp, setShouldSendToWhatsapp] = useState(false)
-  const [fileName, setFileName] = useState('Choose file...')
+  const [filesMap, setFilesMap] = useState<TFilesMap>({ passport: [], doc1: [], doc2: [] })
 
   const [data, setData] = useState<{
     car_models: any
@@ -205,14 +211,20 @@ const RegisterForm: React.FC<IProps> = ({
     if (getPhoneError(u_phone, type === ERegistrationType.Phone)) return
 
     let upload: any[] = []
-    if (data.passport) {
-      upload.push({ name: 'passport', file: data.passport[0] })
+    if (filesMap.passport) {
+      Array.from(filesMap.passport).forEach(file => {
+        upload.push({ name: 'passport', file })
+      })
     }
-    if (data.doc1) {
-      upload.push({ name: 'doc1', file: data.doc1[0] })
+    if (filesMap.doc1) {
+      Array.from(filesMap.doc1).forEach(file => {
+        upload.push({ name: 'doc1', file })
+      })
     }
-    if (data.doc2) {
-      upload.push({ name: 'doc2', file: data.doc2[0] })
+    if (filesMap.doc2) {
+      Array.from(filesMap.doc2).forEach(file => {
+        upload.push({ name: 'doc2', file })
+      })
     }
     
     register({
@@ -441,13 +453,14 @@ const RegisterForm: React.FC<IProps> = ({
         {isDriver && (
           <Input
             onChange={(e) => {
-              if (!e) setValue('passport', null)
+              if (typeof e === 'string') return
+              setFilesMap({ ...filesMap, passport: e || [] })
             }}
-            label='Passport photo'
-            fileName={fileName}
+            label={t(TRANSLATION.PASSPORT_PHOTO)}
             inputProps={{
               ...formRegister('passport'),
               accept: 'image/png, image/jpeg, image/jpg',
+              multiple: true,
             }}
             inputType={EInputTypes.File}
             error={errors.passport?.message}
@@ -457,13 +470,14 @@ const RegisterForm: React.FC<IProps> = ({
         {isDriver && (
           <Input
             onChange={(e) => {
-              if (!e) setValue('doc1', null)
+              if (typeof e === 'string') return
+              setFilesMap({ ...filesMap, doc1: e || [] })
             }}
-            label='Driver license'
-            fileName={fileName}
+            label={t(TRANSLATION.DRIVER_LICENSE_PHOTO)}
             inputProps={{
               ...formRegister('doc1'),
               accept: 'image/png, image/jpeg, image/jpg',
+              multiple: true,
             }}
             inputType={EInputTypes.File}
             error={errors.doc1?.message}
@@ -473,13 +487,14 @@ const RegisterForm: React.FC<IProps> = ({
         {isDriver && (
           <Input
             onChange={(e) => {
-              if (!e) setValue('doc2', null)
+              if (typeof e === 'string') return
+              setFilesMap({ ...filesMap, doc2: e || [] })
             }}
-            label='License'
-            fileName={fileName}
+            label={t(TRANSLATION.LICENSE_PHOTO)}
             inputProps={{
               ...formRegister('doc2'),
               accept: 'image/png, image/jpeg, image/jpg',
+              multiple: true,
             }}
             inputType={EInputTypes.File}
             error={errors.doc2?.message}

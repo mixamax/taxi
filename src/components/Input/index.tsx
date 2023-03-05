@@ -100,14 +100,16 @@ const Input: React.FC<IProps> = (
 
   const addImageToRaw = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFiles([e.target.files[0]])
+      setFiles([ ...files, e.target.files[0] ])
+      onChange && onChange([ ...files, e.target.files[0] ])
       // e.target.value = ''
     }
   }
 
   const removeImg = (file: File) => {
-    setFiles([...files.filter((e) => e !== file)])
-    onChange && onChange('')
+    const newFiles = [...files.filter((e) => e !== file)]
+    setFiles(newFiles)
+    onChange && onChange(newFiles)
   }
 
   const getInputByType = () => {
@@ -123,7 +125,6 @@ const Input: React.FC<IProps> = (
       },
       onChange: (e: any) => {
         if (inputType === EInputTypes.File) {
-          onChange && onChange(e.target.files)
           inputProps.onChange && inputProps.onChange(e as any)
           addImageToRaw(e)
         } else {
