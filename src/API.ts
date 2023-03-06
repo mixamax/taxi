@@ -544,7 +544,8 @@ const _editUser = (
   { formData }: IApiMethodArguments,
   data: Partial<IUser>,
 ) => {
-  const { token, u_hash, u_id, ...userData } = data
+  // @TODO вернуть u_city когда наладим автозаполнение
+  const { token, u_hash, u_id, u_city, ...userData } = data
   if (token && u_hash && u_id) addToFormData(formData, { token, u_hash, u_id })
   addToFormData(formData, {
     data: JSON.stringify(reverseConvertUser(userData))

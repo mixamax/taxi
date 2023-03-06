@@ -62,7 +62,7 @@ const CardDetailsModal: React.FC<IProps> = ({
       email: user?.u_email,
       phone: user?.u_phone,
       state: user?.u_details?.state,
-      city: user?.u_city && (window as any).data.cities ? (window as any).data.cities[user?.u_city][language.id] : '',
+      city: user?.u_city && (window as any).data.cities && (window as any).data.cities[user?.u_city] ? (window as any).data.cities[user?.u_city][language.id] : '',
       zip: user?.u_details?.zip,
       card: user?.u_details?.card,
       street: user?.u_details?.street,
