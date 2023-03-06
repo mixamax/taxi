@@ -281,9 +281,10 @@ const Input: React.FC<IProps> = (
               <label
                 htmlFor={id}
                 className="input__label"
-                style={{ color: (inputProps as React.ComponentProps<'input'>).required && !(inputProps as React.ComponentProps<'input'>).value ? 'red' : '' }}
               >
-                {label}{hideInput ? '' : ':'}
+                {label}
+                {(inputProps as React.ComponentProps<'input'>).required && <span style={{ color: 'red' }}>*</span>}
+                {hideInput ? '' : ':'}
               </label>
             )
           }

@@ -381,6 +381,8 @@ export default {
   REQUESTED: 'requested',
   REQUIRED: 'required',
   REQUIRED_FIELD: 'required_field',
+  REQUIRED_FILE: 'required_file',
+  REQUIRED_FILE_IMAGE_TYPE: 'required_file_image_type',
   CURRENT_LOCATION_IS_FORBIDDEN: 'current_location_is_forbidden',
   RESPONDING_PERFORMERS: 'responding_performers',
   RESTORE_PASSWORD: 'restore_password',

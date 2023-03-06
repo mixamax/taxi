@@ -55,9 +55,9 @@ interface IFormValues {
   zip?: string;
   card?: string;
   document_type?: string;
-  passport?: any;
-  doc1?: any
-  doc2?: any
+  passport_photo?: any;
+  driver_license_photo?: any
+  license_photo?: any
   car_name: string
   car_model: string | null
   seats: string
@@ -71,10 +71,44 @@ interface IProps extends ConnectedProps<typeof connector> {
 }
 
 type TFilesMap = {
-  passport: any[]
-  doc1: any[]
-  doc2: any[]
+  passport_photo: any[]
+  driver_license_photo: any[]
+  license_photo: any[]
 }
+
+interface IRequiredFields {
+  [key: string]: boolean
+}
+
+const requireFieldsStr = 'card,1;name_city,1;state,0;street,1;zip,0;passport_photo,1;driver_license_photo,1;license_photo,0'
+const requireFeildsMap: IRequiredFields = requireFieldsStr
+  .split(';')
+  .reduce((res, item) => {
+    const [ key, value ] = item.split(',')
+    return {
+      ...res,
+      [key]: !!Number(value)
+    }
+  }, {})
+
+const getYupImageSchema = (isRequired: boolean = false) => {
+  const schema = yup
+    .mixed()
+    .test('type', t(TRANSLATION.REQUIRED_FILE_IMAGE_TYPE), (value) => {
+      if(value && value[0]) {
+        return (
+          value[0].type === 'image/jpeg' ||
+          value[0].type === 'image/png'
+        )
+      } else {
+        return true
+      }
+    })
+  return isRequired ? schema : schema.required(TRANSLATION.REQUIRED_FILE)
+}
+
+const getYupSchema = (schema: any, isRequired: boolean = false) => 
+  isRequired ? schema.required(t(TRANSLATION.REQUIRED_FIELD)) : schema
 
 const RegisterForm: React.FC<IProps> = ({
   status,
@@ -88,7 +122,7 @@ const RegisterForm: React.FC<IProps> = ({
   const [isRegistrationAlertVisible, toggleRegistrationAlertVisibility] = useVisibility(false)
   const [isWhatsappAlertVisible, toggleWhatsappAlertVisibility] = useVisibility(false)
   const [shouldSendToWhatsapp, setShouldSendToWhatsapp] = useState(false)
-  const [filesMap, setFilesMap] = useState<TFilesMap>({ passport: [], doc1: [], doc2: [] })
+  const [filesMap, setFilesMap] = useState<TFilesMap>({ passport_photo: [], driver_license_photo: [], license_photo: [] })
 
   const [data, setData] = useState<{
     car_models: any
@@ -111,24 +145,14 @@ const RegisterForm: React.FC<IProps> = ({
       is: (type: ERegistrationType) => type === ERegistrationType.Phone,
       then: yup.string().required(t(TRANSLATION.REQUIRED_FIELD)).trim(),
     }),
-    street: yup.string().trim(),
-    city: yup.string().trim(),
-    state: yup.string().trim(),
-    zip: yup.string().trim(),
-    card: yup.string().min(16).max(16).trim(),
-    document_img: yup
-      .mixed()
-      // .required('You need to provide a file')
-      .test('type', 'Only the following formats are accepted: .jpeg, .jpg, .png, ', (value) => {
-        if(value && value[0]) {
-          return (
-            value[0].type === 'image/jpeg' ||
-            value[0].type === 'image/png'
-          )
-        } else {
-          return true
-        }
-      }),
+    street: getYupSchema(yup.string().trim(), requireFeildsMap.street),
+    city: getYupSchema(yup.string().trim(), requireFeildsMap.city),
+    state: getYupSchema(yup.string().trim(), requireFeildsMap.state),
+    zip: getYupSchema(yup.string().trim(), requireFeildsMap.zip),
+    card: getYupSchema(yup.string().min(16).max(16).trim(), requireFeildsMap.card),
+    passport_photo: getYupImageSchema(requireFeildsMap.passport_photo),
+    driver_license_photo: getYupImageSchema(requireFeildsMap.driver_license_photo),
+    license_photo: getYupImageSchema(requireFeildsMap.license_photo),
   })
 
   const {
@@ -136,7 +160,7 @@ const RegisterForm: React.FC<IProps> = ({
     handleSubmit,
     formState: { errors, isValid },
     control,
-    setValue,
+    setValue
   } = useForm<IFormValues>({
     criteriaMode: 'all',
     mode: 'all',
@@ -211,19 +235,19 @@ const RegisterForm: React.FC<IProps> = ({
     if (getPhoneError(u_phone, type === ERegistrationType.Phone)) return
 
     let upload: any[] = []
-    if (filesMap.passport) {
-      Array.from(filesMap.passport).forEach(file => {
-        upload.push({ name: 'passport', file })
+    if (filesMap.passport_photo) {
+      Array.from(filesMap.passport_photo).forEach(file => {
+        upload.push({ name: 'passport_photo', file })
       })
     }
-    if (filesMap.doc1) {
-      Array.from(filesMap.doc1).forEach(file => {
-        upload.push({ name: 'doc1', file })
+    if (filesMap.driver_license_photo) {
+      Array.from(filesMap.driver_license_photo).forEach(file => {
+        upload.push({ name: 'driver_license_photo', file })
       })
     }
-    if (filesMap.doc2) {
-      Array.from(filesMap.doc2).forEach(file => {
-        upload.push({ name: 'doc2', file })
+    if (filesMap.license_photo) {
+      Array.from(filesMap.license_photo).forEach(file => {
+        upload.push({ name: 'license_photo', file })
       })
     }
     
@@ -286,6 +310,10 @@ const RegisterForm: React.FC<IProps> = ({
   }
 
   const isDriver = Number(u_role) === EUserRoles.Driver
+  let isValidFrom = isValid
+  if (requireFeildsMap.passport_photo && !filesMap.passport_photo.length) isValidFrom = false
+  if (requireFeildsMap.driver_license_photo && !filesMap.driver_license_photo.length) isValidFrom = false
+  if (requireFeildsMap.license_photo && !filesMap.license_photo.length) isValidFrom = false
 
   return (
     <form className="sign-up-subform" onSubmit={handleSubmit(onSubmit)}>
@@ -329,6 +357,7 @@ const RegisterForm: React.FC<IProps> = ({
             ...formRegister('u_name', {
               required: t(TRANSLATION.REQUIRED_FIELD),
             }),
+            required: true
           }}
           label={t(
             workType === EWorkTypes.Company ?
@@ -339,7 +368,10 @@ const RegisterForm: React.FC<IProps> = ({
         />
         <Input
           inputProps={{
-            ...formRegister('u_phone'),
+            ...formRegister('u_phone', {
+              required: t(TRANSLATION.REQUIRED_FIELD),
+            }),
+            required: true
           }}
           label={t(TRANSLATION.PHONE)}
           inputType={EInputTypes.Default}
@@ -362,7 +394,10 @@ const RegisterForm: React.FC<IProps> = ({
 
         <Input
           inputProps={{
-            ...formRegister('u_email'),
+            ...formRegister('u_email', {
+              required: t(TRANSLATION.REQUIRED_FIELD),
+            }),
+            required: true
           }}
           label={t(TRANSLATION.EMAIL)}
           error={errors.u_email?.message}
@@ -385,7 +420,10 @@ const RegisterForm: React.FC<IProps> = ({
         {isDriver && (
           <Input
             inputProps={{
-              ...formRegister('street'),
+              ...formRegister('street', {
+                required: requireFeildsMap.street && t(TRANSLATION.REQUIRED_FIELD),
+              }),
+              required: requireFeildsMap.street
             }}
             label={t(TRANSLATION.STREET_ADDRESS)}
             error={errors.street?.message}
@@ -396,7 +434,10 @@ const RegisterForm: React.FC<IProps> = ({
         {isDriver && (
           <Input
             inputProps={{
-              ...formRegister('city'),
+              ...formRegister('city', {
+                required: requireFeildsMap.city && t(TRANSLATION.REQUIRED_FIELD),
+              }),
+              required: requireFeildsMap.city
             }}
             label={t(TRANSLATION.CITY)}
             error={errors.city?.message}
@@ -406,7 +447,10 @@ const RegisterForm: React.FC<IProps> = ({
         {isDriver && (
           <Input
             inputProps={{
-              ...formRegister('state'),
+              ...formRegister('state', {
+                required: requireFeildsMap.state && t(TRANSLATION.REQUIRED_FIELD),
+              }),
+              required: requireFeildsMap.state
             }}
             label={t(TRANSLATION.STATE)}
             error={errors.state?.message}
@@ -416,7 +460,10 @@ const RegisterForm: React.FC<IProps> = ({
         {isDriver && (
           <Input
             inputProps={{
-              ...formRegister('zip'),
+              ...formRegister('zip', {
+                required: requireFeildsMap.zip && t(TRANSLATION.REQUIRED_FIELD),
+              }),
+              required: requireFeildsMap.zip
             }}
             label={t(TRANSLATION.ZIP_CODE)}
             error={errors.zip?.message}
@@ -427,11 +474,13 @@ const RegisterForm: React.FC<IProps> = ({
           <Input
             inputProps={{
               ...formRegister('card', {
+                required: requireFeildsMap.card && t(TRANSLATION.REQUIRED_FIELD),
                 pattern: {
                   value: /^\d{16}$/,
                   message: t(TRANSLATION.CARD_NUMBER_PATTERN_ERROR),
                 },
               }),
+              required: requireFeildsMap.card,
               placeholder: 'ХХХХ-ХХХХ-ХХХХ-ХХХХ',
             }}
             label={t(TRANSLATION.CARD_NUMBER)}
@@ -454,16 +503,19 @@ const RegisterForm: React.FC<IProps> = ({
           <Input
             onChange={(e) => {
               if (typeof e === 'string') return
-              setFilesMap({ ...filesMap, passport: e || [] })
+              setFilesMap({ ...filesMap, passport_photo: e || [] })
             }}
             label={t(TRANSLATION.PASSPORT_PHOTO)}
             inputProps={{
-              ...formRegister('passport'),
+              ...formRegister('passport_photo', {
+                required: requireFeildsMap.passport_photo && t(TRANSLATION.REQUIRED_FIELD),
+              }),
+              required: requireFeildsMap.passport_photo,
               accept: 'image/png, image/jpeg, image/jpg',
               multiple: true,
             }}
             inputType={EInputTypes.File}
-            error={errors.passport?.message}
+            error={errors.passport_photo?.message}
           />
         )}
 
@@ -471,16 +523,19 @@ const RegisterForm: React.FC<IProps> = ({
           <Input
             onChange={(e) => {
               if (typeof e === 'string') return
-              setFilesMap({ ...filesMap, doc1: e || [] })
+              setFilesMap({ ...filesMap, driver_license_photo: e || [] })
             }}
             label={t(TRANSLATION.DRIVER_LICENSE_PHOTO)}
             inputProps={{
-              ...formRegister('doc1'),
+              ...formRegister('driver_license_photo', {
+                required: requireFeildsMap.driver_license_photo && t(TRANSLATION.REQUIRED_FIELD),
+              }),
+              required: requireFeildsMap.driver_license_photo,
               accept: 'image/png, image/jpeg, image/jpg',
               multiple: true,
             }}
             inputType={EInputTypes.File}
-            error={errors.doc1?.message}
+            error={errors.driver_license_photo?.message}
           />
         )}
 
@@ -488,16 +543,19 @@ const RegisterForm: React.FC<IProps> = ({
           <Input
             onChange={(e) => {
               if (typeof e === 'string') return
-              setFilesMap({ ...filesMap, doc2: e || [] })
+              setFilesMap({ ...filesMap, license_photo: e || [] })
             }}
             label={t(TRANSLATION.LICENSE_PHOTO)}
             inputProps={{
-              ...formRegister('doc2'),
+              ...formRegister('license_photo', {
+                required: requireFeildsMap.license_photo && t(TRANSLATION.REQUIRED_FIELD),
+              }),
+              required: requireFeildsMap.license_photo,
               accept: 'image/png, image/jpeg, image/jpg',
               multiple: true,
             }}
             inputType={EInputTypes.File}
-            error={errors.doc2?.message}
+            error={errors.license_photo?.message}
           />
         )}
 
@@ -599,7 +657,7 @@ const RegisterForm: React.FC<IProps> = ({
           text={t(TRANSLATION.SIGNUP)}
           className="login-modal_login-btn"
           skipHandler={true}
-          disabled={!isValid}
+          disabled={!isValidFrom}
           status={status}
         />
         </>
