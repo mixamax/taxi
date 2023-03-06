@@ -88,10 +88,15 @@ function* registerSaga(data: TAction) {
   try {
     const { uploads, ...payload } = data.payload
     let response = yield* call<any>(API.register, payload)
-
+    const tokens = {
+      token: response.token,
+      u_hash: response.u_hash
+    }
+    localStorage.setItem('tokens', JSON.stringify(tokens))
     yield* call<any>(uploadRegisterFiles, { filesToUpload: uploads, response })
-
     yield put({ type: ActionTypes.REGISTER_SUCCESS, payload: response })
+    yield* call(initUserSaga)
+    yield put(setLoginModal(false))
   } catch (error) {
     console.error(error)
     yield put({ type: ActionTypes.REGISTER_FAIL })
