@@ -505,7 +505,6 @@ const convertTypes = <T, R>(
       for (let [itemKey, itemValue] of Object.entries(value)) {
         detailsArr.push(['=', [itemKey], itemValue])
       }
-      console.log(detailsArr)
       convertedObject[key] = detailsArr
     }
     else if (toDateKeys.includes(key)) convertedObject[key] = moment(value)

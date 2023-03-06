@@ -55,9 +55,9 @@ interface IFormValues {
   zip?: string;
   card?: string;
   document_type?: string;
-  passport?: any;
-  doc1?: any
-  doc2?: any
+  passport_photo?: any;
+  driver_license_photo?: any
+  license_photo?: any
   car_name: string
   car_model: string | null
   seats: string
@@ -71,10 +71,44 @@ interface IProps extends ConnectedProps<typeof connector> {
 }
 
 type TFilesMap = {
-  passport: any[]
-  doc1: any[]
-  doc2: any[]
+  passport_photo: any[]
+  driver_license_photo: any[]
+  license_photo: any[]
 }
+
+interface IRequiredFields {
+  [key: string]: boolean
+}
+
+const requireFieldsStr = 'card,1;name_city,1;state,0;street,1;zip,0;passport_photo,1;driver_license_photo,1;license_photo,0'
+const requireFeildsMap: IRequiredFields = requireFieldsStr
+  .split(';')
+  .reduce((res, item) => {
+    const [ key, value ] = item.split(',')
+    return {
+      ...res,
+      [key]: !!Number(value)
+    }
+  }, {})
+
+const getYupImageSchema = (isRequired: boolean = false) => {
+  const schema = yup
+    .mixed()
+    .test('type', t(TRANSLATION.REQUIRED_FILE_IMAGE_TYPE), (value) => {
+      if(value && value[0]) {
+        return (
+          value[0].type === 'image/jpeg' ||
+          value[0].type === 'image/png'
+        )
+      } else {
+        return true
+      }
+    })
+  return isRequired ? schema : schema.required(TRANSLATION.REQUIRED_FILE)
+}
+
+const getYupSchema = (schema: any, isRequired: boolean = false) => 
+  isRequired ? schema.required(t(TRANSLATION.REQUIRED_FIELD)) : schema
 
 const RegisterForm: React.FC<IProps> = ({
   status,
@@ -88,7 +122,7 @@ const RegisterForm: React.FC<IProps> = ({
   const [isRegistrationAlertVisible, toggleRegistrationAlertVisibility] = useVisibility(false)
   const [isWhatsappAlertVisible, toggleWhatsappAlertVisibility] = useVisibility(false)
   const [shouldSendToWhatsapp, setShouldSendToWhatsapp] = useState(false)
-  const [filesMap, setFilesMap] = useState<TFilesMap>({ passport: [], doc1: [], doc2: [] })
+  const [filesMap, setFilesMap] = useState<TFilesMap>({ passport_photo: [], driver_license_photo: [], license_photo: [] })
 
   const [data, setData] = useState<{
     car_models: any
@@ -111,24 +145,14 @@ const RegisterForm: React.FC<IProps> = ({
       is: (type: ERegistrationType) => type === ERegistrationType.Phone,
       then: yup.string().required(t(TRANSLATION.REQUIRED_FIELD)).trim(),
     }),
-    street: yup.string().trim(),
-    city: yup.string().trim(),
-    state: yup.string().trim(),
-    zip: yup.string().trim(),
-    card: yup.string().min(16).max(16).trim(),
-    document_img: yup
-      .mixed()
-      // .required('You need to provide a file')
-      .test('type', 'Only the following formats are accepted: .jpeg, .jpg, .png, ', (value) => {
-        if(value && value[0]) {
-          return (
-            value[0].type === 'image/jpeg' ||
-            value[0].type === 'image/png'
-          )
-        } else {
-          return true
-        }
-      }),
+    street: getYupSchema(yup.string().trim(), requireFeildsMap.street),
+    city: getYupSchema(yup.string().trim(), requireFeildsMap.city),
+    state: getYupSchema(yup.string().trim(), requireFeildsMap.state),
+    zip: getYupSchema(yup.string().trim(), requireFeildsMap.zip),
+    card: getYupSchema(yup.string().min(16).max(16).trim(), requireFeildsMap.card),
+    passport_photo: getYupImageSchema(requireFeildsMap.passport_photo),
+    driver_license_photo: getYupImageSchema(requireFeildsMap.driver_license_photo),
+    license_photo: getYupImageSchema(requireFeildsMap.license_photo),
   })
 
   const {
@@ -136,7 +160,7 @@ const RegisterForm: React.FC<IProps> = ({
     handleSubmit,
     formState: { errors, isValid },
     control,
-    setValue,
+    setValue
   } = useForm<IFormValues>({
     criteriaMode: 'all',
     mode: 'all',
@@ -211,19 +235,19 @@ const RegisterForm: React.FC<IProps> = ({
     if (getPhoneError(u_phone, type === ERegistrationType.Phone)) return
 
     let upload: any[] = []
-    if (filesMap.passport) {
-      Array.from(filesMap.passport).forEach(file => {
-        upload.push({ name: 'passport', file })
+    if (filesMap.passport_photo) {
+      Array.from(filesMap.passport_photo).forEach(file => {
+        upload.push({ name: 'passport_photo', file })
       })
     }
-    if (filesMap.doc1) {
-      Array.from(filesMap.doc1).forEach(file => {
-        upload.push({ name: 'doc1', file })
+    if (filesMap.driver_license_photo) {
+      Array.from(filesMap.driver_license_photo).forEach(file => {
+        upload.push({ name: 'driver_license_photo', file })
       })
     }
-    if (filesMap.doc2) {
-      Array.from(filesMap.doc2).forEach(file => {
-        upload.push({ name: 'doc2', file })
+    if (filesMap.license_photo) {
+      Array.from(filesMap.license_photo).forEach(file => {
+        upload.push({ name: 'license_photo', file })
       })
     }
     
@@ -286,324 +310,332 @@ const RegisterForm: React.FC<IProps> = ({
   }
 
   const isDriver = Number(u_role) === EUserRoles.Driver
-
+  let isValidFrom = isValid
+  if (requireFeildsMap.passport_photo && !filesMap.passport_photo.length) isValidFrom = false
+  if (requireFeildsMap.driver_license_photo && !filesMap.driver_license_photo.length) isValidFrom = false
+  if (requireFeildsMap.license_photo && !filesMap.license_photo) isValidFrom = false
   return (
     <form className="sign-up-subform" onSubmit={handleSubmit(onSubmit)}>
-      {u_role === EUserRoles.Driver && workType === null ?
-        (
-          <>
-            <label className="input__label">
-              {t(TRANSLATION.YOUR_WORK_TYPE)}:
-            </label>
-            <button
-              className="work-type__button"
-              onClick={() => setWorkType(EWorkTypes.Self)}
-            >
-              {t(TRANSLATION.SELF_EMPLOYED)}
-            </button>
-            <button
-              className="work-type__button"
-              onClick={() => setWorkType(EWorkTypes.Company)}
-            >
-              {t(TRANSLATION.COMPANY)}
-            </button>
-          </>
-        ) :
+      <Input
+        inputProps={{
+          onChange: (e: any) => setWorkType(Number(e.target.value)),
+          value: String(workType),
+        }}
+        inputType={EInputTypes.Select}
+        options={[
+          { label: t(TRANSLATION.SELF_EMPLOYED), value: EWorkTypes.Self },
+          { label: t(TRANSLATION.COMPANY), value: EWorkTypes.Company },
+        ]}
+      />
 
-        (<>{/* <Input
-            inputProps={{
-              ...formRegister('u_role'),
-              disabled: false,
-            }}
-            label={'role'}
-            inputType={EInputTypes.Select}
-            options={[
-              { label: t(TRANSLATION.CLIENT), value: EUserRoles.Client },
-              { label: t(TRANSLATION.DRIVER), value: EUserRoles.Driver },
-            ]}
-          /> */}
+      <Input
+        inputProps={{
+          ...formRegister('u_name', {
+            required: t(TRANSLATION.REQUIRED_FIELD),
+          }),
+          required: true
+        }}
+        label={t(
+          workType === EWorkTypes.Company ?
+            TRANSLATION.COMPANY_NAME :
+            TRANSLATION.NAME,
+        )}
+        error={errors.u_name?.message}
+      />
+      <Input
+        inputProps={{
+          ...formRegister('u_phone', {
+            required: t(TRANSLATION.REQUIRED_FIELD),
+          }),
+          required: true
+        }}
+        label={t(TRANSLATION.PHONE)}
+        inputType={EInputTypes.Default}
+        error={getPhoneError(u_phone, type === ERegistrationType.Phone)}
+      />
 
+      {/*{type === ERegistrationType.Phone && (*/}
+      {/*  <Checkbox*/}
+      {/*    type="checkbox"*/}
+      {/*    label={'Send to Whatsapp'}*/}
+      {/*    id="shouldSendToWhatsapp"*/}
+      {/*    disabled={type !== ERegistrationType.Phone}*/}
+      {/*    wrapperAdditionalClassName="send_to_whatsapp_checkbox"*/}
+      {/*    value={shouldSendToWhatsapp ? 'checked' : ''}*/}
+      {/*    onChange={(e) => {*/}
+      {/*      setShouldSendToWhatsapp(e.target.checked)*/}
+      {/*    }}*/}
+      {/*  />*/}
+      {/*)}*/}
 
+      <Input
+        inputProps={{
+          ...formRegister('u_email', {
+            required: t(TRANSLATION.REQUIRED_FIELD),
+          }),
+          required: true
+        }}
+        label={t(TRANSLATION.EMAIL)}
+        error={errors.u_email?.message}
+      />
+      <Checkbox
+        {...formRegister('type')}
+        type="radio"
+        label={t(TRANSLATION.PHONE)}
+        value={ERegistrationType.Phone}
+        id="phone"
+      />
+      <Checkbox
+        {...formRegister('type')}
+        type="radio"
+        label={t(TRANSLATION.EMAIL)}
+        value={ERegistrationType.Email}
+        id="email"
+      />
+
+      {isDriver && (
         <Input
           inputProps={{
-            ...formRegister('u_name', {
-              required: t(TRANSLATION.REQUIRED_FIELD),
+            ...formRegister('street', {
+              required: requireFeildsMap.street && t(TRANSLATION.REQUIRED_FIELD),
             }),
+            required: requireFeildsMap.street
           }}
-          label={t(
-            workType === EWorkTypes.Company ?
-              TRANSLATION.COMPANY_NAME :
-              TRANSLATION.NAME,
-          )}
-          error={errors.u_name?.message}
+          label={t(TRANSLATION.STREET_ADDRESS)}
+          error={errors.street?.message}
+          fieldWrapperClassName="street"
         />
+      )}
+
+      {isDriver && (
         <Input
           inputProps={{
-            ...formRegister('u_phone'),
+            ...formRegister('city', {
+              required: requireFeildsMap.city && t(TRANSLATION.REQUIRED_FIELD),
+            }),
+            required: requireFeildsMap.city
           }}
-          label={t(TRANSLATION.PHONE)}
-          inputType={EInputTypes.Default}
-          error={getPhoneError(u_phone, type === ERegistrationType.Phone)}
+          label={t(TRANSLATION.CITY)}
+          error={errors.city?.message}
         />
+      )}
 
-        {/*{type === ERegistrationType.Phone && (*/}
-        {/*  <Checkbox*/}
-        {/*    type="checkbox"*/}
-        {/*    label={'Send to Whatsapp'}*/}
-        {/*    id="shouldSendToWhatsapp"*/}
-        {/*    disabled={type !== ERegistrationType.Phone}*/}
-        {/*    wrapperAdditionalClassName="send_to_whatsapp_checkbox"*/}
-        {/*    value={shouldSendToWhatsapp ? 'checked' : ''}*/}
-        {/*    onChange={(e) => {*/}
-        {/*      setShouldSendToWhatsapp(e.target.checked)*/}
-        {/*    }}*/}
-        {/*  />*/}
-        {/*)}*/}
-
+      {isDriver && (
         <Input
           inputProps={{
-            ...formRegister('u_email'),
+            ...formRegister('state', {
+              required: requireFeildsMap.state && t(TRANSLATION.REQUIRED_FIELD),
+            }),
+            required: requireFeildsMap.state
           }}
-          label={t(TRANSLATION.EMAIL)}
-          error={errors.u_email?.message}
+          label={t(TRANSLATION.STATE)}
+          error={errors.state?.message}
         />
-        <Checkbox
-          {...formRegister('type')}
-          type="radio"
-          label={t(TRANSLATION.PHONE)}
-          value={ERegistrationType.Phone}
-          id="phone"
-        />
-        <Checkbox
-          {...formRegister('type')}
-          type="radio"
-          label={t(TRANSLATION.EMAIL)}
-          value={ERegistrationType.Email}
-          id="email"
-        />
+      )}
 
-        {isDriver && (
-          <Input
-            inputProps={{
-              ...formRegister('street'),
-            }}
-            label={t(TRANSLATION.STREET_ADDRESS)}
-            error={errors.street?.message}
-            fieldWrapperClassName="street"
-          />
-        )}
-
-        {isDriver && (
-          <Input
-            inputProps={{
-              ...formRegister('city'),
-            }}
-            label={t(TRANSLATION.CITY)}
-            error={errors.city?.message}
-          />
-        )}
-
-        {isDriver && (
-          <Input
-            inputProps={{
-              ...formRegister('state'),
-            }}
-            label={t(TRANSLATION.STATE)}
-            error={errors.state?.message}
-          />
-        )}
-
-        {isDriver && (
-          <Input
-            inputProps={{
-              ...formRegister('zip'),
-            }}
-            label={t(TRANSLATION.ZIP_CODE)}
-            error={errors.zip?.message}
-          />
-        )}
-
-        {isDriver && (
-          <Input
-            inputProps={{
-              ...formRegister('card', {
-                pattern: {
-                  value: /^\d{16}$/,
-                  message: t(TRANSLATION.CARD_NUMBER_PATTERN_ERROR),
-                },
-              }),
-              placeholder: 'ХХХХ-ХХХХ-ХХХХ-ХХХХ',
-            }}
-            label={t(TRANSLATION.CARD_NUMBER)}
-            error={errors.card?.message}
-          />
-        )}
-
-        {/* {isDriver && (
-          <Input
-            label='Document type'
-            options={prepareOptions(data?.car_models, TRANSLATION.CAR_MODELS)} //TODO: изменить на типы документов
-            inputProps={{
-              ...formRegister('document_type'),
-            }}
-            inputType={EInputTypes.Select}
-          />
-        )} */}
-
-        {isDriver && (
-          <Input
-            onChange={(e) => {
-              if (typeof e === 'string') return
-              setFilesMap({ ...filesMap, passport: e || [] })
-            }}
-            label={t(TRANSLATION.PASSPORT_PHOTO)}
-            inputProps={{
-              ...formRegister('passport'),
-              accept: 'image/png, image/jpeg, image/jpg',
-              multiple: true,
-            }}
-            inputType={EInputTypes.File}
-            error={errors.passport?.message}
-          />
-        )}
-
-        {isDriver && (
-          <Input
-            onChange={(e) => {
-              if (typeof e === 'string') return
-              setFilesMap({ ...filesMap, doc1: e || [] })
-            }}
-            label={t(TRANSLATION.DRIVER_LICENSE_PHOTO)}
-            inputProps={{
-              ...formRegister('doc1'),
-              accept: 'image/png, image/jpeg, image/jpg',
-              multiple: true,
-            }}
-            inputType={EInputTypes.File}
-            error={errors.doc1?.message}
-          />
-        )}
-
-        {isDriver && (
-          <Input
-            onChange={(e) => {
-              if (typeof e === 'string') return
-              setFilesMap({ ...filesMap, doc2: e || [] })
-            }}
-            label={t(TRANSLATION.LICENSE_PHOTO)}
-            inputProps={{
-              ...formRegister('doc2'),
-              accept: 'image/png, image/jpeg, image/jpg',
-              multiple: true,
-            }}
-            inputType={EInputTypes.File}
-            error={errors.doc2?.message}
-          />
-        )}
-
-        <Checkbox
-          type="checkbox"
-          name="ref_code_toggle"
-          label={t(TRANSLATION.PROMO_CODE)}
-          value={showRefCode ? 'checked' : ''}
-          onChange={(e) => setShowRefCode(e.target.checked)}
-          wrapperAdditionalClassName="ref-code__toggler"
-        />
-
+      {isDriver && (
         <Input
           inputProps={{
-            ...formRegister('ref_code'),
+            ...formRegister('zip', {
+              required: requireFeildsMap.zip && t(TRANSLATION.REQUIRED_FIELD),
+            }),
+            required: requireFeildsMap.zip
           }}
-          fieldWrapperClassName={cn('ref-code__input', {
-            'ref-code__input--active': showRefCode,
-          })}
+          label={t(TRANSLATION.ZIP_CODE)}
+          error={errors.zip?.message}
         />
+      )}
 
-        {isDriver && (
-          <Input
-            label='Car models'
-            options={prepareOptions(data?.car_models, TRANSLATION.CAR_MODELS)}
-            inputProps={{
-              ...formRegister('car_model'),
-            }}
-            inputType={EInputTypes.Select}
-          />
-        )}
-
-        {isDriver && (
-          <Input
-            label={t(TRANSLATION.SEATS)}
-            inputProps={{
-              ...formRegister('seats'),
-              defaultValue: 4,
-            }}
-            inputType={EInputTypes.Select}
-            options={seatsOptions()}
-          />
-        )}
-
-        {isDriver && (
-          <Input
-            label={'Car number'}
-            inputProps={{ ...formRegister('car_number') }}
-          />
-        )}
-
-        {isDriver && (
-          <Input
-            label={'Car color'}
-            inputProps={{ ...formRegister('car_color') }}
-            inputType={EInputTypes.Select}
-            options={prepareOptions(data?.car_colors, TRANSLATION.CAR_COLORS)}
-          />
-        )}
-
-        {isDriver && (
-          <Input
-            label={'Car classes'}
-            inputProps={{ ...formRegister('car_classes') }}
-            inputType={EInputTypes.Select}
-            options={prepareOptions(data?.car_classes, TRANSLATION.CAR_CLASSES)}
-          />
-        )}
-
-
-        {isRegistrationAlertVisible && (
-          <div className="alert-container">
-            <Alert
-              intent={
-                status === EStatuses.Fail ? Intent.ERROR : Intent.SUCCESS
-              }
-              message={
-                status === EStatuses.Fail ?
-                  t(TRANSLATION.REGISTER_FAIL) :
-                  t(TRANSLATION.REGISTER_SUCCESS)
-              }
-              onClose={toggleRegistrationAlertVisibility}
-            />
-          </div>
-        )}
-
-        {isWhatsappAlertVisible && (
-          <div className="alert-container">
-            <Alert
-              intent={Intent.INFO}
-              message={whatsappResponseMessage}
-              onClose={toggleWhatsappAlertVisibility}
-            />
-          </div>
-        )}
-
-        <Button
-          type="submit"
-          text={t(TRANSLATION.SIGNUP)}
-          className="login-modal_login-btn"
-          skipHandler={true}
-          disabled={!isValid}
-          status={status}
+      {isDriver && (
+        <Input
+          inputProps={{
+            ...formRegister('card', {
+              required: requireFeildsMap.card && t(TRANSLATION.REQUIRED_FIELD),
+              pattern: {
+                value: /^\d{16}$/,
+                message: t(TRANSLATION.CARD_NUMBER_PATTERN_ERROR),
+              },
+            }),
+            required: requireFeildsMap.card,
+            placeholder: 'ХХХХ-ХХХХ-ХХХХ-ХХХХ',
+          }}
+          label={t(TRANSLATION.CARD_NUMBER)}
+          error={errors.card?.message}
         />
-        </>
-        )}
+      )}
+
+      {/* {isDriver && (
+        <Input
+          label='Document type'
+          options={prepareOptions(data?.car_models, TRANSLATION.CAR_MODELS)} //TODO: изменить на типы документов
+          inputProps={{
+            ...formRegister('document_type'),
+          }}
+          inputType={EInputTypes.Select}
+        />
+      )} */}
+
+      {isDriver && (
+        <Input
+          onChange={(e) => {
+            if (typeof e === 'string') return
+            setFilesMap({ ...filesMap, passport_photo: e || [] })
+          }}
+          label={t(TRANSLATION.PASSPORT_PHOTO)}
+          inputProps={{
+            ...formRegister('passport_photo', {
+              required: requireFeildsMap.passport_photo && t(TRANSLATION.REQUIRED_FIELD),
+            }),
+            required: requireFeildsMap.passport_photo,
+            accept: 'image/png, image/jpeg, image/jpg',
+            multiple: true,
+          }}
+          inputType={EInputTypes.File}
+          error={errors.passport_photo?.message}
+        />
+      )}
+
+      {isDriver && (
+        <Input
+          onChange={(e) => {
+            if (typeof e === 'string') return
+            setFilesMap({ ...filesMap, driver_license_photo: e || [] })
+          }}
+          label={t(TRANSLATION.DRIVER_LICENSE_PHOTO)}
+          inputProps={{
+            ...formRegister('driver_license_photo', {
+              required: requireFeildsMap.driver_license_photo && t(TRANSLATION.REQUIRED_FIELD),
+            }),
+            required: requireFeildsMap.driver_license_photo,
+            accept: 'image/png, image/jpeg, image/jpg',
+            multiple: true,
+          }}
+          inputType={EInputTypes.File}
+          error={errors.driver_license_photo?.message}
+        />
+      )}
+
+      {isDriver && (
+        <Input
+          onChange={(e) => {
+            if (typeof e === 'string') return
+            setFilesMap({ ...filesMap, license_photo: e || [] })
+          }}
+          label={t(TRANSLATION.LICENSE_PHOTO)}
+          inputProps={{
+            ...formRegister('license_photo', {
+              required: requireFeildsMap.license_photo && t(TRANSLATION.REQUIRED_FIELD),
+            }),
+            required: requireFeildsMap.license_photo,
+            accept: 'image/png, image/jpeg, image/jpg',
+            multiple: true,
+          }}
+          inputType={EInputTypes.File}
+          error={errors.license_photo?.message}
+        />
+      )}
+
+      <Checkbox
+        type="checkbox"
+        name="ref_code_toggle"
+        label={t(TRANSLATION.PROMO_CODE)}
+        value={showRefCode ? 'checked' : ''}
+        onChange={(e) => setShowRefCode(e.target.checked)}
+        wrapperAdditionalClassName="ref-code__toggler"
+      />
+
+      <Input
+        inputProps={{
+          ...formRegister('ref_code'),
+        }}
+        fieldWrapperClassName={cn('ref-code__input', {
+          'ref-code__input--active': showRefCode,
+        })}
+      />
+
+      {isDriver && (
+        <Input
+          label='Car models'
+          options={prepareOptions(data?.car_models, TRANSLATION.CAR_MODELS)}
+          inputProps={{
+            ...formRegister('car_model'),
+          }}
+          inputType={EInputTypes.Select}
+        />
+      )}
+
+      {isDriver && (
+        <Input
+          label={t(TRANSLATION.SEATS)}
+          inputProps={{
+            ...formRegister('seats'),
+            defaultValue: 4,
+          }}
+          inputType={EInputTypes.Select}
+          options={seatsOptions()}
+        />
+      )}
+
+      {isDriver && (
+        <Input
+          label={'Car number'}
+          inputProps={{ ...formRegister('car_number') }}
+        />
+      )}
+
+      {isDriver && (
+        <Input
+          label={'Car color'}
+          inputProps={{ ...formRegister('car_color') }}
+          inputType={EInputTypes.Select}
+          options={prepareOptions(data?.car_colors, TRANSLATION.CAR_COLORS)}
+        />
+      )}
+
+      {isDriver && (
+        <Input
+          label={'Car classes'}
+          inputProps={{ ...formRegister('car_classes') }}
+          inputType={EInputTypes.Select}
+          options={prepareOptions(data?.car_classes, TRANSLATION.CAR_CLASSES)}
+        />
+      )}
+
+
+      {isRegistrationAlertVisible && (
+        <div className="alert-container">
+          <Alert
+            intent={
+              status === EStatuses.Fail ? Intent.ERROR : Intent.SUCCESS
+            }
+            message={
+              status === EStatuses.Fail ?
+                t(TRANSLATION.REGISTER_FAIL) :
+                t(TRANSLATION.REGISTER_SUCCESS)
+            }
+            onClose={toggleRegistrationAlertVisibility}
+          />
+        </div>
+      )}
+
+      {isWhatsappAlertVisible && (
+        <div className="alert-container">
+          <Alert
+            intent={Intent.INFO}
+            message={whatsappResponseMessage}
+            onClose={toggleWhatsappAlertVisibility}
+          />
+        </div>
+      )}
+
+      <Button
+        type="submit"
+        text={t(TRANSLATION.SIGNUP)}
+        className="login-modal_login-btn"
+        skipHandler={true}
+        disabled={!isValidFrom}
+        status={status}
+      />
     </form>
   )
 }
