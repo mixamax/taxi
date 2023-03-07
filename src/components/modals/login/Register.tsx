@@ -256,9 +256,9 @@ const RegisterForm: React.FC<IProps> = ({
       u_phone: data.u_phone,
       u_email: data.u_email,
       u_role: data.u_role || EUserRoles.Client,
+      u_city: data.city,
       ref_code: data.ref_code || undefined,
       u_details: {
-        city: data.city,
         street: data.street,
         state: data.state,
         zip: data.zip,

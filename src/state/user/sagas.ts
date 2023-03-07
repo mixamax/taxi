@@ -86,14 +86,14 @@ function* googleLoginSaga(data: TAction) {
 function* registerSaga(data: TAction) {
   yield put({ type: ActionTypes.REGISTER_START })
   try {
-    const { uploads, ...payload } = data.payload
+    const { uploads, u_details, ...payload } = data.payload
     let response = yield* call<any>(API.register, payload)
     const tokens = {
       token: response.token,
       u_hash: response.u_hash
     }
     localStorage.setItem('tokens', JSON.stringify(tokens))
-    yield* call<any>(uploadRegisterFiles, { filesToUpload: uploads, response })
+    yield* call<any>(uploadRegisterFiles, { filesToUpload: uploads, response, u_details })
     yield put({ type: ActionTypes.REGISTER_SUCCESS, payload: response })
     yield* call(initUserSaga)
     yield put(setLoginModal(false))
