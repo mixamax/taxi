@@ -864,6 +864,10 @@
     justify-content: center;
     margin-top: 10px;
     margin-bottom: 10px;
+
+    &_input {
+      display: none;
+    }
   }
 
   .button {

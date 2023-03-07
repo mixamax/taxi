@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { connect, ConnectedProps } from 'react-redux'
 import Button from '../Button'
 import Input, { EInputTypes } from '../Input'
 import { t, TRANSLATION } from '../../localization'
 import { modalsActionCreators, modalsSelectors } from '../../state/modals'
+import { uploadFile, editUser } from '../../API'
 import images from '../../constants/images'
 import './styles.scss'
 import { IRootState } from '../../state'
@@ -17,6 +18,7 @@ import { configSelectors } from '../../state/config'
 import * as API from '../../API'
 
 const mapStateToProps = (state: IRootState) => ({
+  tokens: userSelectors.tokens(state),
   user: userSelectors.user(state),
   language: configSelectors.language(state),
   isOpen: modalsSelectors.isProfileModalOpen(state),
@@ -46,6 +48,7 @@ interface IProps extends ConnectedProps<typeof connector> {
 }
 
 const CardDetailsModal: React.FC<IProps> = ({
+  tokens,
   user,
   language,
   isOpen,
@@ -70,6 +73,20 @@ const CardDetailsModal: React.FC<IProps> = ({
   })
 
   const { phone, email } = useWatch<IFormValues>({ control })
+
+  const onChangeAvatar = useCallback(e => {
+    if (!user || !tokens) return
+    const file = e.target.files[0]
+    uploadFile({
+      u_id: user.u_id,
+      file,
+      token: tokens.token,
+      u_hash: tokens.u_hash
+    }).then((res: any) => {
+      const id = res?.data?.data?.dl_id
+      return editUser({ u_photo: id })
+    })
+  }, [user, tokens])
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     if (isValid) {
@@ -112,7 +129,14 @@ const CardDetailsModal: React.FC<IProps> = ({
           <fieldset>
             <legend>{t(TRANSLATION.PROFILE)}</legend>
             <div className="avatar">
-              <img src={images.driverAvatar} alt={user?.u_name || ''}/>
+              <label>
+                <img src={images.driverAvatar} alt={user?.u_name || ''}/>
+                <input
+                  onChange={onChangeAvatar}
+                  type="file"
+                  className="avatar_input"
+                />
+              </label>
             </div>
             <Input
               inputProps={{

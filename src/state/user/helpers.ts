@@ -1,7 +1,7 @@
 import * as API from './../../API'
 
 export function uploadRegisterFiles(params: any) {
-  const { filesToUpload, response } = params
+  const { filesToUpload, response, u_details } = params
   const uploadsName: string[] = []
   const uploads = filesToUpload
     .filter((item: any) => item.file)
@@ -20,6 +20,11 @@ export function uploadRegisterFiles(params: any) {
     Object.keys(userData).forEach(key => {
       userData[key] = JSON.stringify(userData[key])
     })
+    if (u_details) {
+      Object.keys(u_details).forEach(key => {
+        userData[key] = u_details[key]
+      })
+    }
     return userData
   })
   .then(u_details => {

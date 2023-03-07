@@ -1,12 +1,13 @@
 import { ActionTypes as ConfigActionTypes } from './../config/constants'
 import { all, put } from 'redux-saga/effects'
-import { setLoginModal } from '../modals/actionCreators'
+import { setLoginModal, setMessageModal } from '../modals/actionCreators'
 import { ActionTypes } from './constants'
 import { uploadRegisterFiles } from './helpers'
 import { call, takeEvery } from '../../tools/sagaUtils'
+import { t, TRANSLATION } from '../../localization'
 import * as API from './../../API'
 import { PromiseReturn, TAction } from '../../types'
-import { EUserRoles, ITokens, IUser } from '../../types/types'
+import { EStatuses, EUserRoles, ITokens, IUser } from '../../types/types'
 import history from '../../tools/history'
 import { setUser } from './actionCreators'
 import { clearOrders } from '../orders/actionCreators'
@@ -86,17 +87,18 @@ function* googleLoginSaga(data: TAction) {
 function* registerSaga(data: TAction) {
   yield put({ type: ActionTypes.REGISTER_START })
   try {
-    const { uploads, ...payload } = data.payload
+    const { uploads, u_details, ...payload } = data.payload
     let response = yield* call<any>(API.register, payload)
     const tokens = {
       token: response.token,
       u_hash: response.u_hash
     }
     localStorage.setItem('tokens', JSON.stringify(tokens))
-    yield* call<any>(uploadRegisterFiles, { filesToUpload: uploads, response })
+    yield* call<any>(uploadRegisterFiles, { filesToUpload: uploads, response, u_details })
     yield put({ type: ActionTypes.REGISTER_SUCCESS, payload: response })
     yield* call(initUserSaga)
     yield put(setLoginModal(false))
+    yield put(setMessageModal({ isOpen: true, status: EStatuses.Success, message: t(TRANSLATION.SUCCESS_REGISTER_MESSAGE) }))
   } catch (error) {
     console.error(error)
     yield put({ type: ActionTypes.REGISTER_FAIL })

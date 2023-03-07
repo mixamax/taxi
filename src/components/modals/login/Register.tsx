@@ -13,7 +13,7 @@ import {
 } from '../../../state/user/constants'
 import { connect, ConnectedProps } from 'react-redux'
 import cn from 'classnames'
-import { EStatuses, EUserRoles, EWorkTypes } from '../../../types/types'
+import { EStatuses, EUserRoles, EWorkTypes, TFilesMap, IRequiredFields } from '../../../types/types'
 import { useLocation } from 'react-router-dom'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
@@ -70,16 +70,8 @@ interface IProps extends ConnectedProps<typeof connector> {
   isOpen: boolean;
 }
 
-type TFilesMap = {
-  passport_photo: any[]
-  driver_license_photo: any[]
-  license_photo: any[]
-}
 
-interface IRequiredFields {
-  [key: string]: boolean
-}
-
+// @TODO заменить на значение из data.js
 const requireFieldsStr = 'card,1;name_city,1;state,0;street,1;zip,0;passport_photo,1;driver_license_photo,1;license_photo,0'
 const requireFeildsMap: IRequiredFields = requireFieldsStr
   .split(';')
@@ -256,9 +248,9 @@ const RegisterForm: React.FC<IProps> = ({
       u_phone: data.u_phone,
       u_email: data.u_email,
       u_role: data.u_role || EUserRoles.Client,
+      u_city: data.city,
       ref_code: data.ref_code || undefined,
       u_details: {
-        city: data.city,
         street: data.street,
         state: data.state,
         zip: data.zip,

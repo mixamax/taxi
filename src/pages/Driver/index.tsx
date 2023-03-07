@@ -12,6 +12,7 @@ import { userSelectors } from '../../state/user'
 import { EUserRoles } from '../../types/types'
 import cn from 'classnames'
 import ErrorFrame from '../../components/ErrorFrame'
+import images from '../../constants/images'
 import { withLayout } from '../../HOCs/withLayout'
 
 const mapStateToProps = (state: IRootState) => ({
@@ -69,7 +70,7 @@ const Driver: React.FC<IProps> = ({
   }, [user])
 
   if (user?.u_role !== EUserRoles.Driver) {
-    return <ErrorFrame title={t(TRANSLATION.WRONG_USER_ROLE)}/>
+    return <ErrorFrame image={images.avatar} title={t(TRANSLATION.UNAUTHORIZED_ACCESS)}/>
   }
 
   return (

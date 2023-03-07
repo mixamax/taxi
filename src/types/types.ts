@@ -544,9 +544,9 @@ export interface IUser {
     zip?: string
     /** Номер карты */
     card?: string
-    document_type?: string
-    document_img?: string | File
-    document_2_img?: string | File
+    passport_photo?: string
+    driver_license_photo?: string
+    license_photo?: string
   }
   //
   u_registration: Moment
@@ -682,4 +682,15 @@ export type IFileUpload = {
   name?: string,
   u_id?: string,
   private?: 0 | 1
+}
+
+
+export type TFilesMap = {
+  passport_photo: any
+  driver_license_photo: any
+  license_photo: any
+}
+
+export interface IRequiredFields {
+  [key: string]: boolean
 }
