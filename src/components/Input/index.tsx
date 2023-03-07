@@ -100,8 +100,8 @@ const Input: React.FC<IProps> = (
 
   const addImageToRaw = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFiles([ ...files, e.target.files[0] ])
-      onChange && onChange([ ...files, e.target.files[0] ])
+      setFiles(files.concat(Array.from(e.target.files)))
+      onChange && onChange(files.concat(Array.from(e.target.files)))
       // e.target.value = ''
     }
   }
