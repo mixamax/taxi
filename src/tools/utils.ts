@@ -440,11 +440,14 @@ export const convertCar = (car: any): ICar => {
 
 export const convertUser = (user: any): IUser => {
   return convertTypes<any, IUser>(
-    user,
+    user, 
     {
       customKeys: {
         u_ban: () => convertTypes<any, IUser['u_ban']>(user.u_ban, {
           toIntKeys: ['auth', 'order', 'blog_topic', 'blog_post'],
+        }),
+        u_details: () => convertTypes<any, IUser['u_details']>(user.u_details, {
+          toJSONKeys: ['passport_photo', 'driver_license_photo', 'license_photo'],
         }),
       },
       toIntKeys: ['u_tips', 'u_role'],
@@ -474,6 +477,7 @@ interface TConvertKeys {
   toStringDateKeys?: string[],
   toBooleanKeys?: string[],
   toIntBooleanKeys?: string[],
+  toJSONKeys?: string[],
   customKeys?: {[key: string]: Function}
 }
 const convertTypes = <T, R>(
@@ -488,6 +492,7 @@ const convertTypes = <T, R>(
     toStringDateKeys = [],
     toBooleanKeys = [],
     toIntBooleanKeys = [],
+    toJSONKeys = [],
     customKeys = {},
   }: TConvertKeys,
 ) => {
@@ -511,6 +516,13 @@ const convertTypes = <T, R>(
     else if (toStringDateKeys.includes(key)) convertedObject[key] = value.format(dateFormat)
     else if (toBooleanKeys.includes(key)) convertedObject[key] = Boolean(parseInt(value))
     else if (toIntBooleanKeys.includes(key)) convertedObject[key] = Number(value)
+    else if (toJSONKeys.includes(key)) {
+      try {
+        convertedObject[key] = JSON.parse(value)
+      } catch (e) {
+        convertedObject[key] = value
+      }
+    }
     else if (customKeys.hasOwnProperty(key)) convertedObject[key] = customKeys[key]()
     else convertedObject[key] = value
   }
