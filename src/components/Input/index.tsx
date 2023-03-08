@@ -58,7 +58,8 @@ interface IProps {
   sideCheckbox?: ISideCheckbox
   compareVariant?: ECompareVariants
   onChangeCompareVariant?: (value: ECompareVariants) => any
-  hideInput?: boolean
+  hideInput?: boolean,
+  defaultFiles?: number[]
 }
 
 const Input: React.FC<IProps> = (
@@ -76,6 +77,7 @@ const Input: React.FC<IProps> = (
     defaultValue,
     sideText,
     fileName,
+    defaultFiles = [],
     sideCheckbox,
     compareVariant,
     hideInput,
@@ -168,6 +170,9 @@ const Input: React.FC<IProps> = (
       case EInputTypes.File:
         return (
           <div className="input-file">
+            {defaultFiles.map((fileId: number) => {
+
+            })}
             {files.map((file: File, index: number) =>
               (<div
                 className="input-file-uploaded"

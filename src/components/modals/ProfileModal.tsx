@@ -1,9 +1,10 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState, useEffect } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { connect, ConnectedProps } from 'react-redux'
 import Button from '../Button'
 import Input, { EInputTypes } from '../Input'
 import { t, TRANSLATION } from '../../localization'
+import { getImageBlob } from '../../API'
 import { modalsActionCreators, modalsSelectors } from '../../state/modals'
 import { editUser } from '../../API'
 import images from '../../constants/images'
@@ -12,7 +13,7 @@ import { IRootState } from '../../state'
 import Overlay from './Overlay'
 import { userSelectors, userActionCreators } from '../../state/user'
 import { defaultProfileModal } from '../../state/modals/reducer'
-import { EStatuses, EWorkTypes } from '../../types/types'
+import { EStatuses, EWorkTypes, TFilesMap, IRequiredFields } from '../../types/types'
 import { emailRegex, getPhoneError, getBase64 } from '../../tools/utils'
 import { configSelectors } from '../../state/config'
 import * as API from '../../API'
@@ -42,11 +43,26 @@ interface IFormValues {
   city?: string
   state?: string
   zip?: string
-  card?: string
+  card?: string,
+  passport_photo?: any,
+  driver_license_photo?: any,
+  license_photo?: any
 }
 
 interface IProps extends ConnectedProps<typeof connector> {
 }
+
+// @TODO заменить на значение из data.js
+const requireFieldsStr = 'card,1;name_city,1;state,0;street,1;zip,0;passport_photo,1;driver_license_photo,1;license_photo,0'
+const requireFeildsMap: IRequiredFields = requireFieldsStr
+  .split(';')
+  .reduce((res, item) => {
+    const [ key, value ] = item.split(',')
+    return {
+      ...res,
+      [key]: !!Number(value)
+    }
+  }, {})
 
 const CardDetailsModal: React.FC<IProps> = ({
   tokens,
@@ -57,6 +73,17 @@ const CardDetailsModal: React.FC<IProps> = ({
   setMessageModal,
   updateUser,
 }) => {
+  const [filesMap, setFilesMap] = useState<TFilesMap>({
+    passport_photo: user?.u_details?.passport_photo,
+    driver_license_photo: user?.u_details?.driver_license_photo,
+    license_photo: user?.u_details?.license_photo
+  })
+
+  useEffect(() => {
+    console.log(filesMap.passport_photo)
+    filesMap.passport_photo.map((id: number) => getImageBlob(id).then(res => console.log(res)))
+  }, [])
+
   const { register, getValues, formState: { errors, isValid, isDirty }, handleSubmit, control } = useForm<IFormValues>({
     criteriaMode: 'all',
     mode: 'onChange',
@@ -70,7 +97,7 @@ const CardDetailsModal: React.FC<IProps> = ({
       city: user?.u_city && (window as any).data.cities && (window as any).data.cities[user?.u_city] ? (window as any).data.cities[user?.u_city][language.id] : '',
       zip: user?.u_details?.zip,
       card: user?.u_details?.card,
-      street: user?.u_details?.street,
+      street: user?.u_details?.street
     },
   })
 
@@ -238,6 +265,23 @@ const CardDetailsModal: React.FC<IProps> = ({
               }}
               label={t(TRANSLATION.CARD_NUMBER)}
               error={errors.card?.message}
+            />
+            <Input
+              defaultFiles={filesMap.passport_photo}
+              onChange={(e) => {
+                if (typeof e === 'string') return
+                setFilesMap({ ...filesMap, passport_photo: e || [] })
+              }}
+              label={t(TRANSLATION.PASSPORT_PHOTO)}
+              inputProps={{
+                ...register('passport_photo', {
+                  required: requireFeildsMap.passport_photo && t(TRANSLATION.REQUIRED_FIELD),
+                }),
+                required: requireFeildsMap.passport_photo,
+                accept: 'image/png, image/jpeg, image/jpg',
+                multiple: true,
+              }}
+              inputType={EInputTypes.File}
             />
             <Button
               text={t(TRANSLATION.SAVE)}
