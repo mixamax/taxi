@@ -335,6 +335,7 @@ export default {
   OUTDOOR_UMBRELLA: 'outdoor_umbrella',
   PASSENGER: 'passenger',
   PASSWORD: 'password',
+  PASSWORD_RESET_MESSAGE: 'password_reset_message',
   PATIO: 'patio',
   PAYMENT_FOR_ORDER: 'payment_for_order',
   PAYMENT_WAY: 'payment_way',
