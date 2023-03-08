@@ -100,6 +100,7 @@
     flex: 1 0 auto;
     text-align: center;
     font-weight: normal;
+    margin: 10px 0 20px;
 
     &--fail {
       color: red;
@@ -867,6 +868,19 @@
 
     &_input {
       display: none;
+    }
+
+    &_image {
+      width: 100px;
+      height: 100px;
+      overflow: hidden;
+      border-radius: 100%;
+
+      &_bg {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+      }
     }
   }
 
