@@ -1,3 +1,4 @@
+import { getCacheVersion } from './API'
 import store from './state'
 import { setConfigError, setConfigLoaded } from './state/config/actionCreators'
 
@@ -39,15 +40,16 @@ export default class Config {
 const applyConfigName = (name?: string) => {
   const script = document.createElement('script'),
     _name = name ? `data_${name}.js` : 'data.js'
-
-  script.src = `https://ibronevik.ru/taxi/cache/${_name}`
-  script.async = true
-  script.onload = () => {
-    store.dispatch(setConfigLoaded())
-  }
-  script.onerror = () => {
-    store.dispatch(setConfigError())
-  }
-
-  document.body.appendChild(script)
+  getCacheVersion().then(ver => {
+    script.src = `https://ibronevik.ru/taxi/cache/${_name}?ver=${ver}`
+    script.async = true
+    script.onload = () => {
+      store.dispatch(setConfigLoaded())
+    }
+    script.onerror = () => {
+      store.dispatch(setConfigError())
+    }
+  
+    document.body.appendChild(script)
+  })
 }
