@@ -557,6 +557,18 @@ const _editUser = (
 export const editUser = apiMethod<typeof _editUser>(_editUser)
 export const editUserAfterRegister = apiMethod<typeof _editUser>(_editUser, { authRequired: false })
 
+const _getImageBlob = (
+  { formData }: IApiMethodArguments,
+  id: number,
+) => {
+  return axios.post(`${Config.API_URL}/dropbox/file/${id}`, formData, {
+    responseType: 'blob'
+  }).then(res => {
+    return [id, URL.createObjectURL(res.data)]
+  })
+}
+export const getImageBlob = apiMethod<typeof _getImageBlob>(_getImageBlob)
+
 const _setOutDrive = (
   { formData }: IApiMethodArguments,
   isFinished: boolean,
