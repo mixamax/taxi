@@ -73,16 +73,21 @@ const CardDetailsModal: React.FC<IProps> = ({
   setMessageModal,
   updateUser,
 }) => {
-  const [filesMap, setFilesMap] = useState<TFilesMap>({
-    passport_photo: user?.u_details?.passport_photo,
-    driver_license_photo: user?.u_details?.driver_license_photo,
-    license_photo: user?.u_details?.license_photo
-  })
+  const [ passportImages, setPassportImages ] = useState<any>([])
+  const [ driverLicenseImages, setDriverLicenseImages ] = useState<any>([])
+  const [ licenseImages, setLicenseImages ] = useState<any>([])
+
+  const [filesMap, setFilesMap] = useState<TFilesMap>({ passport_photo: [], driver_license_photo: [], license_photo: [] })
 
   useEffect(() => {
-    console.log(filesMap.passport_photo)
-    filesMap.passport_photo.map((id: number) => getImageBlob(id).then(res => console.log(res)))
-  }, [])
+    if (!isOpen) return
+    const passportImgs = user?.u_details?.passport_photo || []
+    const driverLicenseImgs = user?.u_details?.driver_license_photo || []
+    const licenseImgs = user?.u_details?.license_photo || []
+    Promise.all(passportImgs.map(getImageBlob)).then(setPassportImages)
+    Promise.all(driverLicenseImgs.map(getImageBlob)).then(setDriverLicenseImages)
+    Promise.all(licenseImgs.map(getImageBlob)).then(setLicenseImages)
+  }, [isOpen])
 
   const { register, getValues, formState: { errors, isValid, isDirty }, handleSubmit, control } = useForm<IFormValues>({
     criteriaMode: 'all',
@@ -114,8 +119,37 @@ const CardDetailsModal: React.FC<IProps> = ({
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     if (isValid) {
       const values = getValues()
+      const uploadsName: any[] = []
+      const uploads: any[] = []
+      for (let [key, value] of Object.entries(filesMap)) {
+        value.filter((file: any) => file).forEach((file: any) => {
+          uploadsName.push(key)
+          uploads.push(API.uploadFile({
+            file,
+            u_id: user?.u_id,
+            token: tokens?.token,
+            u_hash: tokens?.u_hash
+          }))
+        })
+      }
 
-      API.editUser({
+      Promise.all(uploads).then((res: any[]) => {
+        const userData: Record<string, any> = {
+          passport_photo: passportImages.map((item: any) => item[0]),
+          driver_license_photo: driverLicenseImages.map((item: any) => item[0]),
+          license_photo: licenseImages.map((item: any) => item[0])
+        }
+        res.forEach((item, i) => {
+          const resData = item.data || {}
+          if (resData.status !== 'success') return
+          const fileId = resData.data?.dl_id
+          userData[uploadsName[i]] = (userData[uploadsName[i]] || []).concat(fileId)
+        })
+        Object.keys(userData).forEach(key => {
+          userData[key] = JSON.stringify(userData[key])
+        })
+        return userData
+      }).then(userData => API.editUser({
         u_name: values.name,
         u_middle: values.middleName,
         u_family: values.surname,
@@ -127,14 +161,16 @@ const CardDetailsModal: React.FC<IProps> = ({
           state: values.state,
           zip: values.zip,
           card: values.card,
+          ...userData
         },
-      })
-        .then(res =>
-          setMessageModal({ isOpen: true, status: EStatuses.Success, message: 'User has been successfully updated' }),
-        )
-        .catch(() =>
-          setMessageModal({ isOpen: true, status: EStatuses.Fail, message: 'An error occured' }),
-        )
+      }))
+      .then(res =>
+        setMessageModal({ isOpen: true, status: EStatuses.Success, message: 'User has been successfully updated' }),
+      )
+      .catch(() =>
+        setMessageModal({ isOpen: true, status: EStatuses.Fail, message: 'An error occured' }),
+      )
+      
     } else {
       console.error('Fields is not valid')
     }
@@ -267,17 +303,51 @@ const CardDetailsModal: React.FC<IProps> = ({
               error={errors.card?.message}
             />
             <Input
-              defaultFiles={filesMap.passport_photo}
+              defaultFiles={passportImages}
+              removeDefaultImage={id => {
+                setPassportImages(passportImages.filter((item: any) => item[0] !== id))
+              }}
               onChange={(e) => {
                 if (typeof e === 'string') return
                 setFilesMap({ ...filesMap, passport_photo: e || [] })
               }}
               label={t(TRANSLATION.PASSPORT_PHOTO)}
               inputProps={{
-                ...register('passport_photo', {
-                  required: requireFeildsMap.passport_photo && t(TRANSLATION.REQUIRED_FIELD),
-                }),
-                required: requireFeildsMap.passport_photo,
+                ...register('passport_photo'),
+                accept: 'image/png, image/jpeg, image/jpg',
+                multiple: true,
+              }}
+              inputType={EInputTypes.File}
+            />
+            <Input
+              defaultFiles={driverLicenseImages}
+              removeDefaultImage={id => {
+                setPassportImages(driverLicenseImages.filter((item: any) => item[0] !== id))
+              }}
+              onChange={(e) => {
+                if (typeof e === 'string') return
+                setFilesMap({ ...filesMap, driver_license_photo: e || [] })
+              }}
+              label={t(TRANSLATION.DRIVER_LICENSE_PHOTO)}
+              inputProps={{
+                ...register('driver_license_photo'),
+                accept: 'image/png, image/jpeg, image/jpg',
+                multiple: true,
+              }}
+              inputType={EInputTypes.File}
+            />
+            <Input
+              defaultFiles={licenseImages}
+              removeDefaultImage={id => {
+                setPassportImages(licenseImages.filter((item: any) => item[0] !== id))
+              }}
+              onChange={(e) => {
+                if (typeof e === 'string') return
+                setFilesMap({ ...filesMap, license_photo: e || [] })
+              }}
+              label={t(TRANSLATION.LICENSE_PHOTO)}
+              inputProps={{
+                ...register('license_photo'),
                 accept: 'image/png, image/jpeg, image/jpg',
                 multiple: true,
               }}

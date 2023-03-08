@@ -48,6 +48,7 @@ interface IProps {
   options?: ISelectOption[]
   inputProps?: React.ComponentProps<'input'> | React.ComponentProps<'select'> | React.ComponentProps<'textarea'> | InputMaskProps
   onChange?: (newValue: string | File[]) => any
+  removeDefaultImage?: (id: number) => any
   fieldWrapperClassName?: string
   oneline?: boolean
   fileName?: string
@@ -82,6 +83,7 @@ const Input: React.FC<IProps> = (
     compareVariant,
     hideInput,
     onChange,
+    removeDefaultImage,
     onDisableChange,
     onChangeCompareVariant,
     onSuggestionClick,
@@ -170,8 +172,17 @@ const Input: React.FC<IProps> = (
       case EInputTypes.File:
         return (
           <div className="input-file">
-            {defaultFiles.map((fileId: number) => {
-
+            {defaultFiles.map((file: any, index: number) => {
+              return (
+              <div
+                className="input-file-uploaded"
+                key={index}
+                onClick={(e) => {
+                  removeDefaultImage && removeDefaultImage(file[0])
+                }}
+              >
+                <img src={file[1]}></img>
+              </div>)
             })}
             {files.map((file: File, index: number) =>
               (<div

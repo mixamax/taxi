@@ -561,7 +561,11 @@ const _getImageBlob = (
   { formData }: IApiMethodArguments,
   id: number,
 ) => {
-  return axios.post(`${Config.API_URL}/dropbox/file/${id}`, formData)
+  return axios.post(`${Config.API_URL}/dropbox/file/${id}`, formData, {
+    responseType: 'blob'
+  }).then(res => {
+    return [id, URL.createObjectURL(res.data)]
+  })
 }
 export const getImageBlob = apiMethod<typeof _getImageBlob>(_getImageBlob)
 

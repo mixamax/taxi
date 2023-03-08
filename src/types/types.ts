@@ -544,9 +544,9 @@ export interface IUser {
     zip?: string
     /** Номер карты */
     card?: string
-    passport_photo?: string
-    driver_license_photo?: string
-    license_photo?: string
+    passport_photo?: number[]
+    driver_license_photo?: number[]
+    license_photo?: number[]
   }
   //
   u_registration: Moment
