@@ -114,8 +114,7 @@ const CardDetailsModal: React.FC<IProps> = ({
     getBase64(file)
       .then((base64: any) => editUser({ u_photo: base64 }))
       .then(() => updateUser())
-      .catch(error => alert(JSON.stringify(error)))
-  }, [])
+  }, [user, tokens])
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     if (isValid) {
