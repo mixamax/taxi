@@ -122,8 +122,10 @@ const RegisterForm: React.FC<IProps> = ({
     car_classes: any
   } | null>(null)
 
+  const isDefaultDriver = location.pathname.includes('/driver-order')
+
   const schema = yup.object({
-    type: yup.string().required(),
+    type: getYupSchema(yup.string(), isDefaultDriver),
     u_name: yup.string().required(t(TRANSLATION.REQUIRED_FIELD)).trim(),
     u_email: yup
       .string()
@@ -137,14 +139,14 @@ const RegisterForm: React.FC<IProps> = ({
       is: (type: ERegistrationType) => type === ERegistrationType.Phone,
       then: yup.string().required(t(TRANSLATION.REQUIRED_FIELD)).trim(),
     }),
-    street: getYupSchema(yup.string().trim(), requireFeildsMap.street),
-    city: getYupSchema(yup.string().trim(), requireFeildsMap.city),
-    state: getYupSchema(yup.string().trim(), requireFeildsMap.state),
-    zip: getYupSchema(yup.string().trim(), requireFeildsMap.zip),
-    card: getYupSchema(yup.string().min(16).max(16).trim(), requireFeildsMap.card),
-    passport_photo: getYupImageSchema(requireFeildsMap.passport_photo),
-    driver_license_photo: getYupImageSchema(requireFeildsMap.driver_license_photo),
-    license_photo: getYupImageSchema(requireFeildsMap.license_photo),
+    street: getYupSchema(yup.string().trim(), isDefaultDriver && requireFeildsMap.street),
+    city: getYupSchema(yup.string().trim(), isDefaultDriver && requireFeildsMap.city),
+    state: getYupSchema(yup.string().trim(), isDefaultDriver && requireFeildsMap.state),
+    zip: getYupSchema(yup.string().trim(), isDefaultDriver && requireFeildsMap.zip),
+    card: getYupSchema(yup.string().min(16).max(16).trim(), isDefaultDriver && requireFeildsMap.card),
+    passport_photo: isDefaultDriver ? getYupImageSchema(requireFeildsMap.passport_photo) : yup.string(),
+    driver_license_photo: isDefaultDriver ? getYupImageSchema(requireFeildsMap.driver_license_photo) : yup.string(),
+    license_photo: isDefaultDriver ? getYupImageSchema(requireFeildsMap.license_photo) : yup.string(),
   })
 
   const {
@@ -158,9 +160,7 @@ const RegisterForm: React.FC<IProps> = ({
     mode: 'all',
     defaultValues: {
       type: ERegistrationType.Email,
-      u_role: !location.pathname.includes('/driver-order') ?
-        EUserRoles.Client :
-        EUserRoles.Driver,
+      u_role: !location.pathname.includes('/driver-order') ? EUserRoles.Client : EUserRoles.Driver,
     },
     resolver: yupResolver(schema),
   })
@@ -170,7 +170,7 @@ const RegisterForm: React.FC<IProps> = ({
   let whatsappResponseMessage = ''
 
   useEffect(() => {
-    if (status === EStatuses.Fail || status === EStatuses.Success) {
+    if (status === EStatuses.Fail) {
       toggleRegistrationAlertVisibility()
     }
 
@@ -303,12 +303,12 @@ const RegisterForm: React.FC<IProps> = ({
 
   const isDriver = Number(u_role) === EUserRoles.Driver
   let isValidFrom = isValid
-  if (requireFeildsMap.passport_photo && !filesMap.passport_photo.length) isValidFrom = false
-  if (requireFeildsMap.driver_license_photo && !filesMap.driver_license_photo.length) isValidFrom = false
-  if (requireFeildsMap.license_photo && !filesMap.license_photo) isValidFrom = false
+  if (isDriver && requireFeildsMap.passport_photo && !filesMap.passport_photo.length) isValidFrom = false
+  if (isDriver && requireFeildsMap.driver_license_photo && !filesMap.driver_license_photo.length) isValidFrom = false
+  if (isDriver && requireFeildsMap.license_photo && !filesMap.license_photo) isValidFrom = false
   return (
     <form className="sign-up-subform" onSubmit={handleSubmit(onSubmit)}>
-      <Input
+      {isDriver && <Input
         inputProps={{
           onChange: (e: any) => setWorkType(Number(e.target.value)),
           value: String(workType),
@@ -318,7 +318,7 @@ const RegisterForm: React.FC<IProps> = ({
           { label: t(TRANSLATION.SELF_EMPLOYED), value: EWorkTypes.Self },
           { label: t(TRANSLATION.COMPANY), value: EWorkTypes.Company },
         ]}
-      />
+      />}
 
       <Input
         inputProps={{
