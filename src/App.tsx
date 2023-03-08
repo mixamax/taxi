@@ -179,10 +179,10 @@ const App: React.FC<IProps> = ({
       <CancelDriverOrderModal/>
       <MapModal/>
       <LoginModal/>
-      <MessageModal/>
       <CandidatesModal/>
       {user && <ProfileModal/>}
       {activeChat && <Chat key={activeChat}/>}
+      <MessageModal/>
     </React.Fragment>
   )
 }
