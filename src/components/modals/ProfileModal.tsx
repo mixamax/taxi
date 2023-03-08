@@ -271,6 +271,7 @@ const CardDetailsModal: React.FC<IProps> = ({
             <Input
               inputProps={{
                 ...register('city'),
+                disabled: true
               }}
               label={t(TRANSLATION.CITY)}
               error={errors.city?.message}

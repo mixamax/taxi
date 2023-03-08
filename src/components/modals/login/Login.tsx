@@ -223,7 +223,8 @@ const LoginForm: React.FC<IProps> = ({
                 ...(!user ?
                   {
                     className: 'restore-password-block__button',
-                    onClick: () => formLogin && remindPassword(formLogin),
+                    type: 'button',
+                    onClick: () => formLogin && confirm(t(TRANSLATION.PASSWORD_RESET_MESSAGE)) && remindPassword(formLogin),
                     disabled: !formLogin || !!errors?.login,
                     text: t(TRANSLATION.RESTORE_PASSWORD),
                     skipHandler: true,
