@@ -161,7 +161,7 @@ const LoginForm: React.FC<IProps> = ({
 
 
   useEffect(() => {
-    if ((status === EStatuses.Fail || status === EStatuses.Success) && type !== ERegistrationType.Whatsapp) {
+    if (((status === EStatuses.Fail || status === EStatuses.Success && user)) && type !== ERegistrationType.Whatsapp) {
       toggleVisibility()
     } else if (status === EStatuses.Whatsapp) {
       setLoginModal(false)

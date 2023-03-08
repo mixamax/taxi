@@ -5,15 +5,15 @@ import Button from '../Button'
 import Input, { EInputTypes } from '../Input'
 import { t, TRANSLATION } from '../../localization'
 import { modalsActionCreators, modalsSelectors } from '../../state/modals'
-import { uploadFile, editUser } from '../../API'
+import { editUser } from '../../API'
 import images from '../../constants/images'
 import './styles.scss'
 import { IRootState } from '../../state'
 import Overlay from './Overlay'
-import { userSelectors } from '../../state/user'
+import { userSelectors, userActionCreators } from '../../state/user'
 import { defaultProfileModal } from '../../state/modals/reducer'
 import { EStatuses, EWorkTypes } from '../../types/types'
-import { emailRegex, getPhoneError } from '../../tools/utils'
+import { emailRegex, getPhoneError, getBase64 } from '../../tools/utils'
 import { configSelectors } from '../../state/config'
 import * as API from '../../API'
 
@@ -27,6 +27,7 @@ const mapStateToProps = (state: IRootState) => ({
 const mapDispatchToProps = {
   setProfileModal: modalsActionCreators.setProfileModal,
   setMessageModal: modalsActionCreators.setMessageModal,
+  updateUser: userActionCreators.initUser
 }
 
 const connector = connect(mapStateToProps, mapDispatchToProps)
@@ -54,6 +55,7 @@ const CardDetailsModal: React.FC<IProps> = ({
   isOpen,
   setProfileModal,
   setMessageModal,
+  updateUser,
 }) => {
   const { register, getValues, formState: { errors, isValid, isDirty }, handleSubmit, control } = useForm<IFormValues>({
     criteriaMode: 'all',
@@ -75,18 +77,12 @@ const CardDetailsModal: React.FC<IProps> = ({
   const { phone, email } = useWatch<IFormValues>({ control })
 
   const onChangeAvatar = useCallback(e => {
-    if (!user || !tokens) return
     const file = e.target.files[0]
-    uploadFile({
-      u_id: user.u_id,
-      file,
-      token: tokens.token,
-      u_hash: tokens.u_hash
-    }).then((res: any) => {
-      const id = res?.data?.data?.dl_id
-      return editUser({ u_photo: id })
-    })
-  }, [user, tokens])
+    if (!user || !tokens || !file) return
+    getBase64(file)
+      .then((base64: any) => editUser({ u_photo: base64 }))
+      .then(() => updateUser())
+  }, [])
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     if (isValid) {
@@ -130,7 +126,15 @@ const CardDetailsModal: React.FC<IProps> = ({
             <legend>{t(TRANSLATION.PROFILE)}</legend>
             <div className="avatar">
               <label>
-                <img src={images.driverAvatar} alt={user?.u_name || ''}/>
+                <div className="avatar_image">
+                  <div
+                    className="avatar_image_bg"
+                    style={{
+                      backgroundImage: `url(${user?.u_photo || images.driverAvatar})`
+                    }}
+                    title={user?.u_name || ''}
+                  />
+                </div>
                 <input
                   onChange={onChangeAvatar}
                   type="file"
