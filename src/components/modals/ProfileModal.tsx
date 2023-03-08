@@ -77,8 +77,8 @@ const CardDetailsModal: React.FC<IProps> = ({
   const { phone, email } = useWatch<IFormValues>({ control })
 
   const onChangeAvatar = useCallback(e => {
-    if (!user || !tokens) return
     const file = e.target.files[0]
+    if (!user || !tokens || !file) return
     getBase64(file)
       .then((base64: any) => editUser({ u_photo: base64 }))
       .then(() => updateUser())
