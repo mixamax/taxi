@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import Input, { EInputTypes } from '../../Input'
 import { t, TRANSLATION } from '../../../localization'
 import Checkbox from '../../Checkbox'
@@ -70,19 +70,6 @@ interface IProps extends ConnectedProps<typeof connector> {
   isOpen: boolean;
 }
 
-
-// @TODO заменить на значение из data.js
-const requireFieldsStr = 'card,1;name_city,1;state,0;street,1;zip,0;passport_photo,1;driver_license_photo,1;license_photo,0'
-const requireFeildsMap: IRequiredFields = requireFieldsStr
-  .split(';')
-  .reduce((res, item) => {
-    const [ key, value ] = item.split(',')
-    return {
-      ...res,
-      [key]: !!Number(value)
-    }
-  }, {})
-
 const getYupImageSchema = (isRequired: boolean = false) => {
   const schema = yup
     .mixed()
@@ -108,6 +95,20 @@ const RegisterForm: React.FC<IProps> = ({
   register,
   response,
 }) => {
+  const requireFeildsMap: IRequiredFields = useMemo(() => {
+    const requireFieldsStr = (window as any).data?.site_constants?.reg_driver?.value || ''
+    return requireFieldsStr
+      .split(';')
+      .reduce((res: any, item: any) => {
+        const [ key, value ] = item.split(',')
+        return {
+          ...res,
+          [key]: !!Number(value)
+        }
+      }, {})
+  }, [])
+  
+
   const [showRefCode, setShowRefCode] = useState(false)
   const [workType, setWorkType] = useState<EWorkTypes | null>(null)
   const location = useLocation()

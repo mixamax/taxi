@@ -16,8 +16,7 @@ import {
   ISuggestion,
   ITokens,
   ITrip,
-  IUser,
-  IFileUpload
+  IUser
 } from './types/types'
 import { Stringify, ValueOf } from './types/index'
 import { addToFormData, apiMethod, IApiMethodArguments, IResponseFields } from './tools/api'
@@ -54,6 +53,9 @@ export enum EBookingActions {
     SetTips = 'set_tips',
     Edit = 'edit',
 }
+
+export const getCacheVersion = () => axios.get(`${Config.API_URL}/?cv=`)
+  .then(response => response?.data['cache version'])
 
 const _uploadFile = (
   { formData }: IApiMethodArguments,
