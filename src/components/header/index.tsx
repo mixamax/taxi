@@ -178,7 +178,8 @@ const Header: React.FC<IProps> = ({
           className="avatar"
           onClick={e => setLoginModal(true)}
           style={{
-            backgroundImage: `url(${user ? images.activeAvatar : images.avatar})`,
+            backgroundSize: user ? 'cover' : '30px',
+            backgroundImage: `url(${user ? user.u_photo : images.avatar})`,
           }}
         />
       </div>
