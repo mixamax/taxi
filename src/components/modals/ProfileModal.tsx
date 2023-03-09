@@ -73,6 +73,8 @@ const CardDetailsModal: React.FC<IProps> = ({
   setMessageModal,
   updateUser,
 }) => {
+  if (!isOpen) return null
+
   const [ passportImages, setPassportImages ] = useState<any>([])
   const [ driverLicenseImages, setDriverLicenseImages ] = useState<any>([])
   const [ licenseImages, setLicenseImages ] = useState<any>([])
@@ -80,7 +82,6 @@ const CardDetailsModal: React.FC<IProps> = ({
   const [filesMap, setFilesMap] = useState<TFilesMap>({ passport_photo: [], driver_license_photo: [], license_photo: [] })
 
   useEffect(() => {
-    if (!isOpen) return
     const passportImgs = user?.u_details?.passport_photo || []
     const driverLicenseImgs = user?.u_details?.driver_license_photo || []
     const licenseImgs = user?.u_details?.license_photo || []
