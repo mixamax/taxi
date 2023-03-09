@@ -120,6 +120,7 @@ const _login = (
 ): Promise<{ user: IUser | null, tokens: ITokens | null, data: string | null } | null> => {
   addToFormData(formData, {
     ...data,
+    au: 'f'
   })
 
   return axios.post(`${Config.API_URL}/auth`, formData)
