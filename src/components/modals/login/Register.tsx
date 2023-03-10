@@ -93,7 +93,7 @@ const RegisterForm: React.FC<IProps> = ({
   status,
   tab,
   register,
-  response,
+  isOpen,
 }) => {
   const requireFeildsMap: IRequiredFields = useMemo(() => {
     const requireFieldsStr = (window as any).data?.site_constants?.reg_driver?.value || ''
@@ -171,7 +171,13 @@ const RegisterForm: React.FC<IProps> = ({
   let whatsappResponseMessage = ''
 
   useEffect(() => {
-    if (status === EStatuses.Fail) {
+    if (isOpen && isRegistrationAlertVisible) {
+      toggleRegistrationAlertVisibility()
+    }
+  }, [isOpen])
+
+  useEffect(() => {
+    if (status === EStatuses.Fail && !isRegistrationAlertVisible) {
       toggleRegistrationAlertVisibility()
     }
 
@@ -226,6 +232,10 @@ const RegisterForm: React.FC<IProps> = ({
 
   const onSubmit = (data: IFormValues) => {
     if (getPhoneError(u_phone, type === ERegistrationType.Phone)) return
+
+    if (isRegistrationAlertVisible) {
+      toggleRegistrationAlertVisibility()
+    }
 
     let upload: any[] = []
     if (filesMap.passport_photo) {
@@ -377,6 +387,7 @@ const RegisterForm: React.FC<IProps> = ({
         label={t(TRANSLATION.PHONE)}
         value={ERegistrationType.Phone}
         id="phone"
+        disabled
       />
       <Checkbox
         {...formRegister('type')}

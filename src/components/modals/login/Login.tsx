@@ -113,6 +113,9 @@ const LoginForm: React.FC<IProps> = ({
       setStatus(EStatuses.Default)
       setMessage('')
     }
+    if (isOpen && isVisible) {
+      toggleVisibility()
+    }
   }, [isOpen])
 
   useEffect(() => {
@@ -161,7 +164,7 @@ const LoginForm: React.FC<IProps> = ({
 
 
   useEffect(() => {
-    if (((status === EStatuses.Fail || status === EStatuses.Success && user)) && type !== ERegistrationType.Whatsapp) {
+    if (((status === EStatuses.Fail || status === EStatuses.Success && user)) && type !== ERegistrationType.Whatsapp && !isVisible) {
       toggleVisibility()
     } else if (status === EStatuses.Whatsapp) {
       setLoginModal(false)
@@ -176,6 +179,7 @@ const LoginForm: React.FC<IProps> = ({
   if (tab !== LOGIN_TABS_IDS[0]) return null
 
   const onSubmit = (data: IFormValues) => {
+    if (isVisible) toggleVisibility()
     setDataToLogin(data)
     if (user) {
       logout()
@@ -242,6 +246,7 @@ const LoginForm: React.FC<IProps> = ({
       label={t(TRANSLATION.PHONE)}
       value={ERegistrationType.Phone}
       id="phone"
+      disabled
     />
     <Checkbox
       {...formRegister('type')}
