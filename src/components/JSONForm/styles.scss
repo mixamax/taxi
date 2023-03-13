@@ -1,0 +1,55 @@
+.element {
+
+    &__field {
+        display: block;
+
+        &_error {
+            color: red;
+        }
+    }
+
+    &__required {
+        color: red;
+    }
+
+    &__file {
+        display: flex;
+        flex-wrap: wrap;
+        height: 120px;
+        padding: 5px;
+        border: 1px solid #858585;
+        box-sizing: border-box;
+        border-radius: 14px;
+        background: #fff;
+
+        &_value,
+        &_add {
+            box-sizing: border-box;
+            height: 100%;
+            border: 1px solid #858585;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 0 5px 0 0;
+            overflow: hidden;
+        }
+
+        &_value {
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+        
+        &_add {
+            width: 90px;
+            background-image: url('/assets/images/GHA/addPhoto.svg');
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        &_input {
+            display: none;
+        }
+    }
+}
