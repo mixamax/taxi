@@ -19,10 +19,10 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import Alert from '../../Alert/Alert'
 import { Intent } from '../../Alert'
+import ErrorFrame from '../../../components/ErrorFrame'
 import { useVisibility } from '../../../tools/hooks'
-import axios from 'axios'
-import { WHATSAPP_BOT_KEY, WHATSAPP_BOT_URL } from '../../../config'
 import { ISelectOption } from '../../../types'
+import JSONForm from '../../JSONForm'
 
 const mapStateToProps = (state: IRootState) => {
   return {
@@ -108,10 +108,10 @@ const RegisterForm: React.FC<IProps> = ({
       }, {})
   }, [])
   
+  const location = useLocation()
 
   const [showRefCode, setShowRefCode] = useState(false)
   const [workType, setWorkType] = useState<EWorkTypes | null>(null)
-  const location = useLocation()
   const [isRegistrationAlertVisible, toggleRegistrationAlertVisibility] = useVisibility(false)
   const [isWhatsappAlertVisible, toggleWhatsappAlertVisibility] = useVisibility(false)
   const [shouldSendToWhatsapp, setShouldSendToWhatsapp] = useState(false)

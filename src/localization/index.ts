@@ -62,7 +62,7 @@ const t = (id: string, options: IOptions = {}) => {
 
     return result
   } catch (error) {
-    console.warn(`Localization error. id: ${id}, options: ${JSON.stringify(options)}`, error)
+    // console.warn(`Localization error. id: ${id}, options: ${JSON.stringify(options)}`, error)
     return 'Error'
   }
 }

@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect, ConnectedProps } from 'react-redux'
+import { useLocation } from 'react-router-dom'
 import Tabs from '../../tabs/Tabs'
 import './login-form.scss'
 import VersionInfo from '../../version-info'
@@ -7,6 +8,7 @@ import { t, TRANSLATION } from '../../../localization'
 import LoadFrame from '../../LoadFrame'
 import LoginForm from './Login'
 import RegisterForm from './Register'
+import RegisterJSON from './RegisterJSON'
 import { LOGIN_TABS, LOGIN_TABS_IDS } from '../../../state/user/constants'
 import { IRootState } from '../../../state'
 import { EStatuses } from '../../../types/types'
@@ -47,11 +49,14 @@ const LoginModal: React.FC<IProps> = ({
   setTab,
   setLoginModal,
 }) => {
+  const location = useLocation()
   const _TABS = LOGIN_TABS.map((item, index) => ({
     ...item,
     label: t(item.label),
     disabled: index === 1 ? !!user : false,
   }))
+
+  const RegisterComponent = location.pathname.includes('/driver-order-test') ? RegisterJSON : RegisterForm
 
   return (
     <Overlay
@@ -78,7 +83,7 @@ const LoginModal: React.FC<IProps> = ({
                 />
               ) :
               (
-                <RegisterForm
+                <RegisterComponent
                   isOpen={isOpen}
                 />
               )}
