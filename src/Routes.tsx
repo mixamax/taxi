@@ -47,6 +47,7 @@ const AppRoutes: React.FC<{user: IUser | null}> = ({ user }) => (
     <Route path="/passenger-order" component={PassengerOrder}/>
     <Route path="/driver-order/:id" component={Order}/>
     <Route path="/driver-order" component={DriverOrder}/>
+    <Route path="/driver-order-test" component={DriverOrder}/>
     <Route path="/sandbox" component={Sandbox}/>
     <Redirect
       from='*'

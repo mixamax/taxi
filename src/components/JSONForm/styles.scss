@@ -1,0 +1,177 @@
+.element {
+    &__field {
+        display: block;
+        margin-bottom: 40px;
+
+        &_error {
+            color: red;
+            margin-top: 5px;
+        }
+    }
+
+    &__label {
+        margin-bottom: 15px;
+    }
+
+    &__required {
+        color: red;
+    }
+
+    &__radio {
+        display: block;
+        margin-bottom: 10px;
+        &_input {
+            display: none;
+
+            & + span {
+                display: block;
+                cursor: pointer;
+                line-height: 25px;
+                height: 25px;
+
+                &:before {
+                    content: '';
+                    display: inline-block;
+                    border: 2px solid #0f2c76;
+                    width: 25px;
+                    height: 25px;
+                    box-sizing: border-box;
+                    border-radius: 50%;
+                    margin-right: 0.5em;
+                    color: #fff;
+                    font-size: 23px;
+                    line-height: 21px;
+                    text-align: center;
+                    vertical-align: middle;
+                }
+            }
+
+            &:checked + span:before {
+                content: '●';
+                border-color: #1c8c00;
+                background: #1fdc00;
+            }
+
+            &:disabled + span {
+                cursor: auto;
+                opacity: 0.5;
+            }
+        }
+    }
+
+    &__checkbox {
+        display: block;
+        margin-bottom: 10px;
+        &_input {
+            display: none;
+
+            & + span {
+                display: block;
+                cursor: pointer;
+                line-height: 25px;
+                height: 25px;
+
+                &:before {
+                    content: '';
+                    display: inline-block;
+                    border: 2px solid #0f2c76;
+                    width: 25px;
+                    height: 25px;
+                    box-sizing: border-box;
+                    border-radius: 4px;
+                    margin-right: 0.5em;
+                    color: #fff;
+                    font-size: 20px;
+                    line-height: 21px;
+                    text-align: center;
+                    vertical-align: middle;
+                }
+            }
+
+            &:checked + span:before {
+                content: '✓';
+                border-color: #1c8c00;
+                background: #1fdc00;
+            }
+
+            &:disabled + span {
+                cursor: auto;
+                opacity: 0.5;
+            }
+        }
+    }
+
+    &__select_input {
+        height: 52px;
+        border: 1px solid #858585;
+        border-radius: 14px;
+        background-color: #fff;
+        width: 100%;
+        display: block;
+        overflow: hidden;
+        position: relative;
+        padding: 0 10px 0 15px;
+    }
+
+    &__text {
+        &_input {
+            height: 52px;
+            border: 1px solid #858585;
+            border-radius: 14px;
+            background-color: #fff;
+            padding: 0 10px 0 15px;
+            width: 100%;
+            display: block;
+ 
+            &:disabled {
+                opacity: 0.7;
+            }
+        }
+    }
+
+    &__file {
+        display: flex;
+        flex-wrap: wrap;
+        height: 120px;
+        padding: 5px;
+        border: 1px solid #858585;
+        box-sizing: border-box;
+        border-radius: 14px;
+        background: #fff;
+
+        &_value,
+        &_add {
+            box-sizing: border-box;
+            height: 100%;
+            border: 1px solid #858585;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 0 5px 0 0;
+            overflow: hidden;
+        }
+
+        &_value {
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+        
+        &_add {
+            width: 90px;
+            background-image: url('/assets/images/GHA/addPhoto.svg');
+            background-position: center;
+            background-repeat: no-repeat;
+
+            &_disabled {
+                cursor: auto;
+                opacity: 0.5;
+            }
+        }
+
+        &_input {
+            display: none;
+        }
+    }
+}
