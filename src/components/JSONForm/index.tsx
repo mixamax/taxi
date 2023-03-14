@@ -1,202 +1,14 @@
-import React, { useCallback, useMemo, useState, useRef, useEffect } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import * as yup from 'yup'
 import { connect, ConnectedProps } from 'react-redux'
 import { t, TRANSLATION } from '../../localization'
 import { IRootState } from '../../state'
 import { configSelectors } from '../../state/config'
 import { EStatuses, ILanguage } from '../../types/types'
-import { TFormElement, TOption, TFormValues } from './types'
+import JSONFormElement from './JSONFormElement'
+import { TForm, TFormElement } from './types'
 import { getCalculation, getTranslation } from './utils'
-import { form as formData } from './data'
 import './styles.scss'
-
-const fields = formData.fields
-
-const JSONFormElement = (props: {
-    element: TFormElement,
-    validationSchema?: any,
-    onChange: (e: any, name: string, value: any) => any,
-    values?: TFormValues,
-    language?: ILanguage
-}) => {
-    const {
-        onChange = () => {},
-        values = {},
-        validationSchema,
-        language
-    } = props
-    const {
-        accept,
-        placeholder,
-        multiple,
-        visible,
-        disabled,
-        options = [],
-        validation = {}
-    } = props.element
-
-    const [ errorMessage, setErrorMessage ] = useState<string>('')
-    const [ files, setFiles ] = useState<[any, File][]>()
-    const name: string = getCalculation(props.element.name, values)
-    const type = getCalculation(props.element.type, values)
-    const value = values[name]
-
-    const validate = useCallback((value) => {
-        if (!validationSchema) return
-        validationSchema.validate(value === '' ? null : value)
-            .then(() => {
-                setErrorMessage('')
-            })
-            .catch((error: any) => {
-                setErrorMessage(error.message)
-            })
-    }, [])
-
-    if (visible) {
-        const isVisible = getCalculation(visible, values)
-        if (!isVisible) return null
-    }
-
-    const commonProperties = {
-        name,
-        disabled: getCalculation(disabled, values),
-        onChange: (e: any) => {
-            const value = e.target.value === '' ? null : e.target.value
-            validate(value)
-            onChange(e, e.target.name, value)
-        },
-        onBlur: (e: any) => {
-            const value = e.target.value === '' ? null : e.target.value
-            validate(value)
-        }
-    }
-    
-    let labelElement: any = (
-        <div className="label">
-            {getTranslation(getCalculation(props.element.label, values))}
-            {getCalculation(validation.required, values) && <span className="element__required">*</span>}
-        </div>
-    )
-    let element
-    
-    if (type === 'button') {
-        labelElement = null
-        return (
-            <button>
-                {getTranslation(getCalculation(props.element.label, values))}
-            </button>
-        )
-    }
-
-    if (type === 'select') {
-        const selectOptions = getCalculation(options, values)
-        element = (
-            <select
-                {...commonProperties}
-                value={value}
-            >
-                {selectOptions.map((option: TOption) => (
-                    <option key={option.value} value={option.value}>
-                        {!!option.label && getTranslation(option.label)}
-                        {!!option.labelLang && !!language && option.labelLang[language.iso]}
-                    </option>
-                ))}
-            </select>
-        )
-    }
-
-    if (type === 'radio') {
-        const radioOptions = getCalculation(options, values)
-        element = (
-            <>
-                {radioOptions.map((option: TOption) => (
-                    <label key={option.value}>
-                        <input
-                            {...commonProperties}
-                            type='radio'
-                            value={option.value}
-                            checked={values[name] === option.value}
-                        />
-                        {getTranslation(option.label)}
-                    </label>
-                ))}
-            </>
-        )
-    }
-
-    if (type === 'checkbox') {
-        labelElement = null
-        element = (
-            <label>
-                <input
-                    {...commonProperties}
-                    type='checkbox'
-                    checked={value}
-                    onChange={e => onChange(e, e.target.name, e.target.checked)}
-                />
-                {getTranslation(getCalculation(props.element.label, values))}
-            </label>
-        )
-    }
-
-    if (type === 'file') {
-        element = (
-            <div className='element__file'>
-                {!!files && files.map((file: [any, File], key: number) => (
-                    <div
-                        className='element__file_value'
-                        key={key}
-                        onClick={e => {
-                            const newFiles = files.filter((file, index: number) => index !== key)
-                            setFiles(newFiles)
-                            onChange(e, name, newFiles.length ? newFiles : null)
-                        }}
-                    >
-                        <img src={URL.createObjectURL(file[1])}></img>
-                    </div>
-                ))}
-                <label className='element__file_add'>
-                    <input
-                        {...commonProperties}
-                        className='element__file_input'
-                        type='file'
-                        multiple={multiple}
-                        accept={accept}
-                        onChange={e => {
-                            if (!e.target.files) return
-                            const inputFiles: [any, File][] = Array.from(e.target.files)
-                                .map((file: File) => ([ null, file ]))
-                            const newFiles = (files || []).concat(inputFiles)
-                            setFiles(newFiles)
-                            onChange(e, name, newFiles)
-                        }}
-                    />
-                </label>
-            </div>
-        )
-    }
-
-    if (!element) {
-        element = (
-            <input
-                {...commonProperties}
-                value={value}
-                type={type}
-                placeholder={placeholder}
-            />
-        )
-    }
-
-    return (
-        <div className="element__field">
-            {labelElement}
-            {element}
-            {!!errorMessage && <div className='element__field_error'>
-                {errorMessage}
-            </div>}
-        </div>
-    )
-}
 
 const mapStateToProps = (state: IRootState) => ({
     language: configSelectors.language(state),
@@ -208,26 +20,18 @@ const connector = connect(mapStateToProps)
 interface IProps extends ConnectedProps<typeof connector> {
     language: ILanguage,
     configStatus: EStatuses,
-    onSubmit?: (values: any) => any
+    onSubmit?: (values: any) => any,
+    fields: TForm
 }
 
 const JSONForm: React.FC<IProps> = ({
     configStatus,
     language,
-    onSubmit
+    onSubmit,
+    fields
 }) => {
     if (configStatus !== EStatuses.Success) return null
     const data = (window as any).data || {}
-
-    const dependenciesByName = useMemo(() => {
-        const calculateFields = ['label', 'type', 'options', 'visible', 'disabled']
-        const result = {}
-        fields.map(field => {
-            calculateFields.forEach(fieldName => {
-
-            })
-        })
-    }, [fields])
 
     const form = useMemo(() => {
         return fields.map(field => {
@@ -245,16 +49,17 @@ const JSONForm: React.FC<IProps> = ({
     }, [fields])
 
     const initialValues = useMemo(
-        () => form.reduce((res, item) => ({
+        () => fields.reduce((res: any, item: TFormElement) => ({
             ...res,
-            [item.name]: item.defaultValue ?? null
+            [item.name]: item.defaultValue ??
+                (item?.validation?.required && getCalculation(item?.validation?.required) ? '' : null)
         }), {}),
-        [form]
+        [fields]
     )
 
     const [ values, setValues ] = useState(initialValues)
-    
-    const validationSchema = form.reduce((res: any, item) => {
+
+    const validationSchema = form.reduce((res: any, item: TFormElement) => {
         const { name, type, validation } = item
         if (!validation) return res
         let obj
@@ -340,8 +145,12 @@ const JSONForm: React.FC<IProps> = ({
                     validationSchema={validationSchema[formElement.name]}
                     language={language}
                 />)}
-                <button type="submit" disabled={!isValid}>
-                    {getTranslation(formData.submitText)}
+                <button
+                    type='submit'
+                    disabled={!isValid}
+                    className='button disabled login-modal_login-btn'
+                >
+                    {getTranslation('signup')}
                 </button>
             </form>
         </div>
