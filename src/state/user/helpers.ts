@@ -1,5 +1,35 @@
 import * as API from './../../API'
 
+export function uploadFiles(data: any) {
+  const filesMap: Record<string, any[]> = data.files
+  const additionalDetails: any = data.u_details
+  const params: any = data.tokens
+  const uploads = Object.keys(filesMap)
+    .filter(key => Array.isArray(filesMap[key]))
+    .map(key => {
+      const files = filesMap[key]
+        .filter((item: [any, File]) => !item[0])
+        .map((item: [any, File]) => item[1])
+      const promises = files.map((file: File) => API.uploadFile({ file, ...params }))
+      return Promise.all(promises).then(
+        (res: any[]) => res.reduce((acc, item) => ({
+          [key]: [...acc[key], item.data?.data?.dl_id]
+        }), { [key]: [] })
+      ).then((res: any) => ({ [key]: JSON.stringify(res[key]) }))
+  })
+
+  return Promise.all(uploads).then(res => {
+    console.log(res)
+    const u_details = res.reduce((acc, item) => ({ ...acc, ...item }), additionalDetails)
+    return API.editUserAfterRegister({
+      u_details,
+      u_id: `${params?.u_id}`,
+      token: params?.token,
+      u_hash: params?.u_hash
+    })
+  })
+}
+
 export function uploadRegisterFiles(params: any) {
   const { filesToUpload, response, u_details } = params
   const uploadsName: string[] = []

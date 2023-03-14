@@ -10,6 +10,9 @@ import JSONFormElement from './JSONFormElement'
 import { TForm, TFormElement } from './types'
 import { getCalculation, getTranslation } from './utils'
 import './styles.scss'
+import { form } from './data'
+
+console.log(JSON.stringify(form))
 
 const mapStateToProps = (state: IRootState) => ({
     language: configSelectors.language(state),
@@ -159,6 +162,7 @@ const JSONForm: React.FC<IProps> = ({
                     type='submit'
                     disabled={!isValid}
                     text={getTranslation(submitText)}
+                    skipHandler
                 />
             </form>
         </div>

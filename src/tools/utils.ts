@@ -508,7 +508,7 @@ const convertTypes = <T, R>(
     else if (toDetailsObjectKeys.includes(key)) {
       const detailsArr = []
       for (let [itemKey, itemValue] of Object.entries(value)) {
-        detailsArr.push(['=', [itemKey], itemValue])
+        detailsArr.push(['=', [itemKey], itemValue ?? ''])
       }
       convertedObject[key] = detailsArr
     }
