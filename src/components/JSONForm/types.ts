@@ -12,6 +12,7 @@ type TOperation = '=' | '<' | '>' | '<=' | '>=' | '!='
 type TOption = {
     label?: string,
     labelLang?: Record<string, string>,
+    disabled?: boolean,
     value: string | number
 }
 
@@ -45,7 +46,7 @@ type TFormElement = {
         length?: number | TCalculate<number>,
         min?: number | TCalculate<number>,
         max?: number | TCalculate<number>,
-        pattern?: string | TCalculate<string>
+        pattern?: string[] | TCalculate<string[]>
     },
     submit?: boolean
 }

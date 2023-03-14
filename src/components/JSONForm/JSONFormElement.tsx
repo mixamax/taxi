@@ -55,12 +55,14 @@ const JSONFormElement = (props: {
         name,
         disabled: getCalculation(disabled, values),
         onChange: (e: any) => {
-            const value = e.target.value === '' ? '' : e.target.value
+            const empty = getCalculation(validation?.required, values) ? '' : null
+            const value = e.target.value === '' ? empty : e.target.value
             validate(value)
             onChange(e, e.target.name, value)
         },
         onBlur: (e: any) => {
-            const value = e.target.value === '' ? '' : e.target.value
+            const empty = getCalculation(validation?.required, values) ? '' : null
+            const value = e.target.value === '' ? empty : e.target.value
             validate(value)
         }
     }
@@ -108,6 +110,7 @@ const JSONFormElement = (props: {
                     <label key={option.value} className='element__radio'>
                         <input
                             {...commonProperties}
+                            disabled={option.disabled}
                             type='radio'
                             className='element__radio_input'
                             value={option.value}
@@ -168,6 +171,7 @@ const JSONFormElement = (props: {
                             const newFiles = (files || []).concat(inputFiles)
                             setFiles(newFiles)
                             onChange(e, name, newFiles)
+                            e.target.value = ''
                         }}
                     />
                 </label>

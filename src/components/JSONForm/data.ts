@@ -44,12 +44,8 @@ export const formFields: TForm = [
         label: "phone",
         type: "phone",
         validation: {
-            required: [
-                {
-                    expression: [['type', '=', 'phone']],
-                    result: true
-                }
-            ]
+            required: true,
+            pattern: ["^[\+]?[0-9]{1,3}[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{3,6}$", "im"]
         }
     },
     {
@@ -57,12 +53,7 @@ export const formFields: TForm = [
         label: "email",
         type: "email",
         validation: {
-            required: [
-                {
-                    expression: [['type', '=', 'email']],
-                    result: true
-                }
-            ]
+            required: true
         }
     },
     {
@@ -76,7 +67,8 @@ export const formFields: TForm = [
             },
             {
                 label: "phone",
-                value: "phone"
+                value: "phone",
+                disabled: true
             }
         ]
     },
