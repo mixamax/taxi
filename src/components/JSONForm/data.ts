@@ -73,7 +73,7 @@ export const formFields: TForm = [
         ]
     },
     {
-        name: "u_details.u_street",
+        name: "u_details.street",
         label: "street_address",
         validation: {
             required: true
@@ -88,13 +88,18 @@ export const formFields: TForm = [
         }
     },
     {
-        name: "u_details.u_zip",
+        name: "u_details.state",
+        label: "state"
+    },
+    {
+        name: "u_details.zip",
         label: "zip_code"
     },
     {
-        name: "u_details.u_card",
+        name: "u_details.card",
         label: "card_number",
         validation: {
+            required: true,
             length: 16
         }
     },
@@ -107,6 +112,23 @@ export const formFields: TForm = [
         validation: {
             required: true
         }
+    },
+    {
+        name: "u_details.driver_license_photo",
+        label: "driver_license_photo",
+        type: "file",
+        multiple: true,
+        accept: 'image/png, image/jpeg, image/jpg',
+        validation: {
+            required: true
+        }
+    },
+    {
+        name: "u_details.license_photo",
+        label: "license_photo",
+        type: "file",
+        multiple: true,
+        accept: 'image/png, image/jpeg, image/jpg'
     },
     {
         name: "ref_code_toggle",
@@ -125,7 +147,7 @@ export const formFields: TForm = [
         ]
     },
     {
-        name: "car.car_model",
+        name: "car.cm_id",
         type: "select",
         label: "Car models",
         options: {
@@ -139,11 +161,11 @@ export const formFields: TForm = [
         options: [{"value":1,"label":"1"},{"value":2,"label":"2"},{"value":3,"label":"3"},{"value":4,"label":"4"},{"value":5,"label":"5"},{"value":6,"label":"6"},{"value":7,"label":"7"},{"value":8,"label":"8"},{"value":9,"label":"9"},{"value":10,"label":"10"},{"value":11,"label":"11"},{"value":12,"label":"12"},{"value":13,"label":"13"},{"value":14,"label":"14"},{"value":15,"label":"15"},{"value":16,"label":"16"},{"value":17,"label":"17"},{"value":18,"label":"18"},{"value":19,"label":"19"},{"value":20,"label":"20"}]
     },
     {
-        name: "car.car_number",
+        name: "car.registration_plate",
         label: "Car number"
     },
     {
-        name: "car.car_color",
+        name: "car.color",
         type: "select",
         label: "car_color",
         options: {
@@ -151,7 +173,7 @@ export const formFields: TForm = [
         }
     },
     {
-        name: "car.car_classes",
+        name: "car.cc_id",
         type: "select",
         label: "Car classes",
         options: {

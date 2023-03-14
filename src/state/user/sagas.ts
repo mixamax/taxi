@@ -2,7 +2,7 @@ import { ActionTypes as ConfigActionTypes } from './../config/constants'
 import { all, put } from 'redux-saga/effects'
 import { setLoginModal, setMessageModal } from '../modals/actionCreators'
 import { ActionTypes } from './constants'
-import { uploadRegisterFiles } from './helpers'
+import { uploadRegisterFiles, uploadFiles } from './helpers'
 import { call, takeEvery } from '../../tools/sagaUtils'
 import { t, TRANSLATION } from '../../localization'
 import * as API from './../../API'
@@ -94,7 +94,14 @@ function* registerSaga(data: TAction) {
       u_hash: response.u_hash
     }
     localStorage.setItem('tokens', JSON.stringify(tokens))
-    yield* call<any>(uploadRegisterFiles, { filesToUpload: uploads, response, u_details })
+    if (uploads) {
+      yield* call<any>(uploadRegisterFiles, { filesToUpload: uploads, response, u_details })
+    } else {
+      const { passport_photo, driver_license_photo, license_photo, ...details } = u_details
+      const files = { passport_photo, driver_license_photo, license_photo }
+      const t = { ...tokens, u_id: response.u_id }
+      yield* call<any>(uploadFiles, { files, u_details: details, tokens: t })
+    }
     yield put({ type: ActionTypes.REGISTER_SUCCESS, payload: response })
     yield* call(initUserSaga)
     yield put(setLoginModal(false))

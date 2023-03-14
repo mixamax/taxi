@@ -47,7 +47,9 @@ const RegisterForm: React.FC<IProps> = ({
   isOpen,
 }) => {
     const handleSubmit = (values: any) => {
-        console.log(values)
+        values.u_role = EUserRoles.Client
+        values.st = 1
+        register(values)
     }
 
     const formStr = (window as any).data?.site_constants?.form_register?.value
