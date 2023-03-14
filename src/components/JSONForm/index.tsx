@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import * as yup from 'yup'
 import { connect, ConnectedProps } from 'react-redux'
 import { t, TRANSLATION } from '../../localization'
+import Button from '../Button'
 import { IRootState } from '../../state'
 import { configSelectors } from '../../state/config'
 import { EStatuses, ILanguage } from '../../types/types'
@@ -21,18 +22,19 @@ interface IProps extends ConnectedProps<typeof connector> {
     language: ILanguage,
     configStatus: EStatuses,
     onSubmit?: (values: any) => any,
-    fields: TForm
+    fields: TForm,
+    submitText?: string
 }
 
 const JSONForm: React.FC<IProps> = ({
     configStatus,
     language,
     onSubmit,
-    fields
+    fields,
+    submitText
 }) => {
     if (configStatus !== EStatuses.Success) return null
     const data = (window as any).data || {}
-
     const form = useMemo(() => {
         return fields.map(field => {
             if (field.type === 'select' && !Array.isArray(field.options) && field.options?.path) {
@@ -51,8 +53,13 @@ const JSONForm: React.FC<IProps> = ({
     const initialValues = useMemo(
         () => fields.reduce((res: any, item: TFormElement) => ({
             ...res,
-            [item.name]: item.defaultValue ??
-                (item?.validation?.required && getCalculation(item?.validation?.required) ? '' : null)
+            [item.name]: item.defaultValue ?? (
+                item?.validation?.required &&
+                getCalculation(item?.validation?.required) &&
+                item?.type !== 'file' ?
+                    '' :
+                    null
+            )
         }), {}),
         [fields]
     )
@@ -90,8 +97,11 @@ const JSONForm: React.FC<IProps> = ({
                 obj = obj.min(getCalculation(validation.min, values), t(TRANSLATION.CARD_NUMBER_PATTERN_ERROR))
             }
             if (getCalculation(validation.pattern, values)) {
-                const regexp = new RegExp(getCalculation(validation.pattern, values))
-                obj = obj.matches(getCalculation(regexp, values), t(TRANSLATION.CARD_NUMBER_PATTERN_ERROR))
+                const pattern: [string, string] = getCalculation(validation.pattern, values)
+                if (Array.isArray(pattern)) {
+                    const regexp = new RegExp(...pattern)
+                    obj = obj.matches(getCalculation(regexp, values), t(TRANSLATION.PHONE_PATTERN_ERROR))
+                }
             }
         }
 
@@ -145,13 +155,11 @@ const JSONForm: React.FC<IProps> = ({
                     validationSchema={validationSchema[formElement.name]}
                     language={language}
                 />)}
-                <button
+                <Button
                     type='submit'
                     disabled={!isValid}
-                    className='button disabled login-modal_login-btn'
-                >
-                    {getTranslation('signup')}
-                </button>
+                    text={getTranslation(submitText)}
+                />
             </form>
         </div>
     )
