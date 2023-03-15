@@ -61,7 +61,6 @@ const RegisterForm: React.FC<IProps> = ({
     }
     return <JSONForm
         fields={form.fields}
-        submitText={form.submitText}
         onSubmit={handleSubmit}
     />
 }
