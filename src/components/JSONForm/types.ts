@@ -2,6 +2,7 @@ type TElementType = 'text' |
     'email' |
     'number' |
     'phone' |
+    'hidden' |
     'select' |
     'checkbox' |
     'radio' |
@@ -32,7 +33,7 @@ type TExpression<Result> = {
 type TCalculate<Result> = TExpression<Result>[]
 
 type TFormElement = {
-    name: string,
+    name?: string,
     placeholder?: string,
     defaultValue?: string | number | boolean,
     label?: string | TCalculate<string>,
@@ -40,7 +41,7 @@ type TFormElement = {
     options?: TOptionData | TOption[] | TCalculate<TOptionData | TOption[]>,
     multiple?: boolean,
     accept?: string,
-    visible?: TCalculate<boolean>,
+    visible?: boolean | string | TCalculate<boolean | string>,
     disabled?: boolean | string | TCalculate<boolean | string>,
     validation?: {
         email?: boolean | TCalculate<boolean>,
@@ -50,7 +51,9 @@ type TFormElement = {
         max?: number | TCalculate<number>,
         pattern?: string[] | TCalculate<string[]>
     },
-    submit?: boolean
+    submit?: boolean,
+    component?: string,
+    props?: Record<string, any>,
 }
 
 type TForm = TFormElement[]

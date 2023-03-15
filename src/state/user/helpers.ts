@@ -19,7 +19,6 @@ export function uploadFiles(data: any) {
   })
 
   return Promise.all(uploads).then(res => {
-    console.log(res)
     const u_details = res.reduce((acc, item) => ({ ...acc, ...item }), additionalDetails)
     return API.editUserAfterRegister({
       u_details,

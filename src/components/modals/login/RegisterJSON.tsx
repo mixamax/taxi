@@ -47,7 +47,6 @@ const RegisterForm: React.FC<IProps> = ({
   isOpen,
 }) => {
     const handleSubmit = (values: any) => {
-        values.u_role = EUserRoles.Client
         values.st = 1
         register(values)
     }
@@ -62,6 +61,10 @@ const RegisterForm: React.FC<IProps> = ({
     return <JSONForm
         fields={form.fields}
         onSubmit={handleSubmit}
+        state={{
+          success: status === EStatuses.Success,
+          failed: status === EStatuses.Fail
+        }}
     />
 }
 

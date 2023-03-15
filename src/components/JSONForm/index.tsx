@@ -2,13 +2,13 @@ import React, { useCallback, useMemo, useState } from 'react'
 import * as yup from 'yup'
 import { connect, ConnectedProps } from 'react-redux'
 import { t, TRANSLATION } from '../../localization'
-import Button from '../Button'
 import { IRootState } from '../../state'
 import { configSelectors } from '../../state/config'
 import { EStatuses, ILanguage } from '../../types/types'
 import JSONFormElement from './JSONFormElement'
+import CustomComponent from './components'
 import { TForm, TFormElement } from './types'
-import { getCalculation, getTranslation } from './utils'
+import { getCalculation } from './utils'
 import './styles.scss'
 import { form as formData } from './data'
 
@@ -25,13 +25,19 @@ interface IProps extends ConnectedProps<typeof connector> {
     language: ILanguage,
     configStatus: EStatuses,
     fields: TForm,
-    onSubmit?: (values: any) => any
+    onSubmit?: (values: any) => any,
+    state?: {
+        success?: boolean,
+        failed?: boolean
+    }
 }
+
 
 const JSONForm: React.FC<IProps> = ({
     configStatus,
     language,
     onSubmit,
+    state = {},
     fields
 }) => {
     if (configStatus !== EStatuses.Success) return null
@@ -52,24 +58,26 @@ const JSONForm: React.FC<IProps> = ({
     }, [fields])
 
     const initialValues = useMemo(
-        () => fields.reduce((res: any, item: TFormElement) => ({
-            ...res,
-            [item.name]: item.defaultValue ?? (
-                item?.validation?.required &&
-                getCalculation(item?.validation?.required) &&
-                item?.type !== 'file' ?
-                    '' :
-                    null
-            )
-        }), {}),
-        [fields]
+        () => fields.reduce((res: any, item: TFormElement) => !item.name ?
+            res :
+            ({
+                ...res,
+                [item.name]: item.defaultValue ?? (
+                    item?.validation?.required &&
+                    getCalculation(item?.validation?.required) &&
+                    item?.type !== 'file' ?
+                        '' :
+                        null
+                )
+            }),
+        {}), [fields]
     )
 
     const [ values, setValues ] = useState(initialValues)
 
     const validationSchema = form.reduce((res: any, item: TFormElement) => {
         const { name, type, validation } = item
-        if (!validation) return res
+        if (!name || !validation) return res
         let obj
         if (type === 'file') {
             obj = yup.mixed()
@@ -130,9 +138,11 @@ const JSONForm: React.FC<IProps> = ({
     const variables = useMemo(() => ({
         form: {
             valid: isValid,
-            invalid: !isValid
+            invalid: !isValid,
+            submitSuccess: state.success,
+            submitFailed: state.failed
         }
-    }), [isValid])
+    }), [isValid, state])
 
     const handleSubmit = useCallback(e => {
         e.preventDefault()
@@ -155,15 +165,22 @@ const JSONForm: React.FC<IProps> = ({
     return (
         <div style={{ position: 'relative', zIndex: 500 }}>
             <form onSubmit={handleSubmit}>
-                {form.map((formElement: TFormElement, i: number) => <JSONFormElement
-                    key={i}
-                    element={formElement}
-                    values={values}
-                    variables={variables}
-                    onChange={handleChange}
-                    validationSchema={validationSchema[formElement.name]}
-                    language={language}
-                />)}
+                {form.map((formElement: TFormElement, i: number) => formElement.name ?
+                    <JSONFormElement
+                        key={i}
+                        element={formElement}
+                        values={values}
+                        variables={variables}
+                        onChange={handleChange}
+                        validationSchema={validationSchema[formElement.name]}
+                        language={language}
+                    /> :
+                    <CustomComponent
+                        {...formElement}
+                        values={values}
+                        variables={variables}
+                    />
+                )}
             </form>
         </div>
     )

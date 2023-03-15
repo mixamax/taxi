@@ -5,6 +5,11 @@ const cityOptions = Object.keys(cities).map(key => ({ value: key, label: cities[
 
 export const formFields: TForm = [
     {
+        name: "u_role",
+        type: "hidden",
+        defaultValue: 2
+    },
+    {
         name: "work-type",
         type: "select",
         defaultValue: 0,
@@ -98,6 +103,7 @@ export const formFields: TForm = [
     {
         name: "u_details.card",
         label: "card_number",
+        placeholder: "XXXX-XXXX-XXXX-XXXX",
         validation: {
             required: true,
             length: 16
@@ -147,7 +153,7 @@ export const formFields: TForm = [
         ]
     },
     {
-        name: "car.cm_id",
+        name: "u_car.cm_id",
         type: "select",
         label: "Car models",
         options: {
@@ -155,17 +161,17 @@ export const formFields: TForm = [
         }
     },
     {
-        name: "car.seats",
+        name: "u_car.seats",
         type: "select",
         label: "seats",
         options: [{"value":1,"label":"1"},{"value":2,"label":"2"},{"value":3,"label":"3"},{"value":4,"label":"4"},{"value":5,"label":"5"},{"value":6,"label":"6"},{"value":7,"label":"7"},{"value":8,"label":"8"},{"value":9,"label":"9"},{"value":10,"label":"10"},{"value":11,"label":"11"},{"value":12,"label":"12"},{"value":13,"label":"13"},{"value":14,"label":"14"},{"value":15,"label":"15"},{"value":16,"label":"16"},{"value":17,"label":"17"},{"value":18,"label":"18"},{"value":19,"label":"19"},{"value":20,"label":"20"}]
     },
     {
-        name: "car.registration_plate",
+        name: "u_car.registration_plate",
         label: "Car number"
     },
     {
-        name: "car.color",
+        name: "u_car.color",
         type: "select",
         label: "car_color",
         options: {
@@ -173,12 +179,20 @@ export const formFields: TForm = [
         }
     },
     {
-        name: "car.cc_id",
+        name: "u_car.cc_id",
         type: "select",
         label: "Car classes",
         options: {
             path: "car_classes"
         }
+    },
+    {
+        component: "alert",
+        props: {
+            intent: "error",
+            message: "register_fail"
+        },
+        visible: "@form.submitFailed"
     },
     {
         name: "submit",

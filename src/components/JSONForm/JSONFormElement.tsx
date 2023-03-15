@@ -77,6 +77,16 @@ const JSONFormElement = (props: {
         </div>
     )
     let element
+
+    if (type === 'hidden') {
+        return (
+            <input
+                type='hidden'
+                name={name}
+                value={value}
+            />
+        )
+    }
     
     if (type === 'button' || type === 'submit') {
         return (

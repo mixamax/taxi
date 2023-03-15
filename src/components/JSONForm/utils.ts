@@ -64,8 +64,6 @@ export const parseVariable = (str: any, variables: Record<string, any>) => {
     let result = variables
     str.substr(1).split('.').forEach(key => {
         result = result && result[key]
-        console.log(key, result)
     })
-    console.log(variables, result)
     return result
 }
