@@ -107,6 +107,13 @@ const Header: React.FC<IProps> = ({
         `${t(TRANSLATION.ORDER)} №${detailedOrderID}` :
         `${t(TRANSLATION.CREATE_ORDER)}`
 
+  let avatar = images.avatar
+  let avatarSize = '30px'
+  if (user) {
+    avatar = user.u_photo || images.activeAvatar
+    avatarSize = user.u_photo ? 'cover' : '30px'
+  }
+
   return (
     <header
       className='header'
@@ -178,8 +185,8 @@ const Header: React.FC<IProps> = ({
           className="avatar"
           onClick={e => setLoginModal(true)}
           style={{
-            backgroundSize: user && user.u_photo ? 'cover' : '30px',
-            backgroundImage: `url(${user && user.u_photo ? user.u_photo : images.avatar})`,
+            backgroundSize: avatarSize,
+            backgroundImage: `url(${avatar})`,
           }}
         />
       </div>
