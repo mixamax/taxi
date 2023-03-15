@@ -24,9 +24,8 @@ const connector = connect(mapStateToProps)
 interface IProps extends ConnectedProps<typeof connector> {
     language: ILanguage,
     configStatus: EStatuses,
-    onSubmit?: (values: any) => any,
     fields: TForm,
-    submitText?: string
+    onSubmit?: (values: any) => any
 }
 
 const JSONForm: React.FC<IProps> = ({
