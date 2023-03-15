@@ -58,3 +58,14 @@ export const getTranslation = (str: any) => {
     const translate = t(str)
     return translate.toLowerCase() === 'error' ? str : translate
 }
+
+export const parseVariable = (str: any, variables: Record<string, any>) => {
+    if (typeof str !== 'string' || str[0] !== '@') return str
+    let result = variables
+    str.substr(1).split('.').forEach(key => {
+        result = result && result[key]
+        console.log(key, result)
+    })
+    console.log(variables, result)
+    return result
+}

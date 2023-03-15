@@ -179,10 +179,15 @@ export const formFields: TForm = [
         options: {
             path: "car_classes"
         }
+    },
+    {
+        name: "submit",
+        type: "submit",
+        label: "signup",
+        disabled: "@form.invalid"
     }
 ]
 
 export const form = {
-    fields: formFields,
-    submitText: 'signup'
+    fields: formFields
 }

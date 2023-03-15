@@ -83,7 +83,7 @@ const LoginModal: React.FC<IProps> = ({
                 />
               ) :
               (
-                <RegisterComponent
+                <RegisterJSON
                   isOpen={isOpen}
                 />
               )}
