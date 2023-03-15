@@ -1,7 +1,8 @@
 import React, { useCallback, useState } from 'react'
 import cn from 'classnames'
 import { ILanguage } from '../../types/types'
-import { getCalculation, getTranslation } from './utils'
+import Button from '../Button'
+import { getCalculation, getTranslation, parseVariable } from './utils'
 import { TFormElement, TOption, TFormValues } from './types'
 import './styles.scss'
 
@@ -10,13 +11,15 @@ const JSONFormElement = (props: {
     validationSchema?: any,
     onChange: (e: any, name: string, value: any) => any,
     values?: TFormValues,
-    language?: ILanguage
+    language?: ILanguage,
+    variables?: Record<string, any>
 }) => {
     const {
         onChange = () => {},
         values = {},
         validationSchema,
-        language
+        language,
+        variables = {}
     } = props
     const {
         accept,
@@ -53,7 +56,7 @@ const JSONFormElement = (props: {
 
     const commonProperties = {
         name,
-        disabled: getCalculation(disabled, values),
+        disabled: parseVariable(getCalculation(disabled, values), variables),
         onChange: (e: any) => {
             const empty = getCalculation(validation?.required, values) ? '' : null
             const value = e.target.value === '' ? empty : e.target.value
@@ -75,12 +78,14 @@ const JSONFormElement = (props: {
     )
     let element
     
-    if (type === 'button') {
-        labelElement = null
+    if (type === 'button' || type === 'submit') {
         return (
-            <button className='element__button'>
-                {getTranslation(getCalculation(props.element.label, values))}
-            </button>
+            <Button
+                type={type}
+                text={getTranslation(getCalculation(props.element.label, values))}
+                disabled={parseVariable(getCalculation(disabled, values), variables)}
+                skipHandler
+            />
         )
     }
 

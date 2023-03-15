@@ -10,9 +10,9 @@ import JSONFormElement from './JSONFormElement'
 import { TForm, TFormElement } from './types'
 import { getCalculation, getTranslation } from './utils'
 import './styles.scss'
-import { form } from './data'
+import { form as formData } from './data'
 
-console.log(JSON.stringify(form))
+// console.log(JSON.stringify(formData))
 
 const mapStateToProps = (state: IRootState) => ({
     language: configSelectors.language(state),
@@ -33,8 +33,7 @@ const JSONForm: React.FC<IProps> = ({
     configStatus,
     language,
     onSubmit,
-    fields,
-    submitText
+    fields
 }) => {
     if (configStatus !== EStatuses.Success) return null
     const data = (window as any).data || {}
@@ -129,6 +128,13 @@ const JSONForm: React.FC<IProps> = ({
         })
     }, [values])
 
+    const variables = useMemo(() => ({
+        form: {
+            valid: isValid,
+            invalid: !isValid
+        }
+    }), [isValid])
+
     const handleSubmit = useCallback(e => {
         e.preventDefault()
         const submitValues: any = {}
@@ -154,16 +160,11 @@ const JSONForm: React.FC<IProps> = ({
                     key={i}
                     element={formElement}
                     values={values}
+                    variables={variables}
                     onChange={handleChange}
                     validationSchema={validationSchema[formElement.name]}
                     language={language}
                 />)}
-                <Button
-                    type='submit'
-                    disabled={!isValid}
-                    text={getTranslation(submitText)}
-                    skipHandler
-                />
             </form>
         </div>
     )

@@ -6,7 +6,9 @@ type TElementType = 'text' |
     'checkbox' |
     'radio' |
     'file' |
-    'button'
+    'button' |
+    'submit'
+
 type TOperation = '=' | '<' | '>' | '<=' | '>=' | '!='
 
 type TOption = {
@@ -39,7 +41,7 @@ type TFormElement = {
     multiple?: boolean,
     accept?: string,
     visible?: TCalculate<boolean>,
-    disabled?: boolean | TCalculate<boolean>,
+    disabled?: boolean | string | TCalculate<boolean | string>,
     validation?: {
         email?: boolean | TCalculate<boolean>,
         required?: boolean | TCalculate<boolean>
