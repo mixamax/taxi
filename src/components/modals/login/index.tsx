@@ -56,7 +56,7 @@ const LoginModal: React.FC<IProps> = ({
     disabled: index === 1 ? !!user : false,
   }))
 
-  const RegisterComponent = location.pathname.includes('/driver-order-test') ? RegisterJSON : RegisterForm
+  const RegisterComponent = location.pathname.includes('/driver-order') ? RegisterJSON : RegisterForm
 
   return (
     <Overlay
@@ -83,7 +83,7 @@ const LoginModal: React.FC<IProps> = ({
                 />
               ) :
               (
-                <RegisterJSON
+                <RegisterComponent
                   isOpen={isOpen}
                 />
               )}
