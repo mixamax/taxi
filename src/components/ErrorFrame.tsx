@@ -5,12 +5,13 @@ import { t, TRANSLATION } from '../localization'
 interface IProps {
    title?: string,
    image?: string,
+   renderImage?: () => any
 }
 
-const LoadFrame: React.FC<IProps> = ({ title, image = images.error }) => {
+const LoadFrame: React.FC<IProps> = ({ title, image = images.error, renderImage }) => {
   return <div className="loading-frame">
     <div className="loading-frame__title">{title}</div>
-    <img src={image} alt={t(TRANSLATION.ERROR)} style={{ marginTop: '20px' }}/>  
+    {!!renderImage ? renderImage() : <img src={image} alt={t(TRANSLATION.ERROR)} style={{ marginTop: '20px' }}/>  }
   </div>
 }
 

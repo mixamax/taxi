@@ -28,6 +28,7 @@
                 cursor: pointer;
                 line-height: 25px;
                 height: 25px;
+                position: relative;
 
                 &:before {
                     content: '';
@@ -46,15 +47,27 @@
                 }
             }
 
-            &:checked + span:before {
-                content: '●';
-                border-color: #1c8c00;
-                background: #1fdc00;
+            &:checked {
+                & + span:before {
+                    border-color: #1c8c00;
+                    background: #1fdc00;
+                }
+                & + span:after {
+                    position: absolute;
+                    left: 8px;
+                    top: 9px;
+                    width: 9px;
+                    height: 9px;
+                    border-radius: 100%;
+                    background-color: #fff;
+                    content: '';
+                }
             }
 
             &:disabled + span {
                 cursor: auto;
-                opacity: 0.5;
+                opacity: 0.3;
+                user-select: none;
             }
         }
     }

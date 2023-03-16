@@ -8,6 +8,7 @@ import { useInterval, useQuery } from '../../tools/hooks'
 import history from '../../tools/history'
 import './styles.scss'
 import { ordersSelectors, ordersActionCreators } from '../../state/orders'
+import { modalsActionCreators } from '../../state/modals'
 import { userSelectors } from '../../state/user'
 import { EUserRoles } from '../../types/types'
 import cn from 'classnames'
@@ -24,6 +25,7 @@ const mapStateToProps = (state: IRootState) => ({
 
 const mapDispatchToProps = {
   ...ordersActionCreators,
+  setLoginModal: modalsActionCreators.setLoginModal
 }
 
 const connector = connect(mapStateToProps, mapDispatchToProps)
@@ -46,6 +48,7 @@ const Driver: React.FC<IProps> = ({
   getActiveOrders,
   getHistoryOrders,
   getReadyOrders,
+  setLoginModal
 }) => {
   const { tab = EDriverTabs.Lite } = useQuery()
 
@@ -70,7 +73,14 @@ const Driver: React.FC<IProps> = ({
   }, [user])
 
   if (user?.u_role !== EUserRoles.Driver) {
-    return <ErrorFrame image={images.avatar} title={t(TRANSLATION.UNAUTHORIZED_ACCESS)}/>
+    return <ErrorFrame
+      renderImage={() => (
+        <div className="errorIcon" onClick={() => setLoginModal(true)}>
+          <img src={images.avatar} alt={t(TRANSLATION.ERROR)} style={{ marginTop: '50px' }}/>
+        </div>
+      )}
+      title={t(TRANSLATION.UNAUTHORIZED_ACCESS)}
+    />
   }
 
   return (
