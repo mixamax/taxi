@@ -35,6 +35,7 @@ type TCalculate<Result> = TExpression<Result>[]
 type TFormElement = {
     name?: string,
     placeholder?: string,
+    hint?: string,
     defaultValue?: string | number | boolean,
     label?: string | TCalculate<string>,
     type?: TElementType | TCalculate<TElementType>,

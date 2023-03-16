@@ -12,6 +12,7 @@ export const formFields: TForm = [
     {
         name: "work-type",
         type: "select",
+        hint: "Hint 1",
         defaultValue: 0,
         options: [
             {
@@ -26,6 +27,7 @@ export const formFields: TForm = [
     },
     {
         name: "u_name",
+        hint: "Hint 2",
         label: [
             {
                 expression: [
@@ -143,6 +145,7 @@ export const formFields: TForm = [
     },
     {
         name: "ref_code",
+        hint: "Your ref code",
         visible: [
             {
                 expression: [

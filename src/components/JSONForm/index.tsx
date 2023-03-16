@@ -42,6 +42,7 @@ const JSONForm: React.FC<IProps> = ({
 }) => {
     if (configStatus !== EStatuses.Success) return null
     const data = (window as any).data || {}
+
     const form = useMemo(() => {
         return fields.map(field => {
             if (field.type === 'select' && !Array.isArray(field.options) && field.options?.path) {
@@ -51,6 +52,7 @@ const JSONForm: React.FC<IProps> = ({
                     value: num,
                     labelLang: map[num]
                 }))
+                field.defaultValue = field.options[0].value
             }
             
             return field

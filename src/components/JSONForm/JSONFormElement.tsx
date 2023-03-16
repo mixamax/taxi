@@ -23,6 +23,7 @@ const JSONFormElement = (props: {
     } = props
     const {
         accept,
+        hint,
         placeholder,
         multiple,
         visible,
@@ -69,11 +70,19 @@ const JSONFormElement = (props: {
             validate(value)
         }
     }
+
+    let hintElement: any = !hint ? null : (
+        <div className="element__hint">
+            <span className="element__hint_icon">?</span>
+            <div className={`element__hint_message element__hint_message_${!props.element.label ? 'left' : 'right'}`}>{hint}</div>
+        </div>
+    )
     
-    let labelElement: any = (
+    let labelElement: any = !props.element.label ? null : (
         <div className="element__label">
             {getTranslation(getCalculation(props.element.label, values))}
             {getCalculation(validation.required, values) && <span className="element__required">*</span>}
+            {hintElement}
         </div>
     )
     let element
@@ -211,7 +220,10 @@ const JSONFormElement = (props: {
     return (
         <Wrap className="element__field">
             {labelElement}
-            {element}
+            <div className="element__input">
+                {element}
+                {!labelElement && !!hint && hintElement}
+            </div>
             {!!errorMessage && <div className='element__field_error'>
                 {errorMessage}
             </div>}
