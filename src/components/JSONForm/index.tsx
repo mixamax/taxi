@@ -26,9 +26,11 @@ interface IProps extends ConnectedProps<typeof connector> {
     configStatus: EStatuses,
     fields: TForm,
     onSubmit?: (values: any) => any,
+    defaultValues?: Record<string, any>,
     state?: {
         success?: boolean,
-        failed?: boolean
+        failed?: boolean,
+        pending?: boolean
     }
 }
 
@@ -38,6 +40,7 @@ const JSONForm: React.FC<IProps> = ({
     language,
     onSubmit,
     state = {},
+    defaultValues = {},
     fields
 }) => {
     if (configStatus !== EStatuses.Success) return null
@@ -59,18 +62,27 @@ const JSONForm: React.FC<IProps> = ({
         })
     }, [fields])
 
+    const getDefaultValue = useCallback((item: TFormElement) => {
+        if (!item.name) return null
+        const path = item.name.split('.')
+        let value: any = path.reduce((res, key) => res ? res[key] : null, defaultValues)
+        if (!value) {
+            value = item.defaultValue ?? (
+                        item?.validation?.required &&
+                        getCalculation(item?.validation?.required) &&
+                        item?.type !== 'file' ?
+                            '' :
+                            null)
+        }
+        return value
+    }, [])
+
     const initialValues = useMemo(
         () => fields.reduce((res: any, item: TFormElement) => !item.name ?
             res :
             ({
                 ...res,
-                [item.name]: item.defaultValue ?? (
-                    item?.validation?.required &&
-                    getCalculation(item?.validation?.required) &&
-                    item?.type !== 'file' ?
-                        '' :
-                        null
-                )
+                [item.name]: getDefaultValue(item)
             }),
         {}), [fields]
     )
@@ -141,6 +153,7 @@ const JSONForm: React.FC<IProps> = ({
         form: {
             valid: isValid,
             invalid: !isValid,
+            pending: state.pending,
             submitSuccess: state.success,
             submitFailed: state.failed
         }

@@ -1,11 +1,12 @@
-import React, { useCallback, useState, useEffect } from 'react'
+import React, { useCallback, useState, useEffect, useMemo } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { connect, ConnectedProps } from 'react-redux'
 import Button from '../Button'
 import Input, { EInputTypes } from '../Input'
 import { t, TRANSLATION } from '../../localization'
-import { getImageBlob } from '../../API'
+import { getImageBlob, getImageFile } from '../../API'
 import { modalsActionCreators, modalsSelectors } from '../../state/modals'
+import ErrorFrame from '../../components/ErrorFrame'
 import { editUser } from '../../API'
 import images from '../../constants/images'
 import './styles.scss'
@@ -17,6 +18,7 @@ import { EStatuses, EWorkTypes, TFilesMap, IRequiredFields } from '../../types/t
 import { emailRegex, getPhoneError, getBase64 } from '../../tools/utils'
 import { configSelectors } from '../../state/config'
 import * as API from '../../API'
+import JSONForm from '../JSONForm'
 
 const mapStateToProps = (state: IRootState) => ({
   tokens: userSelectors.tokens(state),
@@ -178,6 +180,96 @@ const CardDetailsModal: React.FC<IProps> = ({
     }
   }
 
+  const [ isValuesLoaded, setIsValuesLoaded ] = useState(false)
+  const [ isSubmittingForm, setIsSubmittingForm ] = useState(false)
+  const [ defaultValues, setDefaultValues ] = useState({})
+
+  useEffect(() => {
+    if (!isOpen) return
+    const passportImgs = user?.u_details?.passport_photo || []
+    const driverLicenseImgs = user?.u_details?.driver_license_photo || []
+    const licenseImgs = user?.u_details?.license_photo || []
+    Promise.all([
+      Promise.all(passportImgs.map(getImageFile)),
+      Promise.all(driverLicenseImgs.map(getImageFile)),
+      Promise.all(licenseImgs.map(getImageFile))
+    ]).then(res => {
+      setDefaultValues({
+        u_name: user?.u_name,
+        u_email: user?.u_email,
+        u_phone: user?.u_phone,
+        u_city: user?.u_city && (window as any).data.cities && (window as any).data.cities[user?.u_city] ? (window as any).data.cities[user?.u_city][language.id] : '',
+        u_details: {
+          state: user?.u_details?.state,
+          zip: user?.u_details?.zip,
+          card: user?.u_details?.card,
+          street: user?.u_details?.street,
+          passport_photo: res[0],
+          driver_license_photo: res[1],
+          license_photo: res[2]
+        }
+      })
+      setIsValuesLoaded(true)
+    })
+  }, [isOpen])
+
+  const handleSubmitForm = useCallback((values: Record<string, any>) => {
+    setIsSubmittingForm(true)
+    const { u_details } = values
+    const imagesKeys = ['passport_photo', 'driver_license_photo', 'license_photo']
+    const images = [u_details?.passport_photo, u_details?.driver_license_photo, u_details?.license_photo]
+    const imagesMap: Record<string, any> = {}
+    Promise.all(images.map((imageList: [any, File][], i) => {
+      const key: string = imagesKeys[i]
+      if (!imagesMap[key]) imagesMap[key] = []
+      return Promise.all(
+        imageList
+          .map((image: [any, File]) => {
+            if (image[0]) imagesMap[key].push(image[0])
+            return image
+          })
+          .filter((image: [any, File]) => !image[0])
+          .map((image: [any, File]) =>
+            API.uploadFile({
+              file: image[1],
+              u_id: user?.u_id,
+              token: tokens?.token,
+              u_hash: tokens?.u_hash
+            }).then(res => {
+              if (res?.dl_id) imagesMap[key].push(res.dl_id)
+            })
+          )
+      )
+    })).then(() => {
+      values.u_details = {
+        ...u_details,
+        ...imagesMap
+      }
+      API.editUser(values)
+        .then(res =>
+          setMessageModal({ isOpen: true, status: EStatuses.Success, message: 'User has been successfully updated' }),
+        )
+        .catch(() =>
+          setMessageModal({ isOpen: true, status: EStatuses.Fail, message: 'An error occured' }),
+        )
+    })
+    .finally(() => {
+      setIsSubmittingForm(false)
+    })
+  }, [])
+
+  const formState = useMemo(() => ({
+    pending: isSubmittingForm
+  }), [isSubmittingForm])
+
+  const formStr = (window as any).data?.site_constants?.form_profile?.value
+  let form
+  try {
+      form = JSON.parse(formStr)
+  } catch (e) {
+      return <ErrorFrame title='Bad json in data.js' />
+  }
+
   return (
     <Overlay
       isOpen={isOpen}
@@ -186,7 +278,55 @@ const CardDetailsModal: React.FC<IProps> = ({
       <div
         className="modal profile-modal"
       >
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <fieldset>
+          <legend>{t(TRANSLATION.PROFILE)}</legend>
+          <div className="avatar">
+            {isValuesLoaded ?
+              <label>
+                <div className="avatar_image">
+                  <div
+                    className="avatar_image_bg"
+                    style={{
+                      backgroundImage: `url(${user?.u_photo || images.driverAvatar})`
+                    }}
+                    title={user?.u_name || ''}
+                  />
+                </div>
+                <input
+                  onChange={onChangeAvatar}
+                  type="file"
+                  className="avatar_input"
+                />
+              </label> :
+              <svg width="100" height="100" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" stroke="#000">
+                <g fill="none" fill-rule="evenodd">
+                    <g transform="translate(1 1)" stroke-width="2">
+                        <circle stroke-opacity=".5" cx="18" cy="18" r="18"/>
+                        <path d="M36 18c0-9.94-8.06-18-18-18">
+                            <animateTransform
+                                attributeName="transform"
+                                type="rotate"
+                                from="0 18 18"
+                                to="360 18 18"
+                                dur="1s"
+                                repeatCount="indefinite"/>
+                        </path>
+                    </g>
+                </g>
+              </svg>
+            }
+          </div>
+          {isValuesLoaded &&
+            <JSONForm
+              defaultValues={defaultValues}
+              fields={form.fields}
+              onSubmit={handleSubmitForm}
+              state={formState}
+            />
+          }
+        </fieldset>
+
+        {false && <form onSubmit={handleSubmit(onSubmit)}>
           <fieldset>
             <legend>{t(TRANSLATION.PROFILE)}</legend>
             <div className="avatar">
@@ -364,7 +504,7 @@ const CardDetailsModal: React.FC<IProps> = ({
               skipHandler={true}
             />
           </fieldset>
-        </form>
+        </form>}
       </div>
     </Overlay>
   )

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useEffect } from 'react'
 import cn from 'classnames'
 import { ILanguage } from '../../types/types'
 import Button from '../Button'
@@ -34,13 +34,19 @@ const JSONFormElement = (props: {
 
     const [ errorMessage, setErrorMessage ] = useState<string>('')
     const [ files, setFiles ] = useState<[any, File][]>()
-    const name: string = getCalculation(props.element.name, values)
-    const type = getCalculation(props.element.type, values)
+    const name: string = getCalculation(props.element.name, values, variables)
+    const type = getCalculation(props.element.type, values, variables)
     const value = values[name]
+
+    useEffect(() => {
+        if (type === 'file' && value) {
+            setFiles(value)
+        }
+    }, [])
 
     const validate = useCallback((value) => {
         if (!validationSchema) return
-        const empty = getCalculation(validation.required, values) ? '' : null
+        const empty = getCalculation(validation.required, values, variables) ? '' : null
         validationSchema.validate(value === '' ? empty : value)
             .then(() => {
                 setErrorMessage('')
@@ -51,21 +57,21 @@ const JSONFormElement = (props: {
     }, [])
 
     if (visible) {
-        const isVisible = getCalculation(visible, values)
+        const isVisible = getCalculation(visible, values, variables)
         if (!isVisible) return null
     }
 
     const commonProperties = {
         name,
-        disabled: parseVariable(getCalculation(disabled, values), variables),
+        disabled: parseVariable(getCalculation(disabled, values, variables), variables),
         onChange: (e: any) => {
-            const empty = getCalculation(validation?.required, values) ? '' : null
+            const empty = getCalculation(validation?.required, values, variables) ? '' : null
             const value = e.target.value === '' ? empty : e.target.value
             validate(value)
             onChange(e, e.target.name, value)
         },
         onBlur: (e: any) => {
-            const empty = getCalculation(validation?.required, values) ? '' : null
+            const empty = getCalculation(validation?.required, values, variables) ? '' : null
             const value = e.target.value === '' ? empty : e.target.value
             validate(value)
         }
@@ -80,8 +86,8 @@ const JSONFormElement = (props: {
     
     let labelElement: any = !props.element.label ? null : (
         <div className="element__label">
-            {getTranslation(getCalculation(props.element.label, values))}
-            {getCalculation(validation.required, values) && <span className="element__required">*</span>}
+            {getTranslation(getCalculation(props.element.label, values, variables))}
+            {getCalculation(validation.required, values, variables) && <span className="element__required">*</span>}
             {hintElement}
         </div>
     )
@@ -101,15 +107,15 @@ const JSONFormElement = (props: {
         return (
             <Button
                 type={type}
-                text={getTranslation(getCalculation(props.element.label, values))}
-                disabled={parseVariable(getCalculation(disabled, values), variables)}
+                text={getTranslation(getCalculation(props.element.label, values, variables))}
+                disabled={parseVariable(getCalculation(disabled, values, variables), variables)}
                 skipHandler
             />
         )
     }
 
     if (type === 'select') {
-        const selectOptions = getCalculation(options, values)
+        const selectOptions = getCalculation(options, values, variables)
         element = (
             <select
                 {...commonProperties}
@@ -127,7 +133,7 @@ const JSONFormElement = (props: {
     }
 
     if (type === 'radio') {
-        const radioOptions = getCalculation(options, values)
+        const radioOptions = getCalculation(options, values, variables)
         element = (
             <>
                 {radioOptions.map((option: TOption) => (
@@ -158,7 +164,7 @@ const JSONFormElement = (props: {
                     checked={value}
                     onChange={e => onChange(e, e.target.name, e.target.checked)}
                 />
-                <span>{getTranslation(getCalculation(props.element.label, values))}</span>
+                <span>{getTranslation(getCalculation(props.element.label, values, variables))}</span>
             </label>
         )
     }
@@ -220,7 +226,7 @@ const JSONFormElement = (props: {
     return (
         <Wrap className="element__field">
             {labelElement}
-            <div className="element__input">
+            <div className={!hintElement ? '' : 'element__input'}>
                 {element}
                 {!labelElement && !!hint && hintElement}
             </div>

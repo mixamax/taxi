@@ -32,27 +32,6 @@ export const getConditionResult = (left: any, op: TOperation, right: any) => {
     }
 }
 
-export const getCalculation = (calculate: any, values?: TFormValues) => {
-    if (!isCalculate(calculate)) {
-        return values === undefined ? () => calculate : calculate
-    }
-
-    const resultFn = (values: TFormValues) => {
-        let returnValue: any
-        calculate.map((exp: TExpression<any>) => {
-            const { expression, result } = exp
-            expression.map((item: TCondition) => {
-                if (returnValue) return
-                const [ key, op, right ] = item
-                const left = values[key]
-                if (getConditionResult(left, op, right)) returnValue = result
-            })
-        })
-        return returnValue
-    }
-    return values === undefined ? resultFn : resultFn(values)
-}
-
 export const getTranslation = (str: any) => {
     if (typeof str !== 'string') return str
     const translate = t(str)
@@ -66,4 +45,28 @@ export const parseVariable = (str: any, variables: Record<string, any>) => {
         result = result && result[key]
     })
     return result
+}
+
+export const getCalculation = (calculate: any, values?: TFormValues, variables?: Record<string, any>) => {
+    if (!isCalculate(calculate)) {
+        return values === undefined ? () => calculate : calculate
+    }
+
+    const resultFn = (values: TFormValues) => {
+        let returnValue: any
+        calculate.map((exp: TExpression<any>) => {
+            const { expression, result } = exp
+            expression.map((item: TCondition) => {
+                if (returnValue) return
+                const [ key, op, right ] = item
+                let left = values[key]
+                if (!left && variables) {
+                    left = parseVariable(key, variables)
+                }
+                if (getConditionResult(left, op, right)) returnValue = result
+            })
+        })
+        return returnValue
+    }
+    return values === undefined ? resultFn : resultFn(values)
 }

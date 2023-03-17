@@ -74,6 +74,7 @@ const _uploadFile = (
       return formData
     })
     .then(form => axios.post(`${Config.API_URL}/dropbox/file`, form))
+    .then(res => ({ ...res, dl_id: res?.data?.data?.dl_id }))
 }
 
 export const uploadFile = apiMethod<typeof _uploadFile>(_uploadFile, { authRequired: false })
@@ -571,6 +572,18 @@ const _getImageBlob = (
   })
 }
 export const getImageBlob = apiMethod<typeof _getImageBlob>(_getImageBlob)
+
+const _getImageFile = (
+  { formData }: IApiMethodArguments,
+  id: number,
+) => {
+  return axios.post(`${Config.API_URL}/dropbox/file/${id}`, formData, {
+    responseType: 'blob'
+  }).then(res => {
+    return [id, new File([res.data], String(id))]
+  })
+}
+export const getImageFile = apiMethod<typeof _getImageFile>(_getImageFile)
 
 const _setOutDrive = (
   { formData }: IApiMethodArguments,

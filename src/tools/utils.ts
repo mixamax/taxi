@@ -517,10 +517,14 @@ const convertTypes = <T, R>(
     else if (toBooleanKeys.includes(key)) convertedObject[key] = Boolean(parseInt(value))
     else if (toIntBooleanKeys.includes(key)) convertedObject[key] = Number(value)
     else if (toJSONKeys.includes(key)) {
-      try {
-        convertedObject[key] = JSON.parse(value)
-      } catch (e) {
+      if (typeof value !== 'string') {
         convertedObject[key] = value
+      } else {
+        try {
+          convertedObject[key] = JSON.parse(value)
+        } catch (e) {
+          convertedObject[key] = value
+        }
       }
     }
     else if (customKeys.hasOwnProperty(key)) convertedObject[key] = customKeys[key]()
