@@ -137,7 +137,7 @@
             display: block;
  
             &:disabled {
-                opacity: 0.7;
+                opacity: 0.3;
             }
         }
     }
@@ -145,8 +145,8 @@
     &__file {
         display: flex;
         flex-wrap: wrap;
-        height: 120px;
-        padding: 5px;
+        min-height: 120px;
+        padding: 0 5px 5px;
         border: 1px solid #858585;
         box-sizing: border-box;
         border-radius: 14px;
@@ -155,11 +155,11 @@
         &_value,
         &_add {
             box-sizing: border-box;
-            height: 100%;
+            height: 110px;
             border: 1px solid #858585;
             border-radius: 10px;
             cursor: pointer;
-            margin: 0 5px 0 0;
+            margin: 5px 5px 0 0;
             overflow: hidden;
         }
 
@@ -179,7 +179,7 @@
 
             &_disabled {
                 cursor: auto;
-                opacity: 0.5;
+                opacity: 0.3;
             }
         }
 
