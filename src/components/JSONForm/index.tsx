@@ -8,11 +8,9 @@ import { EStatuses, ILanguage } from '../../types/types'
 import JSONFormElement from './JSONFormElement'
 import CustomComponent from './components'
 import { TForm, TFormElement } from './types'
-import { getCalculation } from './utils'
+import { getCalculation, mergeDeep } from './utils'
 import './styles.scss'
-import { form as formData } from './data'
-
-// console.log(JSON.stringify(formData))
+import { formProfile, formRegister } from './data'
 
 const mapStateToProps = (state: IRootState) => ({
     language: configSelectors.language(state),
@@ -66,13 +64,13 @@ const JSONForm: React.FC<IProps> = ({
         if (!item.name) return null
         const path = item.name.split('.')
         let value: any = path.reduce((res, key) => res ? res[key] : null, defaultValues)
-        if (!value) {
+        if (value === undefined || value === null) {
             value = item.defaultValue ?? (
-                        item?.validation?.required &&
-                        getCalculation(item?.validation?.required) &&
-                        item?.type !== 'file' ?
-                            '' :
-                            null)
+                item?.validation?.required &&
+                getCalculation(item?.validation?.required) &&
+                item?.type !== 'file' ?
+                '' :
+                null)
         }
         return value
     }, [])
@@ -86,15 +84,14 @@ const JSONForm: React.FC<IProps> = ({
             }),
         {}), [fields]
     )
-
-    const [ values, setValues ] = useState(initialValues)
+    const [ values, setValues ] = useState(mergeDeep(defaultValues, initialValues))
 
     const validationSchema = form.reduce((res: any, item: TFormElement) => {
         const { name, type, validation } = item
         if (!name || !validation) return res
         let obj
         if (type === 'file') {
-            obj = yup.mixed()
+            obj = yup.array()
         } else if (type === 'number') {
             obj = yup.number()
 
@@ -129,7 +126,11 @@ const JSONForm: React.FC<IProps> = ({
         }
 
         if (getCalculation(validation.required, values)) {
-            obj = obj.required(t(TRANSLATION.REQUIRED_FIELD))
+            if (type === 'file') {
+                obj = obj.min(1, t(TRANSLATION.REQUIRED_FIELD))
+            } else {
+                obj = obj.required(t(TRANSLATION.REQUIRED_FIELD))
+            }
         } else {
             obj = obj.nullable().optional()
         }

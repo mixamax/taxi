@@ -60,7 +60,7 @@ export const getCalculation = (calculate: any, values?: TFormValues, variables?:
                 if (returnValue) return
                 const [ key, op, right ] = item
                 let left = values[key]
-                if (!left && variables) {
+                if (left === undefined && variables) {
                     left = parseVariable(key, variables)
                 }
                 if (getConditionResult(left, op, right)) returnValue = result
@@ -69,4 +69,23 @@ export const getCalculation = (calculate: any, values?: TFormValues, variables?:
         return returnValue
     }
     return values === undefined ? resultFn : resultFn(values)
+}
+
+const isObject = (item: any) => item && typeof item === 'object' && !Array.isArray(item)
+  
+export const mergeDeep = (target: any, source: any) => {
+    let output = Object.assign({}, target)
+    if (isObject(target) && isObject(source)) {
+        Object.keys(source).forEach(key => {
+            if (isObject(source[key])) {
+                if (!(key in target))
+                    Object.assign(output, { [key]: source[key] })
+                else
+                    output[key] = mergeDeep(target[key], source[key])
+                } else {
+                    Object.assign(output, { [key]: source[key] })
+                }
+        })
+    }
+    return output
 }
