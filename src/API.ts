@@ -279,6 +279,26 @@ const _cancelDrive = (
 }
 export const cancelDrive = apiMethod<typeof _cancelDrive>(_cancelDrive)
 
+const _editCar = (
+  { formData }: IApiMethodArguments,
+  data: any
+): Promise<any> => {
+  const { c_id, ...payload } = data
+  addToFormData(formData, { data: JSON.stringify(payload) })
+  return axios.post(`${Config.API_URL}/car/${c_id}`, formData)
+}
+
+export const editCar = apiMethod<typeof _editCar>(_editCar)
+
+const _getUserCars = (
+  { formData }: IApiMethodArguments
+): Promise<any> => {
+  return axios.post(`${Config.API_URL}/user/authorized/car`, formData)
+    .then(res => Object.values(res?.data?.data?.car || {}))
+}
+
+export const getUserCars = apiMethod<typeof _getUserCars>(_getUserCars)
+
 const _getCar = (
   { formData }: IApiMethodArguments,
   id: ICar['c_id'],
