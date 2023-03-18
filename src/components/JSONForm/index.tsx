@@ -66,13 +66,13 @@ const JSONForm: React.FC<IProps> = ({
         if (!item.name) return null
         const path = item.name.split('.')
         let value: any = path.reduce((res, key) => res ? res[key] : null, defaultValues)
-        if (!value) {
+        if (value === undefined) {
             value = item.defaultValue ?? (
-                        item?.validation?.required &&
-                        getCalculation(item?.validation?.required) &&
-                        item?.type !== 'file' ?
-                            '' :
-                            null)
+                item?.validation?.required &&
+                getCalculation(item?.validation?.required) &&
+                item?.type !== 'file' ?
+                '' :
+                null)
         }
         return value
     }, [])
@@ -86,7 +86,6 @@ const JSONForm: React.FC<IProps> = ({
             }),
         {}), [fields]
     )
-
     const [ values, setValues ] = useState(initialValues)
 
     const validationSchema = form.reduce((res: any, item: TFormElement) => {

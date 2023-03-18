@@ -60,7 +60,7 @@ export const getCalculation = (calculate: any, values?: TFormValues, variables?:
                 if (returnValue) return
                 const [ key, op, right ] = item
                 let left = values[key]
-                if (!left && variables) {
+                if (left === undefined && variables) {
                     left = parseVariable(key, variables)
                 }
                 if (getConditionResult(left, op, right)) returnValue = result
