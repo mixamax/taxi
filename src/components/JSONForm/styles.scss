@@ -212,12 +212,12 @@
             height: 24px;
             cursor: help;
             border-radius: 100%;
-            background-color: #000;
-            color: #fff;
+            color: #000;
+            border: 1px solid #000;
+            box-sizing: border-box;
             text-align: center;
             line-height: 26px;
             font-size: 14px;
-
         }
         
         &_message {
@@ -227,7 +227,7 @@
             background-color: #fff;
             box-shadow: 0 0 5px rgba(0, 0, 0, .3);
             padding: 5px;
-            min-width: 220px;
+            min-width: 200px;
             display: none;
 
             &_left {
@@ -235,8 +235,8 @@
             }
 
             &_right {
-                top: 0;
-                left: 24px;
+                top: 100%;
+                left: 0;
                 bottom: auto;
             }
         }
