@@ -80,7 +80,9 @@ const JSONFormElement = (props: {
     let hintElement: any = !hint ? null : (
         <div className="element__hint">
             <span className="element__hint_icon">?</span>
-            <div className={`element__hint_message element__hint_message_${!props.element.label ? 'left' : 'right'}`}>{hint}</div>
+            <div className={`element__hint_message element__hint_message_${!props.element.label ? 'left' : 'right'}`}>
+                {getTranslation(hint)}
+            </div>
         </div>
     )
     
