@@ -712,6 +712,7 @@ export const getStatusClassName = (status: EStatuses) => {
     case EStatuses.Fail: return 'fail'
     case EStatuses.Success: return 'success'
     case EStatuses.Loading: return 'loading'
+    case EStatuses.Warning: return 'warning'
     default: return 'default'
   }
 }

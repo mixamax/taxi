@@ -5,6 +5,7 @@ import Button from '../Button'
 import { getCalculation, getTranslation, parseVariable } from './utils'
 import { TFormElement, TOption, TFormValues } from './types'
 import './styles.scss'
+import { t } from '../../localization'
 
 const JSONFormElement = (props: {
     element: TFormElement,
@@ -12,18 +13,19 @@ const JSONFormElement = (props: {
     onChange: (e: any, name: string, value: any) => any,
     values?: TFormValues,
     language?: ILanguage,
-    variables?: Record<string, any>
+    variables?: Record<string, any>,
+    errors?: Record<string, any>
 }) => {
     const {
         onChange = () => {},
         values = {},
         validationSchema,
         language,
-        variables = {}
+        variables = {},
+        errors = {}
     } = props
     const {
         accept,
-        hint,
         placeholder,
         multiple,
         visible,
@@ -37,6 +39,11 @@ const JSONFormElement = (props: {
     const name: string = getCalculation(props.element.name, values, variables)
     const type = getCalculation(props.element.type, values, variables)
     const value = values[name]
+    const hintTextName = `hint_${name.split('.').slice(-1)[0]}`
+    let hint = props.element.hint
+    if (!hint && getTranslation(hintTextName) !== hintTextName) {
+        hint = getTranslation(hintTextName)
+    }
 
     useEffect(() => {
         if (type === 'file' && value) {
@@ -225,13 +232,20 @@ const JSONFormElement = (props: {
 
     const Wrap = ['file', 'radio', 'checkbox'].includes(type) ? 'div' : 'label'
 
+    const subscription = type === 'file' && accept === 'image/png, image/jpeg, image/jpg' ? t('subscription_images_upload') : null
+
     return (
-        <Wrap className="element__field">
+        <Wrap className={cn('element__field', {
+            ['element__field--error']: errors[name]
+        })}>
             {labelElement}
-            <div className={!hintElement ? '' : 'element__input'}>
+            <div className={type === 'file' || !hintElement ? '' : 'element__input'}>
                 {element}
                 {!labelElement && !!hint && hintElement}
             </div>
+            {!!subscription && <div className="element__field_subscription">
+                {subscription}
+            </div>}
             {!!errorMessage && <div className='element__field_error'>
                 {errorMessage}
             </div>}

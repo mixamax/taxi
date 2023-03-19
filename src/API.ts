@@ -101,7 +101,10 @@ const _register = (
         data: JSON.stringify(data.u_car),
       })
       return axios.post(`${Config.API_URL}/user/${res.data.u_id}/car`, carFormData).then(carRes => {
-        return (res.data)
+        return {
+          ...res.data,
+          car: carRes.data
+        }
       })
     })
 }

@@ -57,6 +57,7 @@ const CardDetailsModal: React.FC<IProps> = ({
   const [ isValuesLoaded, setIsValuesLoaded ] = useState(false)
   const [ isSubmittingForm, setIsSubmittingForm ] = useState(false)
   const [ defaultValues, setDefaultValues ] = useState({})
+  const [ errors, setErrors ] = useState<Record<string, any>>({})
 
   useEffect(() => {
     if (!isOpen) return
@@ -93,51 +94,71 @@ const CardDetailsModal: React.FC<IProps> = ({
     })
   }, [isOpen])
 
+  const handleChange = useCallback((name: string, value: any) => {
+    setErrors({
+      ...errors,
+      [name]: false
+    })
+  }, [errors])
+
   const handleSubmitForm = useCallback((values: Record<string, any>) => {
     setIsSubmittingForm(true)
-    const { u_details } = values
-    const imagesKeys = ['passport_photo', 'driver_license_photo', 'license_photo']
-    const images = [u_details?.passport_photo || [], u_details?.driver_license_photo || [], u_details?.license_photo || []]
-    const imagesMap: Record<string, any> = {}
-    Promise.all(images.map((imageList: [any, File][], i) => {
-      const key: string = imagesKeys[i]
-      if (!imagesMap[key]) imagesMap[key] = []
-      return Promise.all(
-        imageList
-          .map((image: [any, File]) => {
-            if (image[0]) imagesMap[key].push(image[0])
-            return image
+    const { u_details, u_car } = values
+
+    API.editCar(u_car)
+      .then(res => {
+        const isError = res?.data?.message === 'busy registration plate'
+        if (isError) {
+          setErrors({
+            ...errors,
+            ['u_car.registration_plate']: true
           })
-          .filter((image: [any, File]) => !image[0])
-          .map((image: [any, File]) =>
-            API.uploadFile({
-              file: image[1],
-              u_id: user?.u_id,
-              token: tokens?.token,
-              u_hash: tokens?.u_hash
-            }).then(res => {
-              if (res?.dl_id) imagesMap[key].push(res.dl_id)
-            })
+          setIsSubmittingForm(false)
+          return
+        }
+
+        const imagesKeys = ['passport_photo', 'driver_license_photo', 'license_photo']
+        const images = [u_details?.passport_photo || [], u_details?.driver_license_photo || [], u_details?.license_photo || []]
+        const imagesMap: Record<string, any> = {}
+        Promise.all(images.map((imageList: [any, File][], i) => {
+          const key: string = imagesKeys[i]
+          if (!imagesMap[key]) imagesMap[key] = []
+          return Promise.all(
+            imageList
+              .map((image: [any, File]) => {
+                if (image[0]) imagesMap[key].push(image[0])
+                return image
+              })
+              .filter((image: [any, File]) => !image[0])
+              .map((image: [any, File]) =>
+                API.uploadFile({
+                  file: image[1],
+                  u_id: user?.u_id,
+                  token: tokens?.token,
+                  u_hash: tokens?.u_hash
+                }).then(res => {
+                  if (res?.dl_id) imagesMap[key].push(res.dl_id)
+                })
+              )
           )
-      )
-    })).then(() => {
-      const { u_car, ...payload } = values
-      payload.u_details = {
-        ...u_details,
-        ...imagesMap
-      }
-      API.editUser(payload)
-        .then(res => API.editCar(u_car))
-        .then(res =>
-          setMessageModal({ isOpen: true, status: EStatuses.Success, message: 'User has been successfully updated' }),
-        )
-        .catch(() =>
-          setMessageModal({ isOpen: true, status: EStatuses.Fail, message: 'An error occured' }),
-        )
-    })
-    .finally(() => {
-      setIsSubmittingForm(false)
-    })
+        })).then(() => {
+          const { u_car, ...payload } = values
+          payload.u_details = {
+            ...u_details,
+            ...imagesMap
+          }
+          API.editUser(payload)
+            .then(res => {
+              setMessageModal({ isOpen: true, status: EStatuses.Success, message: t(TRANSLATION.SUCCESS_PROFILE_UPDATE_MESSAGE) })
+            })
+            .catch(() =>
+              setMessageModal({ isOpen: true, status: EStatuses.Fail, message: 'An error occured' }),
+            )
+        })
+        .finally(() => {
+          setIsSubmittingForm(false)
+        })
+      })
   }, [])
 
   const formState = useMemo(() => ({
@@ -203,7 +224,9 @@ const CardDetailsModal: React.FC<IProps> = ({
               defaultValues={defaultValues}
               fields={form.fields}
               onSubmit={handleSubmitForm}
+              onChange={handleChange}
               state={formState}
+              errors={errors}
             />
           }
         </fieldset>

@@ -581,6 +581,7 @@ export enum EStatuses {
   Success,
   Fail,
   Whatsapp,
+  Warning,
 }
 
 export interface IRouteInfo {

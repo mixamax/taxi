@@ -24,7 +24,9 @@ interface IProps extends ConnectedProps<typeof connector> {
     configStatus: EStatuses,
     fields: TForm,
     onSubmit?: (values: any) => any,
+    onChange?: (fieldName: string, value: any) => any,
     defaultValues?: Record<string, any>,
+    errors?: Record<string, any>,
     state?: {
         success?: boolean,
         failed?: boolean,
@@ -37,8 +39,10 @@ const JSONForm: React.FC<IProps> = ({
     configStatus,
     language,
     onSubmit,
+    onChange,
     state = {},
     defaultValues = {},
+    errors = {},
     fields
 }) => {
     if (configStatus !== EStatuses.Success) return null
@@ -148,6 +152,7 @@ const JSONForm: React.FC<IProps> = ({
             ...values,
             [name]: value
         })
+        onChange && onChange(name, value)
     }, [values])
 
     const variables = useMemo(() => ({
@@ -190,6 +195,7 @@ const JSONForm: React.FC<IProps> = ({
                         onChange={handleChange}
                         validationSchema={validationSchema[formElement.name]}
                         language={language}
+                        errors={errors}
                     /> :
                     <CustomComponent
                         {...formElement}

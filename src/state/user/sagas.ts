@@ -105,7 +105,15 @@ function* registerSaga(data: TAction) {
     yield put({ type: ActionTypes.REGISTER_SUCCESS, payload: response })
     yield* call(initUserSaga)
     yield put(setLoginModal(false))
-    yield put(setMessageModal({ isOpen: true, status: EStatuses.Success, message: t(TRANSLATION.SUCCESS_REGISTER_MESSAGE) }))
+
+    const isCarError = response?.car?.status === 'error'
+    const messageStatus = isCarError ? EStatuses.Warning : EStatuses.Success
+    const messageText = isCarError ? TRANSLATION.REGISTER_CAR_FAIL : TRANSLATION.SUCCESS_REGISTER_MESSAGE
+    yield put(setMessageModal({
+      isOpen: true,
+      status: messageStatus,
+      message: t(messageText)
+    }))
   } catch (error) {
     console.error(error)
     yield put({ type: ActionTypes.REGISTER_FAIL })

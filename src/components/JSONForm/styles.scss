@@ -3,9 +3,20 @@
         display: block;
         margin-bottom: 40px;
 
+        &--error {
+            input {
+                border-color: red;
+            }
+        }
+
         &_error {
             color: red;
             margin-top: 5px;
+        }
+
+        &_subscription {
+            margin-top: 5px;
+            font-size: .9em;
         }
     }
 
@@ -216,7 +227,7 @@
             background-color: #fff;
             box-shadow: 0 0 5px rgba(0, 0, 0, .3);
             padding: 5px;
-            min-width: 150px;
+            min-width: 220px;
             display: none;
 
             &_left {
@@ -224,7 +235,9 @@
             }
 
             &_right {
-                left: 0;
+                top: 0;
+                left: 24px;
+                bottom: auto;
             }
         }
         
