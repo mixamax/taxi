@@ -105,6 +105,17 @@ const JSONForm: React.FC<IProps> = ({
             if (getCalculation(validation.min, values)) {
                 obj = obj.min(getCalculation(validation.min, values), t(TRANSLATION.CARD_NUMBER_PATTERN_ERROR))
             }
+        } else if (type === 'checkbox') {
+            obj = yup.bool()
+            
+            if (getCalculation(validation.required, values)) {
+                obj = obj.oneOf([true], t(TRANSLATION.REQUIRED_FIELD))
+            }
+
+            return {
+                ...res,
+                [name]: obj
+            }
         } else {
             obj = yup.string()
     

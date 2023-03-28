@@ -546,7 +546,8 @@ export interface IUser {
     card?: string
     passport_photo?: number[]
     driver_license_photo?: number[]
-    license_photo?: number[]
+    license_photo?: number[],
+    subscribe?: boolean
   }
   //
   u_registration: Moment

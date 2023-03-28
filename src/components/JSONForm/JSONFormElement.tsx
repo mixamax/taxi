@@ -173,7 +173,14 @@ const JSONFormElement = (props: {
                     checked={value}
                     onChange={e => onChange(e, e.target.name, e.target.checked)}
                 />
-                <span>{getTranslation(getCalculation(props.element.label, values, variables))}</span>
+                <span>
+                    <span
+                        dangerouslySetInnerHTML={{
+                        __html: getTranslation(getCalculation(props.element.label, values, variables))
+                        }}
+                    />
+                    {getCalculation(validation.required, values, variables) && <span className="element__required">*</span>}
+                </span>
             </label>
         )
     }

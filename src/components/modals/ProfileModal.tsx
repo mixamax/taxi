@@ -80,7 +80,8 @@ const CardDetailsModal: React.FC<IProps> = ({
           street: user?.u_details?.street,
           passport_photo: res[0],
           driver_license_photo: res[1],
-          license_photo: res[2]
+          license_photo: res[2],
+          subscribe: user?.u_details?.subscribe
         },
         u_car: {}
     }))
