@@ -86,16 +86,22 @@
     &__checkbox {
         display: block;
         margin-bottom: 10px;
+        position: relative;
+
         &_input {
             display: none;
 
             & + span {
-                display: block;
+                margin-left: 40px;
+                display: inline-block;
                 cursor: pointer;
                 line-height: 25px;
-                height: 25px;
+                min-height: 25px;
 
                 &:before {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
                     content: '';
                     display: inline-block;
                     border: 2px solid #0f2c76;
