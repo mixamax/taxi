@@ -88,19 +88,22 @@ function* registerSaga(data: TAction) {
   yield put({ type: ActionTypes.REGISTER_START })
   try {
     const { uploads, u_details, ...payload } = data.payload
-    let response = yield* call<any>(API.register, payload)
+    let response = yield* call<any>(API.register, { ...payload, st: 1 })
     const tokens = {
       token: response.token,
       u_hash: response.u_hash
     }
     localStorage.setItem('tokens', JSON.stringify(tokens))
-    if (uploads) {
-      yield* call<any>(uploadRegisterFiles, { filesToUpload: uploads, response, u_details })
-    } else {
-      const { passport_photo, driver_license_photo, license_photo, ...details } = u_details
-      const files = { passport_photo, driver_license_photo, license_photo }
-      const t = { ...tokens, u_id: response.u_id }
-      yield* call<any>(uploadFiles, { files, u_details: details, tokens: t })
+
+    if (data.payload?.u_role === 2) {
+      if (uploads) {
+        yield* call<any>(uploadRegisterFiles, { filesToUpload: uploads, response, u_details })
+      } else {
+        const { passport_photo, driver_license_photo, license_photo, ...details } = u_details
+        const files = { passport_photo, driver_license_photo, license_photo }
+        const t = { ...tokens, u_id: response.u_id }
+        yield* call<any>(uploadFiles, { files, u_details: details, tokens: t })
+      }
     }
     yield put({ type: ActionTypes.REGISTER_SUCCESS, payload: response })
     yield* call(initUserSaga)
