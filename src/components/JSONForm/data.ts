@@ -441,6 +441,11 @@ export const fieldsProfile: TForm = [
         label: "subscribe"
     },
     {
+        name: "ref_code",
+        label: "ref_code",
+        hint: "ref_code_hint"
+    },
+    {
         component: "alert",
         props: {
             intent: "error",

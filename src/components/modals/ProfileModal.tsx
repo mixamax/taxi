@@ -83,6 +83,7 @@ const CardDetailsModal: React.FC<IProps> = ({
           license_photo: res[2],
           subscribe: user?.u_details?.subscribe
         },
+        ref_code: user?.ref_code,
         u_car: {}
     }))
     .then(values => {
