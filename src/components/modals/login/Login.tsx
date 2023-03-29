@@ -45,7 +45,7 @@ const connector = connect(mapStateToProps, mapDispatchToProps)
 
 interface IFormValues {
     login: string | undefined,
-    password: string | undefined,
+    password?: string | undefined,
     type: ERegistrationType
 }
 
@@ -183,10 +183,12 @@ const LoginForm: React.FC<IProps> = ({
     setDataToLogin(data)
     if (user) {
       logout()
-    } else {
-      if (data) {
-        login(data)
-      }
+    } else if (data) {
+      const loginData: IFormValues = data.type === 'whatsapp' ? {
+        type: data.type,
+        login: data.login
+      } : data
+      login(loginData)
     }
   }
 

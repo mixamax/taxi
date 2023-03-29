@@ -260,7 +260,7 @@ export const fieldsRegister : TForm = [
     {
         "name": "u_car.cc_id",
         "type": "select",
-        "label": "car_color",
+        "label": "car_class",
         "options": {
             "path": "car_classes"
         }
@@ -430,7 +430,7 @@ export const fieldsProfile: TForm = [
     {
         name: "u_car.cc_id",
         type: "select",
-        label: "car_color",
+        label: "car_class",
         options: {
             path: "car_classes"
         }

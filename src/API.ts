@@ -118,7 +118,7 @@ const _login = (
   { formData }: IApiMethodArguments,
   data: {
         login: IUser['u_email'] | IUser['u_phone'],
-        password: string | undefined,
+        password?: string | undefined,
         type: ERegistrationType
     },
 ): Promise<{ user: IUser | null, tokens: ITokens | null, data: string | null } | null> => {

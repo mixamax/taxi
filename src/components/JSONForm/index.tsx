@@ -57,6 +57,9 @@ const JSONForm: React.FC<IProps> = ({
                     value: num,
                     labelLang: map[num]
                 }))
+                if (field.name === 'u_car.cc_id') {
+                    field.options = field.options.slice(1)
+                }
                 field.defaultValue = field.options[0].value
             }
             
