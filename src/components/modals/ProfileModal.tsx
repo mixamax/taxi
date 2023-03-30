@@ -104,63 +104,82 @@ const CardDetailsModal: React.FC<IProps> = ({
   }, [errors])
 
   const handleSubmitForm = useCallback((values: Record<string, any>) => {
-    setIsSubmittingForm(true)
-    const { u_details, u_car } = values
+    const isChangeRefCode = values.ref_code !== user?.ref_code
 
-    API.editCar(u_car)
-      .then(res => {
-        const isError = res?.data?.message === 'busy registration plate'
-        if (isError) {
-          setErrors({
-            ...errors,
-            ['u_car.registration_plate']: true
-          })
-          setIsSubmittingForm(false)
-          return
-        }
-
-        const imagesKeys = ['passport_photo', 'driver_license_photo', 'license_photo']
-        const images = [u_details?.passport_photo || [], u_details?.driver_license_photo || [], u_details?.license_photo || []]
-        const imagesMap: Record<string, any> = {}
-        Promise.all(images.map((imageList: [any, File][], i) => {
-          const key: string = imagesKeys[i]
-          if (!imagesMap[key]) imagesMap[key] = []
-          return Promise.all(
-            imageList
-              .map((image: [any, File]) => {
-                if (image[0]) imagesMap[key].push(image[0])
-                return image
-              })
-              .filter((image: [any, File]) => !image[0])
-              .map((image: [any, File]) =>
-                API.uploadFile({
-                  file: image[1],
-                  u_id: user?.u_id,
-                  token: tokens?.token,
-                  u_hash: tokens?.u_hash
-                }).then(res => {
-                  if (res?.dl_id) imagesMap[key].push(res.dl_id)
-                })
-              )
-          )
-        })).then(() => {
-          const { u_car, ...payload } = values
-          payload.u_details = {
-            ...u_details,
-            ...imagesMap
-          }
-          API.editUser(payload)
-            .then(res => {
-              setMessageModal({ isOpen: true, status: EStatuses.Success, message: t(TRANSLATION.SUCCESS_PROFILE_UPDATE_MESSAGE) })
+    let beforeSave = Promise.resolve(true)
+    if (isChangeRefCode) {
+      beforeSave = API.checkRefCode(values.ref_code)
+        .then(res => {
+          if (!res) {
+            setErrors({
+              ref_code: true
             })
-            .catch(() =>
-              setMessageModal({ isOpen: true, status: EStatuses.Fail, message: 'An error occured' }),
+            return false
+          }
+          return true
+        })
+    }
+
+    beforeSave.then((isSuccessBefore) => {
+      if (!isSuccessBefore) return
+      setIsSubmittingForm(true)
+      const { u_details, u_car } = values
+
+      API.editCar(u_car)
+        .then(res => {
+          const isError = res?.data?.message === 'busy registration plate'
+          if (isError) {
+            setErrors({
+              ...errors,
+              ['u_car.registration_plate']: true
+            })
+            setIsSubmittingForm(false)
+            return
+          }
+
+          const imagesKeys = ['passport_photo', 'driver_license_photo', 'license_photo']
+          const images = [u_details?.passport_photo || [], u_details?.driver_license_photo || [], u_details?.license_photo || []]
+          const imagesMap: Record<string, any> = {}
+          Promise.all(images.map((imageList: [any, File][], i) => {
+            const key: string = imagesKeys[i]
+            if (!imagesMap[key]) imagesMap[key] = []
+            return Promise.all(
+              imageList
+                .map((image: [any, File]) => {
+                  if (image[0]) imagesMap[key].push(image[0])
+                  return image
+                })
+                .filter((image: [any, File]) => !image[0])
+                .map((image: [any, File]) =>
+                  API.uploadFile({
+                    file: image[1],
+                    u_id: user?.u_id,
+                    token: tokens?.token,
+                    u_hash: tokens?.u_hash
+                  }).then(res => {
+                    if (res?.dl_id) imagesMap[key].push(res.dl_id)
+                  })
+                )
             )
+          })).then(() => {
+            const { u_car, ...payload } = values
+            payload.u_details = {
+              ...u_details,
+              ...imagesMap
+            }
+            API.editUser(payload)
+              .then(res => {
+                setMessageModal({ isOpen: true, status: EStatuses.Success, message: t(TRANSLATION.SUCCESS_PROFILE_UPDATE_MESSAGE) })
+              })
+              .catch(() =>
+                setMessageModal({ isOpen: true, status: EStatuses.Fail, message: 'An error occured' }),
+              )
+          })
+          .finally(() => {
+            setIsSubmittingForm(false)
+          })
         })
-        .finally(() => {
-          setIsSubmittingForm(false)
-        })
-      })
+    })
   }, [])
 
   const formState = useMemo(() => ({

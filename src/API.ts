@@ -114,6 +114,18 @@ const _register = (
  */
 export const register = apiMethod<typeof _register>(_register, { authRequired: false })
 
+const _checkRefCode = (
+  { formData }: IApiMethodArguments,
+  ref_code: string,
+): Promise<boolean> => {
+  return axios.get(`${Config.API_URL}/referral/code/${ref_code}/check`)
+    .then(res => {
+      return res.data?.data?.ref_code_free || false
+    })
+}
+
+export const checkRefCode = apiMethod<typeof _checkRefCode>(_checkRefCode, { authRequired: false })
+
 const _login = (
   { formData }: IApiMethodArguments,
   data: {
