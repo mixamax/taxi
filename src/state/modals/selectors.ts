@@ -8,6 +8,7 @@ export const isPickTimeModalOpen = createSelector(moduleSelector, state => state
 export const isCommentsModalOpen = createSelector(moduleSelector, state => state.isCommentsModalOpen)
 export const isDriverModalOpen = createSelector(moduleSelector, state => state.isDriverModalOpen)
 export const isWACodeModalOpen = createSelector(moduleSelector, state => state.WACodeModal)
+export const isRefCodeModalOpen = createSelector(moduleSelector, state => state.RefCodeModal)
 export const isRatingModalOpen = createSelector(moduleSelector, state => state.ratingModal.isOpen)
 export const ratingModalOrderID = createSelector(moduleSelector, state => state.ratingModal.orderID)
 export const isTieCardModalOpen = createSelector(moduleSelector, state => state.isTieCardModalOpen)

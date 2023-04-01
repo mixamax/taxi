@@ -515,6 +515,8 @@ export default {
   AND: 'and_p',
   OR: 'or_p',
   CODE_INFO: 'code_get_information',
+  REF_CODE_INFO: 'ref_code_information',
+  REF_CODE_NOT_FOUND: 'ref_code_not_found',
   CODE_WRITE: 'code_write_here',
   CODE_ERROR: 'code_error',
 } as const

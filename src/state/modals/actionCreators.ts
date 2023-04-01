@@ -37,6 +37,9 @@ export const setAlarmModal = (payload: Partial<IModalsState['alarmModal']>): TAc
 export const setWACodeModal = (payload: Partial<IModalsState['WACodeModal']>): TAction => {
   return { type: ActionTypes.SET_WACODE_MODAL, payload }
 }
+export const setRefCodeModal = (payload: Partial<IModalsState['RefCodeModal']>): TAction => {
+  return { type: ActionTypes.SET_REFCODE_MODAL, payload }
+}
 export const setTakePassengerModal = (payload: IModalsState['takePassengerModal']): TAction => {
   return { type: ActionTypes.SET_TAKE_PASSENGER_MODAL, payload }
 }

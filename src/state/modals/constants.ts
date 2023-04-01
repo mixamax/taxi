@@ -19,6 +19,7 @@ export const ActionTypes = {
   SET_LOGIN_MODAL: `${prefix}/SET_LOGIN_MODAL`,
   SET_ALARM_MODAL: `${prefix}/SET_ALARM_MODAL`,
   SET_WACODE_MODAL: `${prefix}/SET_WACODE_MODAL`,
+  SET_REFCODE_MODAL: `${prefix}/SET_REFCODE_MODAL`,
   SET_TAKE_PASSENGER_MODAL: `${prefix}/SET_TAKE_PASSENGER_MODAL`,
   UPDATE_TAKE_PASSENGER_MODAL: `${prefix}/UPDATE_TAKE_PASSENGER_MODAL`,
   SET_TAKE_PASSENGER_MODAL_FROM_REQUEST: `${prefix}/SET_TAKE_PASSENGER_MODAL_FROM_REQUEST`,
@@ -57,6 +58,11 @@ export interface IModalsState {
     isOpen: boolean,
     login: any,
     data: any,
+  },
+  RefCodeModal: {
+    isOpen: boolean,
+    login: any,
+    data: any
   },
   alarmModal: {
     isOpen: boolean,

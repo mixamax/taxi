@@ -39,6 +39,7 @@ const mapDispatchToProps = {
   setMessage: userActionCreators.setMessage,
   register: userActionCreators.register,
   setWAOpen: modalsActionCreators.setWACodeModal,
+  setRefOpen: modalsActionCreators.setRefCodeModal
 }
 
 const connector = connect(mapStateToProps, mapDispatchToProps)
@@ -59,10 +60,9 @@ const LoginForm: React.FC<IProps> = ({
   status,
   tab,
   googleLogin,
-  message,
   isOpen,
-  register,
   setWAOpen,
+  setRefOpen,
   login,
   logout,
   remindPassword,
@@ -130,22 +130,21 @@ const LoginForm: React.FC<IProps> = ({
     } else {
       let u_email = getParamFromURL('u_email')
       let u_name = getParamFromURL('u_name')
-      if (u_email && u_name) {
-        if (typeof u_email === 'string' && typeof u_name === 'string') {
-          googleLogin({
-            data: {
-              u_name: decodeURIComponent(u_name).replaceAll('+', ' '),
-              u_phone: '',
-              u_email: decodeURIComponent(u_email),
-              type: ERegistrationType.Email,
-              u_role: EUserRoles.Client,
-              ref_code: '',
-              u_details: {},
-              st: '1',
-            },
-            auth_hash: null,
-          })
-        }
+
+      if (typeof u_email === 'string' && typeof u_name === 'string') {
+        setRefOpen({
+          isOpen: true,
+          data: {
+            u_name: decodeURIComponent(u_name).replaceAll('+', ' '),
+            u_phone: '',
+            u_email: decodeURIComponent(u_email),
+            type: ERegistrationType.Email,
+            u_role: EUserRoles.Client,
+            ref_code: '',
+            u_details: {},
+            st: '1',
+          }
+        })
       }
     }
   }, [])

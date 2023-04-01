@@ -25,6 +25,11 @@ export const defaultWACodeModal = {
   login: null,
   data: null,
 }
+export const defaultRefCodeModal = {
+  isOpen: false,
+  login: null,
+  data: null,
+}
 export const defaultTakePassengerModal = {
   isOpen: false,
   from: null,
@@ -51,6 +56,7 @@ export const record = Record<IModalsState>({
   isCardDetailsModalOpen: false,
   isVoteModalOpen: false,
   WACodeModal: { ...defaultWACodeModal },
+  RefCodeModal: { ...defaultRefCodeModal },
   isSeatsModalOpen: false,
   isLoginModalOpen: false,
   isDriverCancelModalOpen: false,
@@ -106,6 +112,9 @@ export default function reducer(state = new record(), action: TAction) {
     case ActionTypes.SET_WACODE_MODAL:
       return state
         .set('WACodeModal', payload)
+    case ActionTypes.SET_REFCODE_MODAL:
+      return state
+        .set('RefCodeModal', payload)
     case ActionTypes.SET_ALARM_MODAL:
       return state
         .set('alarmModal', { ...payload, seconds: payload.seconds || (payload.isOpen ? ALARM_SECONDS : 0) })

@@ -6,7 +6,7 @@ import SITE_CONSTANTS from '../../siteConstants'
 
 interface IProps {
   isOpen: boolean,
-  onClick: () => any,
+  onClick?: () => any,
   children: React.ReactChild
 }
 

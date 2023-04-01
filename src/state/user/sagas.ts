@@ -1,6 +1,6 @@
 import { ActionTypes as ConfigActionTypes } from './../config/constants'
 import { all, put } from 'redux-saga/effects'
-import { setLoginModal, setMessageModal } from '../modals/actionCreators'
+import { setLoginModal, setMessageModal, setRefCodeModal } from '../modals/actionCreators'
 import { ActionTypes } from './constants'
 import { uploadRegisterFiles, uploadFiles } from './helpers'
 import { call, takeEvery } from '../../tools/sagaUtils'
@@ -78,6 +78,7 @@ function* googleLoginSaga(data: TAction) {
       payload: result,
     })
     yield put(setLoginModal(false))
+    yield put(setRefCodeModal({ isOpen: false }))
   } catch (error) {
     console.error(error)
     yield put({ type: ActionTypes.GOOGLE_LOGIN_FAIL })
