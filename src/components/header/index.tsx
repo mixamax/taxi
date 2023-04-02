@@ -67,7 +67,8 @@ const Header: React.FC<IProps> = ({
   )
 
   const menuItems: IMenuItem[] = [];
-  (user?.u_role === EUserRoles.Driver) && menuItems.push({
+  //(user?.u_role === EUserRoles.Driver) &&
+  menuItems.push({
     label: t('profile'),
     action: () => setProfileModal({ isOpen: true }),
   })

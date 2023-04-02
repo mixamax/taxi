@@ -9,7 +9,7 @@ import { IRootState } from '../../state'
 import Overlay from './Overlay'
 import { userSelectors, userActionCreators } from '../../state/user'
 import { defaultProfileModal } from '../../state/modals/reducer'
-import { EStatuses } from '../../types/types'
+import { EStatuses, EUserRoles } from '../../types/types'
 import { getBase64 } from '../../tools/utils'
 import { configSelectors } from '../../state/config'
 import * as API from '../../API'
@@ -123,6 +123,20 @@ const CardDetailsModal: React.FC<IProps> = ({
     beforeSave.then((isSuccessBefore) => {
       if (!isSuccessBefore) return
       setIsSubmittingForm(true)
+
+      if (user?.u_role === EUserRoles.Client) {
+        return API.editUser(values)
+          .then(res => {
+            setMessageModal({ isOpen: true, status: EStatuses.Success, message: t(TRANSLATION.SUCCESS_PROFILE_UPDATE_MESSAGE) })
+          })
+          .catch(() =>
+            setMessageModal({ isOpen: true, status: EStatuses.Fail, message: 'An error occured' }),
+          )
+          .finally(() => {
+            setIsSubmittingForm(false)
+          })
+      }
+
       const { u_details, u_car } = values
 
       API.editCar(u_car)
@@ -192,6 +206,11 @@ const CardDetailsModal: React.FC<IProps> = ({
       form = JSON.parse(formStr)
   } catch (e) {
       return <ErrorFrame title='Bad json in data.js' />
+  }
+
+  if (user?.u_role === EUserRoles.Client) {
+    const userFields = ['u_name', 'u_phone', 'u_email', 'ref_code', 'u_details.subscribe', 'submit']
+    form.fields = form.fields.filter((field: any) => userFields.includes(field.name))
   }
 
   return (
