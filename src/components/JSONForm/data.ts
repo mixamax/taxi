@@ -132,7 +132,7 @@ export const fieldsRegister : TForm = [
     },
     {
         "name": "ref_code",
-        "hint": "Your ref code",
+        "hint": "hint_ref_code",
         "visible": [
             {
                 "expression": [
@@ -443,7 +443,7 @@ export const fieldsProfile: TForm = [
     {
         name: "ref_code",
         label: "ref_code",
-        hint: "ref_code_hint"
+        hint: "hint_ref_code"
     },
     {
         component: "alert",
