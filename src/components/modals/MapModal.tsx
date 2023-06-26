@@ -205,6 +205,11 @@ const MapModal: React.FC<IProps> = ({
       })
   }
 
+  const duration = [
+    !!routeInfo?.time.hours && `${routeInfo?.time.hours} h`,
+    !!routeInfo?.time.minutes && `${routeInfo?.time.minutes} min`
+  ].filter(part => part).join(' ')
+
   return (
     <Overlay
       isOpen={isOpen}
@@ -229,12 +234,7 @@ const MapModal: React.FC<IProps> = ({
 
                 <b>{t(TRANSLATION.DISTANCE)}</b> {routeInfo?.distance}km<br/>
                 <b>{t(TRANSLATION.EXPECTED_DURATION)}</b>&nbsp;
-                {routeInfo?.time.hours && routeInfo?.time.hours > 10 ?
-                  routeInfo.time.hours :
-                  `0${routeInfo?.time.hours}`}:
-                {routeInfo?.time.minutes && routeInfo.time.minutes > 10 ?
-                  routeInfo.time.minutes :
-                  `0${routeInfo?.time.minutes}`}
+                {duration}
               </div>
             )
           }
