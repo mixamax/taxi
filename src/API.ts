@@ -753,8 +753,8 @@ export const makeRoutePoints = (from: IAddressPoint, to: IAddressPoint): Promise
   )
     .then(res => res.data)
     .then(res => {
-      const hours = Math.round(res.features[0].properties.summary.duration / (60 * 60))
-      const minutes = Math.round((res.features[0].properties.summary.duration - (hours * 60)) / 60)
+      const hours = Math.floor(res.features[0].properties.summary.duration / (60 * 60))
+      const minutes = Math.round((res.features[0].properties.summary.duration - (hours * 60 * 60)) / 60)
       return {
         distance: parseFloat((res.features[0].properties.summary.distance / 1000).toFixed(2)),
         time: {
