@@ -11,6 +11,7 @@ import { MapContainer, Marker, CircleMarker, TileLayer, Popup, Tooltip, Polyline
 import { EMapModalTypes } from '../../state/modals/constants'
 import { clientOrderActionCreators, clientOrderSelectors } from '../../state/clientOrder'
 import { orderSelectors } from '../../state/order'
+import { userSelectors } from '../../state/user'
 import { EStatuses, IAddressPoint, IRouteInfo, IStaticMarker } from '../../types/types'
 import images from '../../constants/images'
 import { useInterval } from '../../tools/hooks'
@@ -33,6 +34,7 @@ const mapStateToProps = (state: IRootState) => ({
   detailedOrderDestination: orderSelectors.destination(state),
   takePassengerFrom: modalsSelectors.takePassengerModalFrom(state),
   takePassengerTo: modalsSelectors.takePassengerModalTo(state),
+  user: userSelectors.user(state),
 })
 
 const mapDispatchToProps = {
@@ -59,6 +61,7 @@ const MapModal: React.FC<IProps> = ({
   detailedOrderDestination,
   takePassengerFrom,
   takePassengerTo,
+  user,
   setClientFrom,
   setClientTo,
   setTakePassengerModalFrom,
@@ -112,7 +115,7 @@ const MapModal: React.FC<IProps> = ({
   }
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && user?.u_id) {
       API.getWashTrips()
       .then(items => items.filter(item =>
           // @ts-ignore
@@ -135,7 +138,7 @@ const MapModal: React.FC<IProps> = ({
           setStaticMarkers(markers)
         })
     }
-  }, [isOpen])
+  }, [isOpen, user])
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
