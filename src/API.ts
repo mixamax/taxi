@@ -400,6 +400,29 @@ const _getTrips = (
 }
 export const getTrips = apiMethod<typeof _getTrips>(_getTrips)
 
+
+const _getWashTrips = (
+  { formData }: IApiMethodArguments,
+  type: EOrderTypes = EOrderTypes.Active,
+): Promise<IOrder[]> => {
+  addToFormData(formData, {
+    array_type: 'list',
+  })
+
+  return axios.post(`${Config.API_URL}/trip`, formData)
+    .then(res => res.data)
+    .then(res =>
+      res.data.trip || [],
+    )
+    .then(res => res.map((item: any) => convertTrip(item)))
+    .then(res => 
+      res.sort(
+        (a: IOrder, b: IOrder) => a.b_start_datetime < b.b_start_datetime ? 1 : -1,
+      )
+    )
+}
+export const getWashTrips = apiMethod<typeof _getWashTrips>(_getWashTrips)
+
 const _getOrder = (
   { formData }: IApiMethodArguments,
   id: IOrder['b_id'],

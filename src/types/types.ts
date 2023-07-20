@@ -567,6 +567,13 @@ export interface ITokens {
   u_hash: string
 }
 
+export interface IStaticMarker {
+  latitude: number,
+  longitude: number,
+  popup?: string,
+  tooltip?: string
+}
+
 export interface IAddressPoint {
   address?: string,
   date?: string,

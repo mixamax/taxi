@@ -7,11 +7,11 @@ import SITE_CONSTANTS from '../../siteConstants'
 import { t, TRANSLATION } from '../../localization'
 import { IRootState } from '../../state'
 import { modalsActionCreators, modalsSelectors } from '../../state/modals'
-import { MapContainer, Marker, CircleMarker, TileLayer, Popup, Polyline } from 'react-leaflet'
+import { MapContainer, Marker, CircleMarker, TileLayer, Popup, Tooltip, Polyline } from 'react-leaflet'
 import { EMapModalTypes } from '../../state/modals/constants'
 import { clientOrderActionCreators, clientOrderSelectors } from '../../state/clientOrder'
 import { orderSelectors } from '../../state/order'
-import { EStatuses, IAddressPoint, IRouteInfo } from '../../types/types'
+import { EStatuses, IAddressPoint, IRouteInfo, IStaticMarker } from '../../types/types'
 import images from '../../constants/images'
 import { useInterval } from '../../tools/hooks'
 import * as API from '../../API'
@@ -66,6 +66,7 @@ const MapModal: React.FC<IProps> = ({
   setMapModal,
   setMessageModal,
 }) => {
+  const [staticMarkers, setStaticMarkers] = useState<IStaticMarker[]>([])
   const [userCoordinates, setUserCoordinates] = useState<IAddressPoint | null>(null)
   const [buttonsPopupCoordinates, setButtonPopupCoordinates] = useState<[number, number] | null>(null)
   const [routeInfo, setRouteInfo] = useState<IRouteInfo | null>(null)
@@ -109,6 +110,32 @@ const MapModal: React.FC<IProps> = ({
       console.error('Wrong map type:', type)
       break
   }
+
+  useEffect(() => {
+    if (isOpen) {
+      API.getWashTrips()
+      .then(items => items.filter(item =>
+          // @ts-ignore
+          item.t_start_latitude && item.t_start_latitude === item.t_destination_latitude &&
+          // @ts-ignore
+          item.t_start_datetime?.format && item.t_complete_datetime?.format
+        ))
+        .then(items => {
+          // @ts-ignore
+          const markers = items.map(item => ({
+            // @ts-ignore
+            latitude: item.t_start_latitude,
+            // @ts-ignore
+            longitude: item.t_start_longitude,
+            // @ts-ignore
+            popup: `from ${item.t_start_datetime.format('HH:mm MM-DD')} to ${item.t_complete_datetime.format('HH:mm MM-DD')}`,
+            // @ts-ignore
+            tooltip: `until ${item.t_complete_datetime.format('HH:mm MM-DD')}`
+          }))
+          setStaticMarkers(markers)
+        })
+    }
+  }, [isOpen])
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
@@ -276,6 +303,22 @@ const MapModal: React.FC<IProps> = ({
             !!userCoordinates?.longitude &&
               <CircleMarker center={[userCoordinates.latitude, userCoordinates.longitude]}/>
           }
+          {staticMarkers.map(marker => (
+            <Marker
+              position={[marker.latitude, marker.longitude]}
+              icon={new L.Icon({
+                iconUrl: images.activeMarker,
+                iconSize: [24, 34],
+                iconAnchor: [12, 34],
+                popupAnchor: [0, -35],
+              })}
+            >
+              {!!marker.tooltip &&
+                <Tooltip direction="top" offset={[0, -40]} opacity={1} permanent>{marker.tooltip}</Tooltip>
+              }
+              {!!marker.popup && <Popup>{marker.popup}</Popup>}
+            </Marker>
+          ))}
           {!!from?.latitude && !!from?.longitude &&
           <Marker
             position={[from.latitude, from.longitude]}
