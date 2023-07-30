@@ -292,7 +292,7 @@ export const fieldsRegister : TForm = [
         "component": "alert",
         "props": {
             "intent": "error",
-            "message": "register_fail"
+            "message": "@form.errorMessage"
         },
         "visible": "@form.submitFailed"
     },

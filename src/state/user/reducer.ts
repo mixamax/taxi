@@ -82,7 +82,7 @@ export default function reducer(state = new record(), action: TAction) {
     case ActionTypes.REGISTER_FAIL:
       return state
         .set('status', EStatuses.Fail)
-        .set('message', TRANSLATION.REGISTER_FAIL)
+        .set('message', payload && payload.message || TRANSLATION.REGISTER_FAIL)
 
     case ActionTypes.REMIND_PASSWORD_START:
       return state

@@ -30,7 +30,8 @@ interface IProps extends ConnectedProps<typeof connector> {
     state?: {
         success?: boolean,
         failed?: boolean,
-        pending?: boolean
+        pending?: boolean,
+        errorMessage?: string,
     }
 }
 
@@ -43,7 +44,7 @@ const JSONForm: React.FC<IProps> = ({
     state = {},
     defaultValues = {},
     errors = {},
-    fields
+    fields,
 }) => {
     if (configStatus !== EStatuses.Success) return null
     const data = (window as any).data || {}
@@ -175,7 +176,8 @@ const JSONForm: React.FC<IProps> = ({
             invalid: !isValid,
             pending: state.pending,
             submitSuccess: state.success,
-            submitFailed: state.failed
+            submitFailed: state.failed,
+            errorMessage: state.errorMessage,
         }
     }), [isValid, state])
 

@@ -30,9 +30,8 @@ interface IProps extends ConnectedProps<typeof connector> {
 
 const RegisterForm: React.FC<IProps> = ({
   status,
-  tab,
+  message,
   register,
-  isOpen,
 }) => {
     const handleSubmit = (values: any) => {
         values.st = 1
@@ -51,7 +50,8 @@ const RegisterForm: React.FC<IProps> = ({
         onSubmit={handleSubmit}
         state={{
           success: status === EStatuses.Success,
-          failed: status === EStatuses.Fail
+          failed: status === EStatuses.Fail,
+          errorMessage: message,
         }}
     />
 }

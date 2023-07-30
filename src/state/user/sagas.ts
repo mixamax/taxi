@@ -120,7 +120,7 @@ function* registerSaga(data: TAction) {
     }))
   } catch (error) {
     console.error(error)
-    yield put({ type: ActionTypes.REGISTER_FAIL })
+    yield put({ type: ActionTypes.REGISTER_FAIL, payload: error })
   }
 }
 

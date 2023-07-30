@@ -10,7 +10,7 @@ const CustomAlert = (props: any) => {
     return !isVisible ? null : (
         <Alert
             {...props}
-            message={props.message && t(props.message)}
+            message={props.message && (t(props.message) === 'Error' ? props.message : t(props.message))}
             onClose={() => setIsVisible(false)}
         />
     )
@@ -45,6 +45,7 @@ const CustomComponent: React.FC<IPropsCustomComponent> = ({
         ...res,
         [key]: parseVariable(getCalculation(props[key], values), variables)
     }), {})
+
     return <Component {...computedProps} />
 }
 

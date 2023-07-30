@@ -92,7 +92,7 @@ const _register = (
   return axios.post(`${Config.API_URL}/register`, formData)
     .then(res => res.data)
     .then(res => {
-      if (res.status === 'error') return Promise.reject()
+      if (res.status === 'error') return Promise.reject(res)
       if (data.u_role !== EUserRoles.Driver) return res.data
       const carFormData = new FormData()
       addToFormData(carFormData, {

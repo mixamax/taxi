@@ -91,6 +91,7 @@ const getYupSchema = (schema: any, isRequired: boolean = false) =>
 
 const RegisterForm: React.FC<IProps> = ({
   status,
+  message,
   tab,
   register,
   isOpen,
@@ -614,7 +615,7 @@ const RegisterForm: React.FC<IProps> = ({
             }
             message={
               status === EStatuses.Fail ?
-                t(TRANSLATION.REGISTER_FAIL) :
+                (message || t(TRANSLATION.REGISTER_FAIL)) :
                 t(TRANSLATION.REGISTER_SUCCESS)
             }
             onClose={toggleRegistrationAlertVisibility}
