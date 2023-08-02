@@ -1389,7 +1389,7 @@ const PassengerOrder: React.FC<IProps> = ({
         </section>
       </Layout>
 
-      {tab === TABS.WASH.id && <Map disableButtons />}
+      {tab === TABS.WASH.id && <Map disableButtons isOpen={tab === TABS.WASH.id} />}
     </>
   )
 }

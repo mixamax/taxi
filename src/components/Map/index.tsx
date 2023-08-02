@@ -144,6 +144,8 @@ const Map: React.FC<IProps> = ({
   }, [isOpen, user])
 
   useEffect(() => {
+    if (!map) return
+
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
         const point = {
@@ -151,12 +153,24 @@ const Map: React.FC<IProps> = ({
           longitude: coords.longitude,
         }
         setUserCoordinates(point)
-        map?.panTo([point.latitude, point.longitude])
+        map.panTo([point.latitude, point.longitude])
       },
       error => console.error(error),
       { enableHighAccuracy: true },
     )
-  }, [])
+
+    map.on('click', (e: L.LeafletMouseEvent) => {
+      if (!(e.originalEvent?.target as HTMLDivElement)?.classList?.contains('map')) return
+
+      const newCoords: [number, number] = [e.latlng.lat, e.latlng.lng]
+      setButtonPopupCoordinates((prev) => {
+        if (_.isEqual(prev, newCoords)) {
+          return null
+        }
+        return newCoords
+      })
+    })
+  }, [map])
 
   useInterval(() => {
     navigator.geolocation.getCurrentPosition(
@@ -172,29 +186,11 @@ const Map: React.FC<IProps> = ({
   }, 20000)
 
   useEffect(() => {
-    if (map) {
-      map.on('click', (e: L.LeafletMouseEvent) => {
-        if (!(e.originalEvent?.target as HTMLDivElement)?.classList?.contains('map')) return
-
-        const newCoords: [number, number] = [e.latlng.lat, e.latlng.lng]
-        setButtonPopupCoordinates((prev) => {
-          if (_.isEqual(prev, newCoords)) {
-            return null
-          }
-          return newCoords
-        })
-      })
-    }
-  }, [map])
-
-  useEffect(() => {
     defaultCenter && map?.panTo(defaultCenter)
   }, [defaultCenter])
 
   useEffect(() => {
     map?.invalidateSize()
-    userCoordinates && !defaultCenter &&
-      map?.panTo([userCoordinates.latitude, userCoordinates.longitude] as [number, number])
   }, [isOpen])
 
   const handleFromClick = (isButtonPopup?: boolean) => {
