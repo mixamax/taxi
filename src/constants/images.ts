@@ -101,6 +101,7 @@ const names = {
   largeTruck: 'largeTruck.svg',
   time: 'time.svg',
   bigTruck: 'bigTruck.svg',
+  carWash: 'carWash.svg',
 }
 
 export default new Proxy({}, {

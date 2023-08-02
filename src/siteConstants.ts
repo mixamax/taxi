@@ -5,7 +5,7 @@ import shader from 'shader'
 
 const SITE_CONSTANTS_SECTION = 'site_constants'
 const CURRENCIES_SECTION = 'currencies'
-const ALL_TABS_AVAILABLE = '1;2;3=1,2,3,4,5,6;4;5;6;7;'
+const ALL_TABS_AVAILABLE = "1;2;3=1,2,3,4,5,6;4;5;6;7;8;";
 
 export enum EMapMode {
   OSM = 'OSM',
