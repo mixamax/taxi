@@ -7,7 +7,6 @@
   overflow-x: hidden;
   background: #FFFFFF;
   border-radius: 9px;
-  padding: 10px;
   margin: 0 20px;
   box-sizing: border-box;
 
@@ -15,6 +14,7 @@
     height: 90%;
     width: 90%;
     z-index: 1000;
+    padding: 10px;
 
     .leaflet-marker-icon {
       z-index: 1100;
