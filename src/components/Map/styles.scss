@@ -1,19 +1,20 @@
 .map-container {
   height: 1000px;
-  width: calc(100% - 20px);
+  width: 100%;
   box-shadow: 0px 30px 12px rgba(0, 0, 0, 0.04);
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
   background: #FFFFFF;
-  border-radius: 9px;
-  margin: 0 10px;
+  margin: 0;
   box-sizing: border-box;
 
   &--modal {
+    border-radius: 9px;
     height: 90%;
     width: 90%;
     z-index: 1000;
+    padding: 10px;
 
     .leaflet-marker-icon {
       z-index: 1100;
