@@ -12,6 +12,7 @@ export const TABS = {
   MOVE: { id: 'move', sid: 5, label: TRANSLATION.MOVING_THINGS, image: 'move' },
   WAGON: { id: 'wagon', sid: 6, label: TRANSLATION.WAGON, image: 'bigTruck' },
   TRIP: { id: 'trip', sid: 7, label: TRANSLATION.TRIP, image: 'bigTruck' },
+  WASH: { id: 'wash', sid: 8, label: TRANSLATION.CAR_WASH, image: 'carWash' },
 }
 
 interface IProps {

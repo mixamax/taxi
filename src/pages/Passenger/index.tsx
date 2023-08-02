@@ -57,8 +57,8 @@ import LocationInput from '../../components/LocationInput'
 import { IBigTruckService } from '../../constants/bigTruckServices'
 import Checkbox from '../../components/Checkbox'
 import RadioCheckbox from '../../components/RadioCheckbox'
-import { withLayout } from '../../HOCs/withLayout'
-import { string } from 'prop-types'
+import Map from '../../components/Map'
+import Layout from '../../components/Layout'
 
 const mapStateToProps = (state: IRootState) => ({
   seats: clientOrderSelectors.seats(state),
@@ -662,711 +662,736 @@ const PassengerOrder: React.FC<IProps> = ({
   } else cardPaymentEnabled = mode
 
   return (
-    <section>
-      <PassengerMiniOrders handleOrderClick={handleOrderClick} />
-      <form onSubmit={formHandleSubmit(handleSubmit)} className="input-groups">
-        <TabsSwitcher tab={tab} onChange={(id: typeof tab) => setTab(id)} />
-        <CouriersTransportTabs
-          tab={courierAuto as ECourierAutoTypes}
-          onChange={(id: typeof courierAuto) => setCourierAuto(id)}
-          visible={tab === TABS.DELIVERY.id}
-        />
-        <MoveTypeTabs
-          tab={moveType as EMoveTypes}
-          onChange={(id: typeof moveType) => setMoveType(id)}
-          visible={tab === TABS.MOVE.id}
-        />
+    <>
+      <Layout>
+        <section>
+          <PassengerMiniOrders handleOrderClick={handleOrderClick} />
+          <form onSubmit={formHandleSubmit(handleSubmit)} className="input-groups">
+            <TabsSwitcher tab={tab} onChange={(id: typeof tab) => setTab(id)} />
+            <CouriersTransportTabs
+              tab={courierAuto as ECourierAutoTypes}
+              onChange={(id: typeof courierAuto) => setCourierAuto(id)}
+              visible={tab === TABS.DELIVERY.id}
+            />
+            <MoveTypeTabs
+              tab={moveType as EMoveTypes}
+              onChange={(id: typeof moveType) => setMoveType(id)}
+              visible={tab === TABS.MOVE.id}
+            />
 
-        {tab === TABS.MOVE.id && moveType === EMoveTypes.Apartament && (
-          <>
-            <Rooms furnitureState={furniture.house} value={room} onChange={setRoom} />
-            <div className="move__elevator">
-              {!elevator.elevator && (
+            {tab === TABS.MOVE.id && moveType === EMoveTypes.Apartament && (
+              <>
+                <Rooms furnitureState={furniture.house} value={room} onChange={setRoom} />
+                <div className="move__elevator">
+                  {!elevator.elevator && (
+                    <Input
+                      inputProps={{
+                        type: 'number',
+                        min: 0,
+                        disabled: room === null,
+                        value: room !== null && elevator.steps[room] !== undefined ? elevator.steps[room] : '',
+                        onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+                          room !== null && setElevator(prev => ({
+                            ...prev,
+                            steps: { ...prev.steps, [room]: parseInt(e.target.value) },
+                          })),
+                      }}
+                      label={t(TRANSLATION.NUMBER_OF_STEPS)}
+                      error={errors.steps?.message}
+                      fieldWrapperClassName={
+                        cn(
+                          'move__steps',
+                          {
+                            'move__steps--oneline': _.sum(Object.values(elevator.steps)),
+                            'move__steps--disabled': room === null,
+                          },
+                        )
+                      }
+                    />
+                  )}
+                  {!_.sum(Object.values(elevator.steps)) && (
+                    <div className={cn('move__elevator-switcher-wrapper', { 'move__elevator-switcher-wrapper--oneline': elevator.elevator })}>
+                      <label
+                        className="input__label"
+                      >
+                        {t(TRANSLATION.ELEVATOR)}
+                      </label>
+                      <SwitchSlider
+                        isVertical={window.innerWidth < 768 && !elevator.elevator}
+                        checked={!!elevator.elevator}
+                        onValueChanged={
+                          (value) => setElevator(prev => ({ ...prev, elevator: value }))
+                        }
+                        startButton={{ label: t(TRANSLATION.NO) }}
+                        endButton={{ label: t(TRANSLATION.YES) }}
+                      />
+                    </div>
+                  )}
+                  <hr className="move__elevator-hr" style={{ backgroundColor: SITE_CONSTANTS.PALETTE.primary.dark }} />
+                </div>
+                {/* <label
+            className="move__images"
+            onClick={e => {
+              if (room === null) {
+                e.preventDefault()
+                e.stopPropagation()
+                setMessageModal({ isOpen: true, message: t(TRANSLATION.ONE_ROOM_ERROR) })
+              }
+            }}
+          >
+            <input
+              type="file"
+              multiple
+              hidden
+              accept="video/mp4,video/x-m4v,video/*,image/*"
+              ref={moveImagesRef}
+              onChange={handleMoveFilesChanged}
+            />
+            <Button
+              type="button"
+              text={t(TRANSLATION.ADD_IMAGES)}
+              className="move__images-button"
+              skipHandler
+              imageProps={{
+                src: images.addPhoto,
+              }}
+            />
+          </label> */}
+                {room !== null && !!moveFiles[room]?.length && (
+                  <Slider
+                    files={moveFiles[room]}
+                    controls
+                    handleDelete={handleDeleteMoveFile}
+                    handleDeleteAll={handleDeleteMoveFiles}
+                    mobileFriendly
+                    headerLabel={t((rooms.find(i => i.id === room) as IRoom).label)}
+                  />
+                )}
+              </>
+            )}
+
+            {tab === TABS.MOVE.id && (
+              <>
+                <Furniture
+                  value={roomFurniture}
+                  room={room}
+                  listAll={moveType !== EMoveTypes.Apartament}
+                  key={`${room}_${moveType}`}
+                  handleChange={handleFurnitureChange}
+                  total={
+                    moveType === EMoveTypes.Apartament ?
+                      Object.values(furniture.house).reduce((sum, i) => sum + _.sum(Object.values(i)), 0) :
+                      _.sum(Object.values(furniture.room))
+                  }
+                // roomsChoosen={Object.values(roomFurniture)
+                // .reduce((sum, i) => sum + (_.sum(Object.values(i)) > 0 ? 1 : 0), 0)}
+                />
+                <hr className="move__separator" style={{ backgroundColor: SITE_CONSTANTS.PALETTE.primary.dark }} />
+              </>
+            )}
+
+            {![TABS.WAGON.id, TABS.MOTORCYCLE.id, TABS.WASH.id].includes(tab) &&
+        <SwitchSlider
+          checked={isIntercity}
+          onValueChanged={value => setIsIntercity(value)}
+          startButton={{ label: t(tab === TABS.MOVE.id ? TRANSLATION.SAME_STATE : TRANSLATION.CITY) }}
+          endButton={{ label: t(tab === TABS.MOVE.id ? TRANSLATION.INTERSTATE : TRANSLATION.INTERCITY) }}
+          wrapperClassName="is-intercity"
+        />
+            }
+
+            {tab !== TABS.WASH.id && <LocationInput type={EPointType.From} isIntercity={isIntercity} />}
+
+            {[TABS.WAGON.id, TABS.TRIP.id].includes(tab) &&
+        <DateTimeIntervalInput
+          value={fromTimeInterval}
+          onChange={setFromTimeInterval}
+          isSimple={tab === TABS.TRIP.id}
+        />
+            }
+
+            {[TABS.DELIVERY.id].includes(tab) && (
+              <GroupedInputs>
                 <Input
                   inputProps={{
                     type: 'number',
-                    min: 0,
-                    disabled: room === null,
-                    value: room !== null && elevator.steps[room] !== undefined ? elevator.steps[room] : '',
-                    onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-                      room !== null && setElevator(prev => ({
-                        ...prev,
-                        steps: { ...prev.steps, [room]: parseInt(e.target.value) },
-                      })),
+                    ...register('from_porch'),
                   }}
-                  label={t(TRANSLATION.NUMBER_OF_STEPS)}
-                  error={errors.steps?.message}
-                  fieldWrapperClassName={
-                    cn(
-                      'move__steps',
-                      {
-                        'move__steps--oneline': _.sum(Object.values(elevator.steps)),
-                        'move__steps--disabled': room === null,
-                      },
-                    )
-                  }
+                  label={t(TRANSLATION.PORCH)}
+                  error={errors.from_porch?.message}
                 />
-              )}
-              {!_.sum(Object.values(elevator.steps)) && (
-                <div className={cn('move__elevator-switcher-wrapper', { 'move__elevator-switcher-wrapper--oneline': elevator.elevator })}>
-                  <label
-                    className="input__label"
-                  >
-                    {t(TRANSLATION.ELEVATOR)}
-                  </label>
-                  <SwitchSlider
-                    isVertical={window.innerWidth < 768 && !elevator.elevator}
-                    checked={!!elevator.elevator}
-                    onValueChanged={
-                      (value) => setElevator(prev => ({ ...prev, elevator: value }))
-                    }
-                    startButton={{ label: t(TRANSLATION.NO) }}
-                    endButton={{ label: t(TRANSLATION.YES) }}
-                  />
-                </div>
-              )}
-              <hr className="move__elevator-hr" style={{ backgroundColor: SITE_CONSTANTS.PALETTE.primary.dark }} />
-            </div>
-            {/* <label
-              className="move__images"
-              onClick={e => {
-                if (room === null) {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  setMessageModal({ isOpen: true, message: t(TRANSLATION.ONE_ROOM_ERROR) })
-                }
-              }}
-            >
-              <input
-                type="file"
-                multiple
-                hidden
-                accept="video/mp4,video/x-m4v,video/*,image/*"
-                ref={moveImagesRef}
-                onChange={handleMoveFilesChanged}
-              />
-              <Button
-                type="button"
-                text={t(TRANSLATION.ADD_IMAGES)}
-                className="move__images-button"
-                skipHandler
-                imageProps={{
-                  src: images.addPhoto,
-                }}
-              />
-            </label> */}
-            {room !== null && !!moveFiles[room]?.length && (
-              <Slider
-                files={moveFiles[room]}
-                controls
-                handleDelete={handleDeleteMoveFile}
-                handleDeleteAll={handleDeleteMoveFiles}
-                mobileFriendly
-                headerLabel={t((rooms.find(i => i.id === room) as IRoom).label)}
-              />
+                <Input
+                  inputProps={{
+                    type: 'number',
+                    ...register('from_floor'),
+                  }}
+                  label={t(TRANSLATION.FLOOR)}
+                  error={errors.from_floor?.message}
+                />
+                <Input
+                  inputProps={{
+                    type: 'number',
+                    ...register('from_room'),
+                  }}
+                  label={t(TRANSLATION.ROOM)}
+                  error={errors.from_room?.message}
+                />
+              </GroupedInputs>
             )}
-          </>
-        )}
-
-        {tab === TABS.MOVE.id && (
-          <>
-            <Furniture
-              value={roomFurniture}
-              room={room}
-              listAll={moveType !== EMoveTypes.Apartament}
-              key={`${room}_${moveType}`}
-              handleChange={handleFurnitureChange}
-              total={
-                moveType === EMoveTypes.Apartament ?
-                  Object.values(furniture.house).reduce((sum, i) => sum + _.sum(Object.values(i)), 0) :
-                  _.sum(Object.values(furniture.room))
-              }
-              // roomsChoosen={Object.values(roomFurniture)
-              // .reduce((sum, i) => sum + (_.sum(Object.values(i)) > 0 ? 1 : 0), 0)}
-            />
-            <hr className="move__separator" style={{ backgroundColor: SITE_CONSTANTS.PALETTE.primary.dark }} />
-          </>
-        )}
-
-        {![TABS.WAGON.id, TABS.MOTORCYCLE.id].includes(tab) &&
-          <SwitchSlider
-            checked={isIntercity}
-            onValueChanged={value => setIsIntercity(value)}
-            startButton={{ label: t(tab === TABS.MOVE.id ? TRANSLATION.SAME_STATE : TRANSLATION.CITY) }}
-            endButton={{ label: t(tab === TABS.MOVE.id ? TRANSLATION.INTERSTATE : TRANSLATION.INTERCITY) }}
-            wrapperClassName="is-intercity"
-          />
-        }
-
-        <LocationInput type={EPointType.From} isIntercity={isIntercity} />
-
-        {[TABS.WAGON.id, TABS.TRIP.id].includes(tab) &&
-          <DateTimeIntervalInput
-            value={fromTimeInterval}
-            onChange={setFromTimeInterval}
-            isSimple={tab === TABS.TRIP.id}
-          />
-        }
-
-        {[TABS.DELIVERY.id].includes(tab) && (
-          <GroupedInputs>
-            <Input
-              inputProps={{
-                type: 'number',
-                ...register('from_porch'),
-              }}
-              label={t(TRANSLATION.PORCH)}
-              error={errors.from_porch?.message}
-            />
-            <Input
-              inputProps={{
-                type: 'number',
-                ...register('from_floor'),
-              }}
-              label={t(TRANSLATION.FLOOR)}
-              error={errors.from_floor?.message}
-            />
-            <Input
-              inputProps={{
-                type: 'number',
-                ...register('from_room'),
-              }}
-              label={t(TRANSLATION.ROOM)}
-              error={errors.from_room?.message}
-            />
-          </GroupedInputs>
-        )}
-        {
-          [TABS.DELIVERY.id, TABS.MOVE.id].includes(tab) &&
-          SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.fromWay &&
-            <Input
-              inputProps={{
-                ...register('from_way'),
-              }}
-              label={t(tab === TABS.MOVE.id ? TRANSLATION.COMMENT : TRANSLATION.WAY)}
-              error={errors.from_way?.message}
-            />
-        }
-        {
-          [TABS.DELIVERY.id].includes(tab) &&
-          SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.fromMission &&
-            <details>
-              <summary>
-                {t(TRANSLATION.COURIER_MISSION)}
-              </summary>
-              <Input
-                inputProps={{
-                  placeholder: t(TRANSLATION.WRITE_COURIER_MISSION),
-                  ...register('from_mission'),
-                }}
-                inputType={EInputTypes.Textarea}
-                error={errors.from_mission?.message}
-              />
-            </details>
-        }
-        {(tab === TABS.DELIVERY.id || tab === TABS.MOTORCYCLE.id) &&
+            {
+              [TABS.DELIVERY.id, TABS.MOVE.id].includes(tab) &&
+        SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.fromWay &&
           <Input
             inputProps={{
-              value: fromPhone || '',
-              onChange: (e: React.ChangeEvent<HTMLInputElement>) => setFromPhone(e.target.value),
+              ...register('from_way'),
             }}
-            inputType={EInputTypes.MaskedPhone}
-            error={getPhoneError(fromPhone)}
+            label={t(tab === TABS.MOVE.id ? TRANSLATION.COMMENT : TRANSLATION.WAY)}
+            error={errors.from_way?.message}
           />
-        }
-        {tab === TABS.DELIVERY.id && (
-          <>
+            }
+            {
+              [TABS.DELIVERY.id].includes(tab) &&
+        SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.fromMission &&
+          <details>
+            <summary>
+              {t(TRANSLATION.COURIER_MISSION)}
+            </summary>
             <Input
               inputProps={{
-                value: fromDay,
-                onChange: handleFromDayChange,
+                placeholder: t(TRANSLATION.WRITE_COURIER_MISSION),
+                ...register('from_mission'),
               }}
-              inputType={EInputTypes.Select}
-              options={getDayOptions()}
-            />
-            <GroupedInputs>
-              <Input
-                inputProps={{
-                  value: fromTimeFrom || '',
-                  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => setFromTimeFrom(e.target.value),
-                }}
-                inputType={EInputTypes.Select}
-                label={t(TRANSLATION.TIME_FROM)}
-                options={fromTimeFromOptions}
-              />
-              <Input
-                inputProps={{
-                  value: fromTimeTill || '',
-                  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => setFromTimeTill(e.target.value),
-                }}
-                inputType={EInputTypes.Select}
-                label={t(TRANSLATION.TIME_TILL)}
-                options={getTimeOptions(fromTimeFrom ? moment(fromTimeFrom, dateFormatTime) : null)}
-              />
-            </GroupedInputs>
-          </>
-        )}
-        {[TABS.MOVE.id].includes(tab) && (
-          <GroupedInputs>
-            <Input
-              inputProps={{
-                value: fromDay,
-                onChange: handleFromDayChange,
-                type: 'date',
-              }}
-              label={t(TRANSLATION.PICKUP_DATE)}
-            />
-            <Input
-              inputProps={{
-                value: fromTimeFrom || '',
-                onChange: (e: React.ChangeEvent<HTMLSelectElement>) => setFromTimeFrom(e.target.value),
-              }}
-              inputType={EInputTypes.Select}
-              label={t(TRANSLATION.PICKUP_TIME)}
-              options={fromTimeFromOptions}
-            />
-          </GroupedInputs>
-        )}
-
-        {
-          !(tab === TABS.MOVE.id && moveType === EMoveTypes.Handy) &&
-            <LocationInput type={EPointType.To} isIntercity={isIntercity} />
-        }
-
-        {[TABS.WAGON.id, TABS.TRIP.id].includes(tab) && (
-          <DateTimeIntervalInput
-            value={tillTimeInterval}
-            onChange={setTillTimeInterval}
-            isSimple={tab === TABS.TRIP.id}
-          />
-        )}
-
-        {
-          tab === TABS.WAGON.id &&
-          <>
-            <Input
-              inputType={EInputTypes.Select}
-              inputProps={{
-                value: '-1',
-                onChange:
-                  (e: any) => {
-                    if (e.target.value === '-1') return
-                    insertCargoTypeIntoCargoDescription(t(e.target.value))
-                  },
-              }}
-              label={t(TRANSLATION.CARGO_P)}
-              options={
-                [{ label: t(TRANSLATION.CHOSE), value: '-1' }]
-                  .concat(
-                    SITE_CONSTANTS.BIG_TRUCK_CARGO_TYPES.map(item => ({ label: t(item.value), value: item.value })),
-                  )
-              }
-              fieldWrapperClassName="big-truck__cargo-types"
-              oneline
-            />
-            <Input
               inputType={EInputTypes.Textarea}
-              inputProps={{
-                value: cargoDescription ?? '',
-                onChange: (e: React.ChangeEvent<HTMLInputElement>) => setCargoDescription(e.target.value),
-                placeholder: t(TRANSLATION.CARGO_DESCRIPTION_PLACEHOLDER),
-                rows: 4,
-              }}
+              error={errors.from_mission?.message}
             />
-            <GroupedInputs label={`${
-              t(TRANSLATION.CARGO_VOLUME_P)
-            } ${t(TRANSLATION.AND, { toLower: true })} ${
-              t(TRANSLATION.CARGO_WEIGHT_P, { toLower: true })
-            }`}
-            >
-              <Input
-                inputType={EInputTypes.Default}
-                inputProps={{
-                  type: 'number',
-                  min: 0,
-                  ...register('size'),
-                }}
-              />
-              <Input
-                inputType={EInputTypes.Default}
-                inputProps={{
-                  type: 'number',
-                  min: 0,
-                  ...register('bigTruckCargoWeight'),
-                }}
-              />
-            </GroupedInputs>
-            <GroupedInputs label={t(TRANSLATION.CAR_QUANTITY_AND_CAR_TYPE)}>
-              <Input
-                fieldWrapperClassName="big-truck__car-count"
-                inputProps={{
-                  type: 'number',
-                  min: 1,
-                  max: 99,
-                  ...register('carsCount'),
-                }}
-              />
-              <div className="big-truck__car-types">
+          </details>
+            }
+            {(tab === TABS.DELIVERY.id || tab === TABS.MOTORCYCLE.id) &&
+        <Input
+          inputProps={{
+            value: fromPhone || '',
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => setFromPhone(e.target.value),
+          }}
+          inputType={EInputTypes.MaskedPhone}
+          error={getPhoneError(fromPhone)}
+        />
+            }
+            {tab === TABS.DELIVERY.id && (
+              <>
                 <Input
-                  inputType={EInputTypes.Select}
                   inputProps={{
-                    ...register('bigTruckCarTypes'),
-                    multiple: values.bigTruckCarLogic !== ELogic.Nothing,
-                    size: 1,
+                    value: fromDay,
+                    onChange: handleFromDayChange,
                   }}
-                  options={
-                    SITE_CONSTANTS.BIG_TRUCK_TRANSPORT_TYPES
-                      .map(item => ({ label: t(item.value), value: item.key }))
-                  }
+                  inputType={EInputTypes.Select}
+                  options={getDayOptions()}
                 />
-                <GroupedInputs className="big-truck__logic">
-                  <RadioCheckbox
-                    textLabel={t(TRANSLATION.AND)}
-                    checked={values.bigTruckCarLogic === ELogic.And}
-                    onChange={handleLogicChange(ELogic.And)}
+                <GroupedInputs>
+                  <Input
+                    inputProps={{
+                      value: fromTimeFrom || '',
+                      onChange: (e: React.ChangeEvent<HTMLSelectElement>) => setFromTimeFrom(e.target.value),
+                    }}
+                    inputType={EInputTypes.Select}
+                    label={t(TRANSLATION.TIME_FROM)}
+                    options={fromTimeFromOptions}
                   />
-                  <RadioCheckbox
-                    textLabel={t(TRANSLATION.OR)}
-                    checked={values.bigTruckCarLogic === ELogic.Or}
-                    onChange={handleLogicChange(ELogic.Or)}
+                  <Input
+                    inputProps={{
+                      value: fromTimeTill || '',
+                      onChange: (e: React.ChangeEvent<HTMLSelectElement>) => setFromTimeTill(e.target.value),
+                    }}
+                    inputType={EInputTypes.Select}
+                    label={t(TRANSLATION.TIME_TILL)}
+                    options={getTimeOptions(fromTimeFrom ? moment(fromTimeFrom, dateFormatTime) : null)}
                   />
                 </GroupedInputs>
-              </div>
-            </GroupedInputs>
-            <BigTruckServices
-              value={bigTruckServices}
-              onChange={setBigTruckServices}
+              </>
+            )}
+            {[TABS.MOVE.id].includes(tab) && (
+              <GroupedInputs>
+                <Input
+                  inputProps={{
+                    value: fromDay,
+                    onChange: handleFromDayChange,
+                    type: 'date',
+                  }}
+                  label={t(TRANSLATION.PICKUP_DATE)}
+                />
+                <Input
+                  inputProps={{
+                    value: fromTimeFrom || '',
+                    onChange: (e: React.ChangeEvent<HTMLSelectElement>) => setFromTimeFrom(e.target.value),
+                  }}
+                  inputType={EInputTypes.Select}
+                  label={t(TRANSLATION.PICKUP_TIME)}
+                  options={fromTimeFromOptions}
+                />
+              </GroupedInputs>
+            )}
+
+            {
+              !(tab === TABS.MOVE.id && moveType === EMoveTypes.Handy) && tab !== TABS.WASH.id &&
+          <LocationInput type={EPointType.To} isIntercity={isIntercity} />
+            }
+
+            {[TABS.WAGON.id, TABS.TRIP.id].includes(tab) && (
+              <DateTimeIntervalInput
+                value={tillTimeInterval}
+                onChange={setTillTimeInterval}
+                isSimple={tab === TABS.TRIP.id}
+              />
+            )}
+
+            {
+              tab === TABS.WAGON.id &&
+        <>
+          <Input
+            inputType={EInputTypes.Select}
+            inputProps={{
+              value: '-1',
+              onChange:
+                (e: any) => {
+                  if (e.target.value === '-1') return
+                  insertCargoTypeIntoCargoDescription(t(e.target.value))
+                },
+            }}
+            label={t(TRANSLATION.CARGO_P)}
+            options={
+              [{ label: t(TRANSLATION.CHOSE), value: '-1' }]
+                .concat(
+                  SITE_CONSTANTS.BIG_TRUCK_CARGO_TYPES.map(item => ({ label: t(item.value), value: item.value })),
+                )
+            }
+            fieldWrapperClassName="big-truck__cargo-types"
+            oneline
+          />
+          <Input
+            inputType={EInputTypes.Textarea}
+            inputProps={{
+              value: cargoDescription ?? '',
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) => setCargoDescription(e.target.value),
+              placeholder: t(TRANSLATION.CARGO_DESCRIPTION_PLACEHOLDER),
+              rows: 4,
+            }}
+          />
+          <GroupedInputs label={`${
+            t(TRANSLATION.CARGO_VOLUME_P)
+          } ${t(TRANSLATION.AND, { toLower: true })} ${
+            t(TRANSLATION.CARGO_WEIGHT_P, { toLower: true })
+          }`}
+          >
+            <Input
+              inputType={EInputTypes.Default}
+              inputProps={{
+                type: 'number',
+                min: 0,
+                ...register('size'),
+              }}
             />
-          </>
-        }
-        {
-          SITE_CONSTANTS.ENABLE_CUSTOMER_PRICE && ![TABS.MOVE.id, TABS.WAGON.id, TABS.TRIP.id].includes(tab) &&
+            <Input
+              inputType={EInputTypes.Default}
+              inputProps={{
+                type: 'number',
+                min: 0,
+                ...register('bigTruckCargoWeight'),
+              }}
+            />
+          </GroupedInputs>
+          <GroupedInputs label={t(TRANSLATION.CAR_QUANTITY_AND_CAR_TYPE)}>
+            <Input
+              fieldWrapperClassName="big-truck__car-count"
+              inputProps={{
+                type: 'number',
+                min: 1,
+                max: 99,
+                ...register('carsCount'),
+              }}
+            />
+            <div className="big-truck__car-types">
+              <Input
+                inputType={EInputTypes.Select}
+                inputProps={{
+                  ...register('bigTruckCarTypes'),
+                  multiple: values.bigTruckCarLogic !== ELogic.Nothing,
+                  size: 1,
+                }}
+                options={
+                  SITE_CONSTANTS.BIG_TRUCK_TRANSPORT_TYPES
+                    .map(item => ({ label: t(item.value), value: item.key }))
+                }
+              />
+              <GroupedInputs className="big-truck__logic">
+                <RadioCheckbox
+                  textLabel={t(TRANSLATION.AND)}
+                  checked={values.bigTruckCarLogic === ELogic.And}
+                  onChange={handleLogicChange(ELogic.And)}
+                />
+                <RadioCheckbox
+                  textLabel={t(TRANSLATION.OR)}
+                  checked={values.bigTruckCarLogic === ELogic.Or}
+                  onChange={handleLogicChange(ELogic.Or)}
+                />
+              </GroupedInputs>
+            </div>
+          </GroupedInputs>
+          <BigTruckServices
+            value={bigTruckServices}
+            onChange={setBigTruckServices}
+          />
+        </>
+            }
+            {
+              SITE_CONSTANTS.ENABLE_CUSTOMER_PRICE &&
+        ![TABS.MOVE.id, TABS.WAGON.id, TABS.TRIP.id, TABS.WASH.id].includes(tab) &&
+        <Input
+          inputProps={{
+            type: 'number',
+            min: 0,
+            ...register('customer_price'),
+          }}
+          label={`${t(TRANSLATION.CUSTOMER_PRICE)}, ${CURRENCY.SIGN}`}
+          error={errors.customer_price?.message}
+        />
+            }
+            {[TABS.DELIVERY.id].includes(tab) &&
+        <GroupedInputs>
           <Input
             inputProps={{
               type: 'number',
-              min: 0,
-              ...register('customer_price'),
+              ...register('to_porch'),
             }}
-            label={`${t(TRANSLATION.CUSTOMER_PRICE)}, ${CURRENCY.SIGN}`}
-            error={errors.customer_price?.message}
+            label={t(TRANSLATION.PORCH)}
+            error={errors.to_porch?.message}
           />
-        }
-        {[TABS.DELIVERY.id].includes(tab) &&
-          <GroupedInputs>
-            <Input
-              inputProps={{
-                type: 'number',
-                ...register('to_porch'),
-              }}
-              label={t(TRANSLATION.PORCH)}
-              error={errors.to_porch?.message}
-            />
-            <Input
-              inputProps={{
-                type: 'number',
-                ...register('to_floor'),
-              }}
-              label={t(TRANSLATION.FLOOR)}
-              error={errors.to_floor?.message}
-            />
-            <Input
-              inputProps={{
-                type: 'number',
-                ...register('to_room'),
-              }}
-              label={t(TRANSLATION.ROOM)}
-              error={errors.to_room?.message}
-            />
-          </GroupedInputs>
-        }
-        {
-          ([TABS.DELIVERY.id].includes(tab) || (tab === TABS.MOVE.id && moveType !== EMoveTypes.Handy)) &&
-          SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.toWay &&
-            <Input
-              inputProps={{
-                ...register('to_way'),
-              }}
-              label={t(tab === TABS.MOVE.id ? TRANSLATION.COMMENT : TRANSLATION.WAY)}
-              error={errors.to_way?.message}
-            />
-        }
-        {
-          [TABS.DELIVERY.id].includes(tab) &&
-          SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.toMission &&
-            <details>
-              <summary><span>{t(TRANSLATION.COURIER_MISSION)}</span></summary>
-              <Input
-                inputProps={{
-                  placeholder: t(TRANSLATION.WRITE_COURIER_MISSION),
-                  ...register('to_mission'),
-                }}
-                inputType={EInputTypes.Textarea}
-                error={errors.to_mission?.message}
-              />
-            </details>
-        }
-        {
-          (tab === TABS.DELIVERY.id || tab === TABS.MOTORCYCLE.id) &&
           <Input
             inputProps={{
-              value: toPhone || '',
-              onChange: (e: React.ChangeEvent<HTMLInputElement>) => setToPhone(e.target.value),
+              type: 'number',
+              ...register('to_floor'),
             }}
-            inputType={EInputTypes.MaskedPhone}
-            error={getPhoneError(toPhone)}
+            label={t(TRANSLATION.FLOOR)}
+            error={errors.to_floor?.message}
           />
-        }
-        {tab === TABS.DELIVERY.id && <>
           <Input
             inputProps={{
-              value: toDay,
-              onChange: (e: React.ChangeEvent<HTMLSelectElement>) => setToDay(e.target.value),
+              type: 'number',
+              ...register('to_room'),
             }}
-            inputType={EInputTypes.Select}
-            options={getDayOptions(moment(fromDay, dateFormatDate))}
+            label={t(TRANSLATION.ROOM)}
+            error={errors.to_room?.message}
           />
-          <GroupedInputs>
-            <Input
-              inputProps={{
-                value: toTimeFrom || '',
-                onChange: (e: React.ChangeEvent<HTMLSelectElement>) => setToTimeFrom(e.target.value),
-              }}
-              inputType={EInputTypes.Select}
-              label={t(TRANSLATION.TIME_FROM)}
-              options={getTimeOptions(moment(toDay, dateFormatDate).days() === moment().days() ? moment() : null)}
-            />
-            <Input
-              inputProps={{
-                value: toTimeTill || '',
-                onChange: (e: React.ChangeEvent<HTMLSelectElement>) => setToTimeTill(e.target.value),
-              }}
-              inputType={EInputTypes.Select}
-              label={t(TRANSLATION.TIME_TILL)}
-              options={getTimeOptions(toTimeFrom ? moment(toTimeFrom, dateFormatTime) : null)}
-            />
-          </GroupedInputs>
-        </>}
-
-        {
-          (tab === TABS.DELIVERY.id || tab === TABS.MOTORCYCLE.id) &&
-          <>
-            <Input
-              inputProps={{
-                ...register('object'),
-              }}
-              label={t(TRANSLATION.WHAT_WE_DELIVERING)}
-              error={errors.object?.message}
-            />
-            <Hints
-              hints={[
-                t(TRANSLATION.DOCUMENTS),
-                t(TRANSLATION.GROCERIES),
-                t(TRANSLATION.GIFT),
-                t(TRANSLATION.FLOWERS),
-              ]}
-              onClick={item => setValue('object', item)}
-            />
-          </>
-        }
-        {
-          tab === TABS.DELIVERY.id &&
-          <div className='weight'>
-            <Tabs
-              tabs={
-                SITE_CONSTANTS
-                  .PASSENGER_ORDER_CONFIG
-                  .values
-                  .weight
-                  .map(item => (
-                    { ...item, label: `${t(TRANSLATION.NUMBER_TILL)} ${item.id}${t(TRANSLATION.KG)}` }
-                  ))
-              }
-              activeTabID={weight}
-              onChange={(id) => setWeight(id as typeof weight)}
-            />
-          </div>
-        }
-        {(tab === TABS.DELIVERY.id || tab === TABS.MOTORCYCLE.id) && <>
-          <Checkbox
-            label={t(TRANSLATION.LARGE_PACKAGE)}
-            {...register('is_big_size')}
-          />
-          <GroupedInputs className="groupped-inputs--cost">
-            {tab === TABS.DELIVERY.id ?
-              (
-                <Input
-                  inputProps={{
-                    type: 'number',
-                    ...register('cost'),
-                  }}
-                  label={t(TRANSLATION.COST)}
-                  error={errors.cost?.message}
-                />
-              ) :
-              <CostTabs defaultValue={cost} onChange={id => setCost(id)} />
+        </GroupedInputs>
             }
             {
-              distance ?
-                <span className="order-payment colored">
-                  {
-                    tab !== TABS.DELIVERY.id &&
-                    getPayment(null, null, distance, moment(fromTimeFrom, dateFormatTime), carClass).text
-                  }
-                </span> :
-                null
+              ([TABS.DELIVERY.id].includes(tab) || (tab === TABS.MOVE.id && moveType !== EMoveTypes.Handy)) &&
+        SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.toWay &&
+          <Input
+            inputProps={{
+              ...register('to_way'),
+            }}
+            label={t(tab === TABS.MOVE.id ? TRANSLATION.COMMENT : TRANSLATION.WAY)}
+            error={errors.to_way?.message}
+          />
             }
-          </GroupedInputs>
-        </>}
-        {
-          tab === TABS.DELIVERY.id &&
-          <>
-            <div className='info' style={{ color: SITE_CONSTANTS.PALETTE.primary.light }}>{t(TRANSLATION.DELIVERY_INFO)}</div>
-            {/* TODO rename to boxing */}
-            <Checkbox
-              {...register('loading')}
-              label={t(TRANSLATION.BOXING_REQUIRED)}
+            {
+              [TABS.DELIVERY.id].includes(tab) &&
+        SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.toMission &&
+          <details>
+            <summary><span>{t(TRANSLATION.COURIER_MISSION)}</span></summary>
+            <Input
+              inputProps={{
+                placeholder: t(TRANSLATION.WRITE_COURIER_MISSION),
+                ...register('to_mission'),
+              }}
+              inputType={EInputTypes.Textarea}
+              error={errors.to_mission?.message}
             />
-          </>
-        }
-        {
-          ![TABS.DELIVERY.id, TABS.MOTORCYCLE.id, TABS.MOVE.id, TABS.WAGON.id, TABS.TRIP.id].includes(tab) && <>
-            <Separator text={t(TRANSLATION.AUTO_CLASS)} />
-            <div className="taxi-cards">
-              {
-                class_auto.map(auto => {
-                  const _time = typeof time === 'string' ?
-                    moment() :
-                    time
-                  const value = getPayment(
-                    null, null, distance, _time, auto.id,
-                  ).value
-                  const payment = `~${value.toFixed(2)}${CURRENCY.NAME}`
-
-                  return (
-                    <Card
-                      key={auto.id}
-                      active={auto.id === carClass}
-                      src={auto.src}
-                      text={t(TRANSLATION.CAR_CLASSES[auto.id])}
-                      onClick={() => setCarClass(auto.id)}
-                      payment={payment}
-                    />
-                  )
-                })
-              }
-            </div>
-            <div className="waiting-block">
-              <span>
-                <img src={images.carAlt} alt={t(TRANSLATION.CAR)} />
-                <label className="colored">{t(TRANSLATION.FREE)}: <span>7</span></label>
-              </span>
-              <div className="vertical-line" />
-              <span>
-                <img src={images.clock} alt={t(TRANSLATION.CLOCK)} />
-                <label className="colored">{t(TRANSLATION.WAITING)}: <span>5 {t(TRANSLATION.MINUTES)}</span></label>
-              </span>
-            </div>
-          </>}
-        <Separator text={t(TRANSLATION.PAYMENT_WAY)} />
-        <div className="credit-cards">
-          <Card
-            src={images.cash}
-            onClick={() => setPaymentWay(EPaymentWays.Cash)}
-            text={t(TRANSLATION.PAYMENT_WAYS[1])}
-            active={paymentWay === EPaymentWays.Cash || !cardPaymentEnabled}
-          />
-          <Card
-            src={images.card}
-            onClick={() => setPaymentWay(EPaymentWays.Credit)}
-            text={t(TRANSLATION.PAYMENT_WAYS[2])}
-            disabled={true}
-          // onClick={(e) => {
-          //   e.preventDefault()
-          //   setCardActiveClass(2)
-          //   setTieCardModal(true)
-          // }}
-          />
-        </div>
-        {![TABS.DELIVERY.id, TABS.MOTORCYCLE.id, TABS.MOVE.id, TABS.WAGON.id, TABS.TRIP.id].includes(tab) && <>
-          <Separator text={t(TRANSLATION.ORDER_DETAILS)} />
-          <div className="info-block">
-            <div onClick={() => setPickTimeModal(true)}>
-              <img
-                src={images.timer}
-                alt={t(TRANSLATION.CLOCK)}
+          </details>
+            }
+            {
+              (tab === TABS.DELIVERY.id || tab === TABS.MOTORCYCLE.id) &&
+        <Input
+          inputProps={{
+            value: toPhone || '',
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => setToPhone(e.target.value),
+          }}
+          inputType={EInputTypes.MaskedPhone}
+          error={getPhoneError(toPhone)}
+        />
+            }
+            {tab === TABS.DELIVERY.id && <>
+              <Input
+                inputProps={{
+                  value: toDay,
+                  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => setToDay(e.target.value),
+                }}
+                inputType={EInputTypes.Select}
+                options={getDayOptions(moment(fromDay, dateFormatDate))}
               />
-              <label style={{ color: SITE_CONSTANTS.PALETTE.primary.dark }}>
-                {
-                  typeof time === 'string' ?
-                    t(TRANSLATION.NOW) :
-                    time.isSame(new Date(), 'day') ?
-                      `${t(TRANSLATION.TODAY)} ${time.format(dateFormatTime)}` :
-                      `${t(TRANSLATION.TOMORROW)} ${time.format(dateFormatTime)}`
-                }
-              </label>
-            </div>
-            <div onClick={() => setSeatsModal(true)}>
-              <img src={images.multipleUsers} alt={t(TRANSLATION.SEATS)} />
-              <label style={{ color: SITE_CONSTANTS.PALETTE.primary.dark }}>
-                {t(TRANSLATION.SEATS)}: <span>{seats}</span>
-              </label>
-            </div>
-            <div onClick={() => setCommentsModal(true)}>
-              <span className="comment-controls" style={{ height: '55px' }}>
-                <img src={images.messageIcon} alt={t(TRANSLATION.MESSAGE)} />
-              </span>
-              <label style={{ color: SITE_CONSTANTS.PALETTE.primary.dark }}>
-                {t(TRANSLATION.COMMENT)}
-              </label>
-            </div>
-          </div>
-        </>}
+              <GroupedInputs>
+                <Input
+                  inputProps={{
+                    value: toTimeFrom || '',
+                    onChange: (e: React.ChangeEvent<HTMLSelectElement>) => setToTimeFrom(e.target.value),
+                  }}
+                  inputType={EInputTypes.Select}
+                  label={t(TRANSLATION.TIME_FROM)}
+                  options={getTimeOptions(moment(toDay, dateFormatDate).days() === moment().days() ? moment() : null)}
+                />
+                <Input
+                  inputProps={{
+                    value: toTimeTill || '',
+                    onChange: (e: React.ChangeEvent<HTMLSelectElement>) => setToTimeTill(e.target.value),
+                  }}
+                  inputType={EInputTypes.Select}
+                  label={t(TRANSLATION.TIME_TILL)}
+                  options={getTimeOptions(toTimeFrom ? moment(toTimeFrom, dateFormatTime) : null)}
+                />
+              </GroupedInputs>
+            </>}
 
-        {tab === TABS.WAGON.id && (
+            {
+              (tab === TABS.DELIVERY.id || tab === TABS.MOTORCYCLE.id) &&
+        <>
           <Input
             inputProps={{
-              placeholder: t(TRANSLATION.EMAIL),
-              type: 'email',
-              value: email || '',
+              ...register('object'),
             }}
-            defaultValue={user?.u_email}
-            onChange={(e) => {
-              if (typeof e === 'string') {
-                setEmail(e)
-              }
-            }}
+            label={t(TRANSLATION.WHAT_WE_DELIVERING)}
+            error={errors.object?.message}
           />
-        )}
-
-        {![TABS.TRIP.id].includes(tab) && (
-          <Input
-            inputProps={{
-              value: phone || '',
-            }}
-            fieldWrapperClassName="phone-input"
-            inputType={EInputTypes.MaskedPhone}
-            error={getPhoneError(phone)}
-            buttons={[{ src: images.checkMark }]}
-            defaultValue={user?.u_phone}
-            onChange={(e) => {
-              if (typeof e === 'string') {
-                setPhone(e)
-              }
-            }}
+          <Hints
+            hints={[
+              t(TRANSLATION.DOCUMENTS),
+              t(TRANSLATION.GROCERIES),
+              t(TRANSLATION.GIFT),
+              t(TRANSLATION.FLOWERS),
+            ]}
+            onClick={item => setValue('object', item)}
           />
-        )}
-
-        <div className="order-vote">
-          <Button
-            type="submit"
-            text={t(tab === TABS.VOTING.id ? TRANSLATION.VOTE : TRANSLATION.TO_ORDER, { toUpper: true })}
-            status={status}
-            label={message}
+        </>
+            }
+            {
+              tab === TABS.DELIVERY.id &&
+        <div className='weight'>
+          <Tabs
+            tabs={
+              SITE_CONSTANTS
+                .PASSENGER_ORDER_CONFIG
+                .values
+                .weight
+                .map(item => (
+                  { ...item, label: `${t(TRANSLATION.NUMBER_TILL)} ${item.id}${t(TRANSLATION.KG)}` }
+                ))
+            }
+            activeTabID={weight}
+            onChange={(id) => setWeight(id as typeof weight)}
           />
         </div>
-      </form>
-    </section>
+            }
+            {(tab === TABS.DELIVERY.id || tab === TABS.MOTORCYCLE.id) && <>
+              <Checkbox
+                label={t(TRANSLATION.LARGE_PACKAGE)}
+                {...register('is_big_size')}
+              />
+              <GroupedInputs className="groupped-inputs--cost">
+                {tab === TABS.DELIVERY.id ?
+                  (
+                    <Input
+                      inputProps={{
+                        type: 'number',
+                        ...register('cost'),
+                      }}
+                      label={t(TRANSLATION.COST)}
+                      error={errors.cost?.message}
+                    />
+                  ) :
+                  <CostTabs defaultValue={cost} onChange={id => setCost(id)} />
+                }
+                {
+                  distance ?
+                    <span className="order-payment colored">
+                      {
+                        tab !== TABS.DELIVERY.id &&
+                  getPayment(null, null, distance, moment(fromTimeFrom, dateFormatTime), carClass).text
+                      }
+                    </span> :
+                    null
+                }
+              </GroupedInputs>
+            </>}
+            {
+              tab === TABS.DELIVERY.id &&
+        <>
+          <div className='info' style={{ color: SITE_CONSTANTS.PALETTE.primary.light }}>{t(TRANSLATION.DELIVERY_INFO)}</div>
+          {/* TODO rename to boxing */}
+          <Checkbox
+            {...register('loading')}
+            label={t(TRANSLATION.BOXING_REQUIRED)}
+          />
+        </>
+            }
+            {
+              ![
+                TABS.DELIVERY.id,
+                TABS.MOTORCYCLE.id,
+                TABS.MOVE.id,
+                TABS.WAGON.id,
+                TABS.TRIP.id,
+                TABS.WASH.id,
+              ].includes(tab) && <>
+                <Separator text={t(TRANSLATION.AUTO_CLASS)} />
+                <div className="taxi-cards">
+                  {
+                    class_auto.map(auto => {
+                      const _time = typeof time === 'string' ?
+                        moment() :
+                        time
+                      const value = getPayment(
+                        null, null, distance, _time, auto.id,
+                      ).value
+                      const payment = `~${value.toFixed(2)}${CURRENCY.NAME}`
+
+                      return (
+                        <Card
+                          key={auto.id}
+                          active={auto.id === carClass}
+                          src={auto.src}
+                          text={t(TRANSLATION.CAR_CLASSES[auto.id])}
+                          onClick={() => setCarClass(auto.id)}
+                          payment={payment}
+                        />
+                      )
+                    })
+                  }
+                </div>
+                <div className="waiting-block">
+                  <span>
+                    <img src={images.carAlt} alt={t(TRANSLATION.CAR)} />
+                    <label className="colored">{t(TRANSLATION.FREE)}: <span>7</span></label>
+                  </span>
+                  <div className="vertical-line" />
+                  <span>
+                    <img src={images.clock} alt={t(TRANSLATION.CLOCK)} />
+                    <label className="colored">{t(TRANSLATION.WAITING)}: <span>5 {t(TRANSLATION.MINUTES)}</span></label>
+                  </span>
+                </div>
+              </>}
+            {tab !== TABS.WASH.id &&
+        <>
+          <Separator text={t(TRANSLATION.PAYMENT_WAY)} />
+          <div className="credit-cards">
+            <Card
+              src={images.cash}
+              onClick={() => setPaymentWay(EPaymentWays.Cash)}
+              text={t(TRANSLATION.PAYMENT_WAYS[1])}
+              active={paymentWay === EPaymentWays.Cash || !cardPaymentEnabled}
+            />
+            <Card
+              src={images.card}
+              onClick={() => setPaymentWay(EPaymentWays.Credit)}
+              text={t(TRANSLATION.PAYMENT_WAYS[2])}
+              disabled={true}
+            // onClick={(e) => {
+            //   e.preventDefault()
+            //   setCardActiveClass(2)
+            //   setTieCardModal(true)
+            // }}
+            />
+          </div>
+        </>
+            }
+            {![
+              TABS.DELIVERY.id,
+              TABS.MOTORCYCLE.id,
+              TABS.MOVE.id,
+              TABS.WAGON.id,
+              TABS.TRIP.id,
+              TABS.WASH.id,
+            ].includes(tab) && <>
+              <Separator text={t(TRANSLATION.ORDER_DETAILS)} />
+              <div className="info-block">
+                <div onClick={() => setPickTimeModal(true)}>
+                  <img
+                    src={images.timer}
+                    alt={t(TRANSLATION.CLOCK)}
+                  />
+                  <label style={{ color: SITE_CONSTANTS.PALETTE.primary.dark }}>
+                    {
+                      typeof time === 'string' ?
+                        t(TRANSLATION.NOW) :
+                        time.isSame(new Date(), 'day') ?
+                          `${t(TRANSLATION.TODAY)} ${time.format(dateFormatTime)}` :
+                          `${t(TRANSLATION.TOMORROW)} ${time.format(dateFormatTime)}`
+                    }
+                  </label>
+                </div>
+                <div onClick={() => setSeatsModal(true)}>
+                  <img src={images.multipleUsers} alt={t(TRANSLATION.SEATS)} />
+                  <label style={{ color: SITE_CONSTANTS.PALETTE.primary.dark }}>
+                    {t(TRANSLATION.SEATS)}: <span>{seats}</span>
+                  </label>
+                </div>
+                <div onClick={() => setCommentsModal(true)}>
+                  <span className="comment-controls" style={{ height: '55px' }}>
+                    <img src={images.messageIcon} alt={t(TRANSLATION.MESSAGE)} />
+                  </span>
+                  <label style={{ color: SITE_CONSTANTS.PALETTE.primary.dark }}>
+                    {t(TRANSLATION.COMMENT)}
+                  </label>
+                </div>
+              </div>
+            </>}
+
+            {tab === TABS.WAGON.id && (
+              <Input
+                inputProps={{
+                  placeholder: t(TRANSLATION.EMAIL),
+                  type: 'email',
+                  value: email || '',
+                }}
+                defaultValue={user?.u_email}
+                onChange={(e) => {
+                  if (typeof e === 'string') {
+                    setEmail(e)
+                  }
+                }}
+              />
+            )}
+
+            {![TABS.TRIP.id, TABS.WASH.id].includes(tab) && (
+              <Input
+                inputProps={{
+                  value: phone || '',
+                }}
+                fieldWrapperClassName="phone-input"
+                inputType={EInputTypes.MaskedPhone}
+                error={getPhoneError(phone)}
+                buttons={[{ src: images.checkMark }]}
+                defaultValue={user?.u_phone}
+                onChange={(e) => {
+                  if (typeof e === 'string') {
+                    setPhone(e)
+                  }
+                }}
+              />
+            )}
+
+            {tab !== TABS.WASH.id && <div className="order-vote">
+              <Button
+                type="submit"
+                text={t(tab === TABS.VOTING.id ? TRANSLATION.VOTE : TRANSLATION.TO_ORDER, { toUpper: true })}
+                status={status}
+                label={message}
+              />
+            </div>}
+          </form>
+        </section>
+      </Layout>
+
+      {tab === TABS.WASH.id && <Map disableButtons />}
+    </>
   )
 }
 
-export default withLayout(connector(PassengerOrder))
+export default connector(PassengerOrder)
