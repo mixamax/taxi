@@ -54,7 +54,7 @@ export enum EBookingActions {
     Edit = 'edit',
 }
 
-export const getCacheVersion = () => axios.get(`${Config.API_URL}/?cv=`)
+export const getCacheVersion = (url: string) => axios.get(`${url}/?cv=`)
   .then(response => response?.data['cache version'])
 
 const _uploadFile = (
