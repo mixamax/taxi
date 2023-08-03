@@ -251,6 +251,7 @@ const Map: React.FC<IProps> = ({
           className='map'
           // crs={SITE_CONSTANTS.MAP_MODE === MAP_MODE.YANDEX ? L.CRS.EPSG3395 : L.CRS.EPSG3857}
           whenCreated={setMap}
+          attributionControl={false}
         >
           {
             showRouteInfo && (

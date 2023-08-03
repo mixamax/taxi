@@ -35,10 +35,12 @@ const PassengerMiniOrders: React.FC<IProps> = ({
   setCancelModal,
   handleOrderClick,
 }) => {
+  if (!activeOrders?.length) return null
+
   return (
     <div className="passenger-order__mini-orders">
       {
-        activeOrders?.map(order => {
+        activeOrders.map(order => {
           const payment = getPayment(order)
           const orderDriver = order?.drivers &&
             order
