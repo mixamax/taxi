@@ -229,7 +229,9 @@ const LoginForm: React.FC<IProps> = ({
                   {
                     className: 'restore-password-block__button',
                     type: 'button',
-                    onClick: () => formLogin && confirm(t(TRANSLATION.PASSWORD_RESET_MESSAGE)) && remindPassword(formLogin),
+                    onClick: () => {
+                      formLogin && window.confirm(t(TRANSLATION.PASSWORD_RESET_MESSAGE)) && remindPassword(formLogin)
+                    },
                     disabled: !formLogin || !!errors?.login,
                     text: t(TRANSLATION.RESTORE_PASSWORD),
                     skipHandler: true,
@@ -300,7 +302,7 @@ const LoginForm: React.FC<IProps> = ({
       //     console.log(err)
       //   }}
       // >
-      <a href={`https://accounts.google.com/o/oauth2/v2/auth?response_type=code&access_type=offline&client_id=${googleClientId}&redirect_uri=https%3A%2F%2Fibronevik.ru%2Ftaxi%2Fc%2F0%2Fgoogle%2F&state&scope=email%20profile&prompt=select_account`}>
+      <a href={`https://accounts.google.com/o/oauth2/v2/auth?response_type=code&access_type=offline&client_id=${googleClientId}&redirect_uri=${window.location.origin}&state&scope=email%20profile&prompt=select_account`}>
         <GoogleLoginButton />
       </a>
 

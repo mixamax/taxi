@@ -19,10 +19,9 @@ import CancelDriverOrderModal from './components/modals/DriverCancelModal'
 import ProfileModal from './components/modals/ProfileModal'
 import CandidatesModal from './components/modals/CandidatesModal'
 import MessageModal from './components/modals/MessageModal'
-import Config from './config'
 import SITE_CONSTANTS from './siteConstants'
 import MetaTags from 'react-meta-tags'
-import { configActionCreators, configSelectors } from './state/config'
+import { configSelectors } from './state/config'
 import { userActionCreators, userSelectors } from './state/user'
 import './App.scss'
 import { IRootState } from './state'
@@ -40,8 +39,6 @@ const mapStateToProps = (state: IRootState) => ({
 })
 
 const mapDispatchToProps = {
-  clearConfig: configActionCreators.clearConfig,
-  checkConfig: configActionCreators.checkConfig,
   initUser: userActionCreators.initUser,
 }
 
@@ -55,8 +52,6 @@ const App: React.FC<IProps> = ({
   activeChat,
   user,
   configStatus,
-  clearConfig,
-  checkConfig,
   initUser,
 }) => {
   if ((window as any).ReactNativeWebView) {
@@ -67,40 +62,6 @@ const App: React.FC<IProps> = ({
 
   useEffect(() => {
     initUser()
-
-    let _params = new URLSearchParams(window.location.search),
-      _config = _params.get('config'),
-      _clearConfig = _params.get('clearConfig') !== null
-
-    if (_clearConfig) {
-      clearConfig()
-    } else {
-      if (_config) {
-        checkConfig(_config)
-      }
-    }
-
-    if (!!_config) {
-      _params.delete('config')
-    }
-    if (!!_clearConfig) {
-      _params.delete('clearConfig')
-    }
-
-    if (_config || _clearConfig) {
-      const _path = window.location.origin + window.location.pathname
-      let _newUrl = _params.toString() ?
-        _path + '?' + _params.toString() :
-        _path
-      window.history.replaceState({}, document.title, _newUrl)
-    } else {
-      let _savedConfig = Config.SavedConfig
-      if (!!_savedConfig) {
-        checkConfig(_savedConfig)
-      } else {
-        Config.setDefaultName()
-      }
-    }
 
     API.activateChatServer()
     const interval = setInterval(() => API.activateChatServer(), 30000)

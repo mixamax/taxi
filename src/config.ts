@@ -11,36 +11,74 @@ export const WHATSAPP_BOT_KEY = '1472'
 
 let _configName: string
 
-export default class Config {
-  static setConfig(name: string) {
-    localStorage.setItem('config', name)
-    _configName = name
-    applyConfigName(name)
+class Config {
+  constructor() {
+    let params = new URLSearchParams(window.location.search),
+      configParam = params.get('config'),
+      clearConfigParam = params.get('clearConfig') !== null
+
+    if (clearConfigParam) {
+      this.clearConfig()
+    } else {
+      if (configParam) {
+        this.setConfig(configParam)
+      }
+    }
+
+    if (!!configParam) {
+      params.delete('config')
+    }
+    if (!!clearConfigParam) {
+      params.delete('clearConfig')
+    }
+
+    if (configParam || clearConfigParam) {
+      const _path = window.location.origin + window.location.pathname
+      let _newUrl = params.toString() ?
+        _path + '?' + params.toString() :
+        _path
+      window.history.replaceState({}, document.title, _newUrl)
+    } else {
+      let _savedConfig = this.SavedConfig
+      if (!!_savedConfig) {
+        this.setConfig(_savedConfig)
+      } else {
+        this.setDefaultName()
+      }
+    }
   }
 
-  static clearConfig() {
+  setConfig(name: string) {
+    localStorage.setItem('config', name)
+    _configName = name
+    applyConfigName(name, this.API_URL)
+  }
+
+  clearConfig() {
     localStorage.removeItem('config')
     _configName = ''
     applyConfigName()
   }
 
-  static setDefaultName() {
+  setDefaultName() {
     applyConfigName()
   }
 
-  static get API_URL() {
+  get API_URL() {
     return _configName ? `https://ibronevik.ru/taxi/c/${_configName}/api/v1` : API_URL
   }
 
-  static get SavedConfig() {
+  get SavedConfig() {
     return localStorage.getItem('config')
   }
 }
 
-const applyConfigName = (name?: string) => {
+const config = new Config()
+
+function applyConfigName(name?: string, url?: string) {
   const script = document.createElement('script'),
     _name = name ? `data_${name}.js` : 'data.js'
-  getCacheVersion().then(ver => {
+  getCacheVersion(url || config.API_URL).then(ver => {
     script.src = `https://ibronevik.ru/taxi/cache/${_name}?ver=${ver}`
     script.async = true
     script.onload = () => {
@@ -49,7 +87,9 @@ const applyConfigName = (name?: string) => {
     script.onerror = () => {
       store.dispatch(setConfigError())
     }
-  
+
     document.body.appendChild(script)
   })
 }
+
+export default config
