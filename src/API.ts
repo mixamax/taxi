@@ -409,7 +409,7 @@ const _getWashTrips = (
     array_type: 'list',
   })
 
-  return axios.post(`${Config.API_URL}/trip`, formData)
+  return axios.post(`${Config.API_URL}/trip/get`, formData)
     .then(res => res.data)
     .then(res =>
       res.data.trip || [],
