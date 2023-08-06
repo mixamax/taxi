@@ -415,13 +415,13 @@ const _getWashTrips = (
       res.data.trip || [],
     )
     .then(res => res.map((item: any) => convertTrip(item)))
-    .then(res => 
+    .then(res =>
       res.sort(
         (a: IOrder, b: IOrder) => a.b_start_datetime < b.b_start_datetime ? 1 : -1,
-      )
+      ),
     )
 }
-export const getWashTrips = apiMethod<typeof _getWashTrips>(_getWashTrips)
+export const getWashTrips = apiMethod<typeof _getWashTrips>(_getWashTrips, { authRequired: false })
 
 const _getOrder = (
   { formData }: IApiMethodArguments,

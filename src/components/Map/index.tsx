@@ -118,7 +118,7 @@ const Map: React.FC<IProps> = ({
   }
 
   useEffect(() => {
-    if (isOpen && user?.u_id) {
+    if (isOpen) {
       API.getWashTrips()
         .then(items => items.filter(item =>
           // @ts-ignore
@@ -141,7 +141,7 @@ const Map: React.FC<IProps> = ({
           setStaticMarkers(markers)
         })
     }
-  }, [isOpen, user])
+  }, [isOpen])
 
   useEffect(() => {
     if (!map) return
