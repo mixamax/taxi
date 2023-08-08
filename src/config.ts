@@ -11,6 +11,23 @@ export const WHATSAPP_BOT_KEY = '1472'
 
 let _configName: string
 
+const applyConfigName = (url: string, name?: string) => {
+  const script = document.createElement('script'),
+    _name = name ? `data_${name}.js` : 'data.js'
+  getCacheVersion(url).then(ver => {
+    script.src = `https://ibronevik.ru/taxi/cache/${_name}?ver=${ver}`
+    script.async = true
+    script.onload = () => {
+      store.dispatch(setConfigLoaded())
+    }
+    script.onerror = () => {
+      store.dispatch(setConfigError())
+    }
+
+    document.body.appendChild(script)
+  })
+}
+
 class Config {
   constructor() {
     let params = new URLSearchParams(window.location.search),
@@ -51,17 +68,17 @@ class Config {
   setConfig(name: string) {
     localStorage.setItem('config', name)
     _configName = name
-    applyConfigName(name, this.API_URL)
+    applyConfigName(this.API_URL, name)
   }
 
   clearConfig() {
     localStorage.removeItem('config')
     _configName = ''
-    applyConfigName()
+    applyConfigName(this.API_URL)
   }
 
   setDefaultName() {
-    applyConfigName()
+    applyConfigName(this.API_URL)
   }
 
   get API_URL() {
@@ -74,22 +91,5 @@ class Config {
 }
 
 const config = new Config()
-
-function applyConfigName(name?: string, url?: string) {
-  const script = document.createElement('script'),
-    _name = name ? `data_${name}.js` : 'data.js'
-  getCacheVersion(url || config.API_URL).then(ver => {
-    script.src = `https://ibronevik.ru/taxi/cache/${_name}?ver=${ver}`
-    script.async = true
-    script.onload = () => {
-      store.dispatch(setConfigLoaded())
-    }
-    script.onerror = () => {
-      store.dispatch(setConfigError())
-    }
-
-    document.body.appendChild(script)
-  })
-}
 
 export default config
