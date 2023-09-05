@@ -124,7 +124,9 @@ const Map: React.FC<IProps> = ({
           // @ts-ignore
           item.t_start_latitude && item.t_start_latitude === item.t_destination_latitude &&
           // @ts-ignore
-          item.t_start_datetime?.format && item.t_complete_datetime?.format
+          item.t_start_datetime?.format && item.t_complete_datetime?.format &&
+          // @ts-ignore
+          item.t_complete_datetime.isAfter(Date.now())
         ))
         .then(items => {
           // @ts-ignore
