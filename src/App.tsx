@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { connect, ConnectedProps } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 import AppRoutes from './Routes'
 import CancelOrderModal from './components/modals/CancelModal'
 import TimerModal from './components/modals/PickTimeModal'
@@ -59,6 +60,8 @@ const App: React.FC<IProps> = ({
       JSON.stringify({ type: 'SYSTEM', message: 'START' }),
     )
   }
+
+  const history = useHistory()
 
   useEffect(() => {
     initUser()
@@ -124,28 +127,30 @@ const App: React.FC<IProps> = ({
     <React.Fragment key={`${language.id}_${configStatus}`}>
       {getMetaTags()}
       <AppRoutes/>
-      {/* <PositionTracker/> */}
-      <VoteModal/>
-      <TimerModal/>
-      <CommentsModal/>
-      <DriverModal/>
-      <OnTheWayModal/>
-      <CancelOrderModal/>
-      <RatingModal/>
-      <TieCardModal/>
-      <CardDetailsModal/>
-      <WACodeModal />
-      <RefCodeModal />
-      <PlaceModal/>
-      <AlarmModal/>
-      <TakePassengerModal/>
-      <CancelDriverOrderModal/>
-      <MapModal/>
-      <LoginModal/>
-      <CandidatesModal/>
-      {user && <ProfileModal/>}
-      {activeChat && <Chat key={activeChat}/>}
-      <MessageModal/>
+      {history.location.pathname !== '/' && <>
+        {/* <PositionTracker/> */}
+        <VoteModal/>
+        <TimerModal/>
+        <CommentsModal/>
+        <DriverModal/>
+        <OnTheWayModal/>
+        <CancelOrderModal/>
+        <RatingModal/>
+        <TieCardModal/>
+        <CardDetailsModal/>
+        <WACodeModal />
+        <RefCodeModal />
+        <PlaceModal/>
+        <AlarmModal/>
+        <TakePassengerModal/>
+        <CancelDriverOrderModal/>
+        <MapModal/>
+        <LoginModal/>
+        <CandidatesModal/>
+        {user && <ProfileModal/>}
+        {activeChat && <Chat key={activeChat}/>}
+        <MessageModal/>
+      </>}
     </React.Fragment>
   )
 }
