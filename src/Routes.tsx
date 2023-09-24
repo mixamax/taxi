@@ -46,7 +46,7 @@ const HomePageRedirect = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       history.push('/passenger-order')
-    }, 3000)
+    }, 11000)
     return () => clearTimeout(timer)
   }, [])
 
