@@ -1,5 +1,5 @@
-import React, { Suspense, lazy } from 'react'
-import { Route, Switch, Redirect } from 'react-router-dom'
+import React, { Suspense, lazy, useEffect } from 'react'
+import { Route, Switch, Redirect, useHistory } from 'react-router-dom'
 import {
   configSelectors,
 } from './state/config'
@@ -41,9 +41,34 @@ const UnavailableBase = () => {
   </section>
 }
 
+const HomePageRedirect = () => {
+  const history = useHistory()
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      history.push('/passenger-order')
+    }, 3000)
+    return () => clearTimeout(timer)
+  }, [])
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+        backgroundImage: `url(${images.loading})`,
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    />
+  )
+}
+
 const AppRoutes: React.FC<{user: IUser | null}> = ({ user }) => (
   <Switch>
-    <Route exact path="/" component={PassengerOrder}/>
+    <Route exact path="/" component={HomePageRedirect}/>
     <Route path="/passenger-order" component={PassengerOrder}/>
     <Route path="/driver-order/:id" component={Order}/>
     <Route path="/driver-order" component={DriverOrder}/>
