@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useEffect } from 'react'
-import { Route, Switch, Redirect, useHistory } from 'react-router-dom'
+import { Route, Switch, Redirect, Link, useHistory } from 'react-router-dom'
 import {
   configSelectors,
 } from './state/config'
@@ -42,13 +42,13 @@ const UnavailableBase = () => {
 }
 
 const HomePageRedirect = () => {
-  const history = useHistory()
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      history.push('/passenger-order')
-    }, 11000)
-    return () => clearTimeout(timer)
-  }, [])
+  // const history = useHistory()
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     history.push('/passenger-order')
+  //   }, 11000)
+  //   return () => clearTimeout(timer)
+  // }, [])
 
   return (
     <div
@@ -58,11 +58,27 @@ const HomePageRedirect = () => {
         top: 0,
         right: 0,
         bottom: 0,
-        backgroundImage: `url(${images.loading})`,
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
       }}
-    />
+    >
+      <Link
+        to='/passenger-order'
+        style={{
+          background: 'linear-gradient(90deg, rgb(15, 44, 118) 0%, rgb(30, 88, 235) 100%)',
+          height: 60,
+          lineHeight: '60px',
+          width: 300,
+          color: '#fff',
+          textAlign: 'center',
+          fontSize: '20px',
+          borderRadius: 10
+        }}
+      >
+        Go to map
+      </Link>
+    </div>
   )
 }
 
