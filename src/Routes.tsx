@@ -76,7 +76,7 @@ const HomePageRedirect = () => {
           borderRadius: 10
         }}
       >
-        Go to map
+        Go to map +1
       </a>
     </div>
   )
