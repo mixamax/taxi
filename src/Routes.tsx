@@ -63,8 +63,8 @@ const HomePageRedirect = () => {
         justifyContent: 'center'
       }}
     >
-      <Link
-        to='/passenger-order'
+      <a
+        href='/passenger-order'
         style={{
           background: 'linear-gradient(90deg, rgb(15, 44, 118) 0%, rgb(30, 88, 235) 100%)',
           height: 60,
@@ -77,7 +77,7 @@ const HomePageRedirect = () => {
         }}
       >
         Go to map
-      </Link>
+      </a>
     </div>
   )
 }
