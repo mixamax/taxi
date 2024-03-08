@@ -50,8 +50,6 @@ const HomePageRedirect = () => {
     return () => clearTimeout(timer)
   }, [])
 
-  return null
-
   return (
     <div
       style={{
@@ -86,7 +84,7 @@ const HomePageRedirect = () => {
 
 const AppRoutes: React.FC<{user: IUser | null}> = ({ user }) => (
   <Switch>
-    <Route exact path="/" component={HomePageRedirect}/>
+    <Route exact path="/" component={PassengerOrder}/>
     <Route path="/passenger-order" component={PassengerOrder}/>
     <Route path="/driver-order/:id" component={Order}/>
     <Route path="/driver-order" component={DriverOrder}/>
