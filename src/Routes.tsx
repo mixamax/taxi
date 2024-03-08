@@ -42,13 +42,15 @@ const UnavailableBase = () => {
 }
 
 const HomePageRedirect = () => {
-  // const history = useHistory()
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     history.push('/passenger-order')
-  //   }, 11000)
-  //   return () => clearTimeout(timer)
-  // }, [])
+  const history = useHistory()
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      history.push('/passenger-order')
+    }, 11000)
+    return () => clearTimeout(timer)
+  }, [])
+
+  return null
 
   return (
     <div
