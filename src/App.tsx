@@ -127,7 +127,7 @@ const App: React.FC<IProps> = ({
     <React.Fragment key={`${language.id}_${configStatus}`}>
       {getMetaTags()}
       <AppRoutes/>
-      {history.location.pathname !== '/' && <>
+      {<>
         {/* <PositionTracker/> */}
         <VoteModal/>
         <TimerModal/>
