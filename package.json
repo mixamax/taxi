@@ -103,7 +103,7 @@
     "yup": "^0.32.11"
   },
   "scripts": {
-    "start": "node scripts/start.js",
+    "start": "node PORT=3040 scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
     "prepare-build": "npm version patch && node pre-build.js"
