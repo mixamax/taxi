@@ -1,0 +1,263 @@
+@import "../../tools/mixins";
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0px 1px 7px rgba(0, 0, 0, 0.18);
+  border-radius: 13px;
+  cursor: pointer;
+  padding-bottom: 20px;
+  background: #FFFFFF;
+  filter: grayscale(100%)
+
+  span {
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 20px;
+    line-height: 23px;
+    text-align: center;
+  }
+
+  hr {
+    width: 68%;
+    box-shadow: 1px 0px 0px #FFFFFF;
+  }
+
+  &__price {
+    font-weight: 500;
+    margin-bottom: 0;
+  }
+
+  img {
+    filter: grayscale(100%)
+  }
+
+  &--active {
+    img {
+      filter: none
+    }
+  }
+}
+
+.status-card {
+  cursor: pointer;
+  min-height: 172px;
+  background: #FFFFFF;
+  border: 2px solid #AE0000;
+  box-sizing: border-box;
+  box-shadow: 0px 1px 7px rgba(0, 0, 0, 0.22);
+  border-radius: 13px;
+  padding: 10px;
+
+  &:not(:last-child) {
+    margin-bottom: 20px;
+  }
+
+  &--history {
+    filter: grayscale(100%);
+  }
+
+  @include phone {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 20px;
+
+    .order-chat {
+      justify-content: center !important;
+      padding-bottom: 10px;
+    }
+
+    &__cost {
+      justify-content: center !important;
+      border-bottom: 1px solid rgba(79, 0, 0, 0.22);
+      padding: 10px 0;
+    }
+  }
+
+
+  // > span {
+  //   font-weight: 500;
+  //   font-size: 15px;
+  //   line-height: 18px;
+  //   color: #6F1717;
+  // }
+
+  &__points {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  &__from {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    @include phone {
+      flex-direction: column;
+
+      &-address {
+        order: 2;
+        align-self: baseline;
+      }
+    }
+
+    span:nth-child(1) {
+      font-weight: normal;
+      font-size: 20px;
+      line-height: 23px;
+    }
+
+    span:nth-child(2) {
+      display: flex;
+      align-items: center;
+      margin-left: auto;
+      font-size: 20px;
+      line-height: 23px;
+      text-align: right;
+      color: #158819;
+
+      img {
+        margin-left: 10px;
+      }
+    }
+  }
+
+  &__time {
+    label {
+      font-size: 20px;
+      font-weight: 400;
+      color: #158819;
+    }
+  }
+
+  &__to {
+    span {
+      font-weight: 300;
+      font-size: 19px;
+      line-height: 23px;
+      margin-left: 5px;
+    }
+  }
+
+  &__separator {
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+
+    &.separate {
+      span:nth-child(1) {
+        border-bottom: 1px solid rgba(79, 0, 0, 0.22);
+        width: 55%;
+
+        @include phone {
+          display: none;
+        }
+      }
+    }
+
+    span:nth-child(2) {
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+      font-size: 29px;
+      line-height: 34px;
+      text-align: right;
+
+      img {
+        margin-left: 10px;
+      }
+
+      @include phone {
+        align-self: center;
+      }
+    }
+  }
+
+  &__comments {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+
+    span {
+      display: flex;
+      align-items: center;
+    }
+
+    span:nth-child(1) {
+      font-weight: normal;
+      font-size: 17px;
+
+      img {
+        margin-right: 10px;
+        width: 20px;
+      }
+    }
+
+    .user-id {
+      margin-left: 10px;
+      font-size: 18px;
+    }
+  }
+
+  &__seats {
+    label {
+      font-weight: 500;
+      font-size: 24px;
+      color: #8B1010;
+    }
+
+    img {
+      margin-left: 5px;
+      width: 22px;
+    }
+  }
+
+  &__other-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    span {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      font-style: italic;
+      font-weight: normal;
+      font-size: 16px;
+      line-height: 19px;
+      text-align: right;
+      color: #838383;
+
+      img {
+        height: 18px;
+        width: 18px;
+        margin: 0 8px
+      }
+    }
+
+    > img {
+      height: 17px;
+    }
+  }
+}
+
+
+.order-history {
+  margin-bottom: 20px;
+
+  * {
+    color: #989898 !important;
+  }
+
+  .status-card-separator {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}

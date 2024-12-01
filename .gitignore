@@ -1,0 +1,7 @@
+/node_modules
+.vercel
+build/*
+yarn.lock
+.idea
+.vscode
+.env
