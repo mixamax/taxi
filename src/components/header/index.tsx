@@ -114,7 +114,6 @@ const Header: React.FC<IProps> = ({
     avatar = user.u_photo || images.activeAvatar
     avatarSize = user.u_photo ? 'cover' : '30px'
   }
-
   return (
     <header
       className='header'

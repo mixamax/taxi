@@ -40,6 +40,7 @@ import store from './state'
 import { configSelectors } from './state/config'
 import SITE_CONSTANTS from './siteConstants'
 import getCountryISO3 from './tools/countryISO2To3'
+import {to} from "./state/clientOrder/selectors";
 
 export enum EBookingActions {
     SetConfirmState = 'set_confirm_state',
@@ -156,7 +157,7 @@ const _login = (
       addToFormData(tokenFormData, {
         auth_hash: res?.auth_hash,
       })
-      return axios.post(`${Config.API_URL}/token`, tokenFormData)
+      return axios.post(`${Config.API_URL}/token`, tokenFormData, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
         .then(tokenRes => tokenRes)
         .then(tokenRes => ({
           user: convertUser(res.auth_user),
@@ -186,6 +187,7 @@ const _googleLogin = (
       auth_hash: string | null
   },
 ): Promise<{ user: IUser, tokens: ITokens } | null> => {
+    console.log(auth)
   if(auth.auth_hash === null) {
     addToFormData(formData, {
       ...auth.data,
@@ -201,7 +203,7 @@ const _googleLogin = (
           token: res?.data?.token,
           u_hash: res?.data?.u_hash,
         })
-        return axios.post(`${Config.API_URL}/token/authorized`, tokenFormData)
+        return axios.post(`${Config.API_URL}/token/authorized`, tokenFormData,{ headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
           .then(userRes => userRes.data)
           .then(userRes => {
             return {
@@ -213,12 +215,10 @@ const _googleLogin = (
             }
           })
       })
-  } else {
-    const tokenFormData = new FormData()
-    addToFormData(tokenFormData, {
-      auth_hash:  auth.auth_hash,
-    })
-    return axios.post(`${Config.API_URL}/token`, tokenFormData)
+  }
+  else {
+    const tokenFormData = "auth_hash="+encodeURIComponent(auth.auth_hash)
+    return axios.post(`${Config.API_URL}/token`, tokenFormData, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
       .then(tokenRes => tokenRes.data)
       .then(tokenRes => {
         return {
@@ -901,6 +901,5 @@ export const activateChatServer = () => {
     params: {
       s: 1,
     },
-  })
-    .catch(error => console.error(error))
+  }).catch(error => console.error(error))
 }

@@ -102,10 +102,12 @@ const VoteModal: React.FC<IProps> = ({
               {t(TRANSLATION.DRIVE)} №{order?.b_driver_code}
             </legend>
             <div className="timer-block">
-              <img src={images.timer} className="timer-block_timer-img" alt={t(TRANSLATION.TIMER)}/>
-              <article className="colored">
-                {t(TRANSLATION.LEFT)} <span>{seconds}</span> {t(TRANSLATION.SECONDS)}
-              </article>
+              <img src={images.timer} className="timer-block_timer-img" alt={t(TRANSLATION.TIMER)} style={{ display: 'flex',margin: '0 auto' }} />
+              <div className="article-container" style={{ display: 'flex',margin: '10px 0'}}>
+                <article className="colored" style={{ display: 'flex',margin: '0 auto' }}>
+                  {t(TRANSLATION.LEFT)} <span style={{ marginLeft: '5px', marginRight: '5px' }}>{seconds}</span> {t(TRANSLATION.SECONDS)}
+                </article>
+              </div>
 
               <Button
                 text={t(TRANSLATION.CONTINUE_WAITING)}

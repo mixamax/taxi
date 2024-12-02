@@ -64,7 +64,7 @@ function* googleLoginSaga(data: TAction) {
     const result = yield* call<PromiseReturn<ReturnType<typeof API.googleLogin>>>(API.googleLogin, data.payload)
 
     if (!result) throw new Error('Wrong login response')
-
+    console.log("GFP-POINT-01: Saving tokens from goole auth to localStorage", result)
     localStorage.setItem('tokens', JSON.stringify(result.tokens))
 
     if(result.user.u_role === EUserRoles.Client || result.user.u_role === EUserRoles.Agent) {
