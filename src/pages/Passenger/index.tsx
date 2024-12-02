@@ -281,6 +281,8 @@ const PassengerOrder: React.FC<IProps> = ({
   const [distance, setDistance] = useState(0)
   const [moveFiles, setMoveFiles] = useState<TMoveFiles>({})
 
+  const [refresh, setRefresh] = useState(false)
+
   // const moveImagesRef = useRef<HTMLInputElement>(null)
 
   const roomFurniture = tab === TABS.MOVE.id && moveType === EMoveTypes.Apartament ?
@@ -322,6 +324,32 @@ const PassengerOrder: React.FC<IProps> = ({
 
   useInterval(() => {
     user && getActiveOrders()
+    for(const order of activeOrders || []) {
+      if(order.b_voting && order.b_start_datetime &&
+            ((order.b_max_waiting || SITE_CONSTANTS.WAITING_INTERVAL) - moment().diff(order.b_start_datetime, 'seconds')) <= 0){
+        API.cancelDrive(order.b_id)
+        return API.postDrive({
+          ...order,
+          b_start_datetime: moment(),
+          b_payment_way: paymentWay as EPaymentWays,
+          b_max_waiting: undefined,
+        })
+            .then(res => {
+              getActiveOrders()
+              setSelectedOrder(res.b_id)
+              window.scroll(0, 0)
+            })
+            .catch(error => {
+              console.error(error)
+              setMessageModal({
+                isOpen: true,
+                status: EStatuses.Fail,
+                message: error.message,
+              })
+            })
+      }
+    }
+    setRefresh(!refresh)
   }, 5000)
 
   useEffect(() => {

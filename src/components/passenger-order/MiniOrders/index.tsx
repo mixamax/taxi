@@ -36,7 +36,6 @@ const PassengerMiniOrders: React.FC<IProps> = ({
   handleOrderClick,
 }) => {
   if (!activeOrders?.length) return null
-  console.log("RENDER MINI ORDERS", activeOrders)
 
   return (
     <div className="passenger-order__mini-orders">
