@@ -40,3 +40,4 @@ export const deleteFilesModalDeleteFile = createSelector(
 export const deleteFilesModalDeleteFiles = createSelector(
   moduleSelector, state => state.deleteFilesModal.handleDeleteFiles,
 )
+export const isShowSwitchersMenu = createSelector(moduleSelector, state => state.isShowSwitchersMenu)

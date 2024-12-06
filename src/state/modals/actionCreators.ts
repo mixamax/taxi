@@ -79,3 +79,6 @@ export const setCandidatesModal = (payload: IModalsState['isCandidatesModalOpen'
 export const setDeleteFilesModal = (payload: IModalsState['deleteFilesModal']): TAction => {
   return { type: ActionTypes.SET_DELETE_FILES_MODAL, payload }
 }
+export const setIsShowSwitchersMenu = (payload: IModalsState['isShowSwitchersMenu']): TAction => {
+  return { type: ActionTypes.SET_SHOW_SWITCHERS_MENU, payload }
+}

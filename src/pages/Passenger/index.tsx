@@ -68,7 +68,7 @@ import {
   clientOrderActionCreators,
 } from "../../state/clientOrder";
 import { ordersSelectors, ordersActionCreators } from "../../state/orders";
-import { modalsActionCreators } from "../../state/modals";
+import { modalsActionCreators, modalsSelectors } from "../../state/modals";
 import { userSelectors } from "../../state/user";
 import _, { set } from "lodash";
 import MoveTypeTabs, {
@@ -103,6 +103,7 @@ const mapStateToProps = (state: IRootState) => ({
   message: clientOrderSelectors.message(state),
   activeOrders: ordersSelectors.activeOrders(state),
   user: userSelectors.user(state),
+  isShowSwitchersMenu: modalsSelectors.isShowSwitchersMenu(state)
 });
 
 const mapDispatchToProps = {
@@ -185,6 +186,7 @@ const PassengerOrder: React.FC<IProps> = ({
   setOnTheWayModal,
   setRatingModal,
   setCandidatesModal,
+  isShowSwitchersMenu
 }) => {
   // Cards, tabs
   const [paymentWay, setPaymentWay] = useCachedState(
@@ -770,7 +772,7 @@ const PassengerOrder: React.FC<IProps> = ({
             onSubmit={formHandleSubmit(handleSubmit)}
             className="input-groups"
           >
-            <TabsSwitcher tab={tab} onChange={(id: typeof tab) => setTab(id)} />
+            {isShowSwitchersMenu &&<TabsSwitcher tab={tab} onChange={(id: typeof tab) => setTab(id)} />}
             <div className="form-with-map">
               <Map
                 containerClassName="form-map-container"
