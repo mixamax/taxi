@@ -50,6 +50,8 @@ interface IProps extends ConnectedProps<typeof connector> {
   isOpen?: boolean;
   disableButtons?: boolean;
   isModal?: boolean;
+  onClose?: () => void
+  containerClassName?: string
 }
 
 const Map: React.FC<IProps> = ({
@@ -71,6 +73,8 @@ const Map: React.FC<IProps> = ({
   setTakePassengerModalTo,
   setMapModal,
   setMessageModal,
+  onClose,
+  containerClassName
 }) => {
   const [staticMarkers, setStaticMarkers] = useState<IStaticMarker[]>([])
   const [userCoordinates, setUserCoordinates] = useState<IAddressPoint | null>(null)
@@ -196,7 +200,7 @@ const Map: React.FC<IProps> = ({
   }, [isOpen])
 
   const handleFromClick = (isButtonPopup?: boolean) => {
-    if (!setFrom || !map) return
+        if (!setFrom || !map) return
 
     if (!isButtonPopup) {
       const center = map.getCenter()
@@ -244,7 +248,7 @@ const Map: React.FC<IProps> = ({
   return (
     <>
       <div
-        className={cn('map-container', { 'map-container--active': isOpen, 'map-container--modal': isModal })}
+        className={cn('map-container',containerClassName, { 'map-container--active': isOpen, 'map-container--modal': isModal })}
         key={SITE_CONSTANTS.MAP_MODE}
       >
         <MapContainer
@@ -325,19 +329,27 @@ const Map: React.FC<IProps> = ({
             alt="Центр"
             tabIndex={0}
           />
-          {!disableButtons && <div className='modal-buttons'>
+          {!disableButtons && <div className={cn('modal-buttons',{'z-indexed': isModal})}>
             {!!setFrom && (
               <Button
                 className='modal-button'
+                type="button"
                 text={t(TRANSLATION.FROM)}
-                onClick={() => handleFromClick()}
+                onClick={(event) => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                  handleFromClick()}}
               />
             )}
             {!!setTo && (
               <Button
                 className='modal-button'
                 text={t(TRANSLATION.TO)}
-                onClick={() => handleToClick()}
+                onClick={(event) => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                  handleToClick()
+                }}
               />
             )}
             {!!(from?.latitude && from?.longitude) && !!(to?.latitude && to?.longitude) && (
@@ -351,7 +363,10 @@ const Map: React.FC<IProps> = ({
               className='modal-button'
               skipHandler={true}
               text={t(TRANSLATION.CLOSE)}
-              onClick={() => setMapModal({ ...defaultMapModal })}
+              onClick={() => {
+                if (onClose) return onClose()
+                setMapModal({ ...defaultMapModal })
+              }}
             />
           </div>}
           <TileLayer
