@@ -164,6 +164,7 @@ const Header: React.FC<IProps> = ({
           timeoutRef.current = setTimeout(() => {
             setIsShowSwitchersMenu(false)
           }, 7000)
+          
         }
         setIsShowSwitchersMenu(!isShowSwitchersMenu)
       }}>{heading}</h2>
