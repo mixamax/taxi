@@ -316,7 +316,7 @@ const PassengerOrder: React.FC<IProps> = ({
 
   const [refresh, setRefresh] = useState(false);
 
-  const [isMapVisible, setIsMapVisible] = useState(false);
+  const [isMapVisible, setIsMapVisible] = useState(true);
 
   // const moveImagesRef = useRef<HTMLInputElement>(null)
 
