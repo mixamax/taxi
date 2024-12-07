@@ -1,4 +1,4 @@
-@import '../../tools/mixins';
+@import "../../tools/mixins";
 
 section {
   .input-group {
@@ -9,12 +9,14 @@ section {
       min-height: 54px;
       text-align: left;
 
-      background: #FFFFFF;
+      background: #ffffff;
       border: 1px solid #858585;
       box-sizing: border-box;
       border-radius: 14px;
 
-      input, textarea, select {
+      input,
+      textarea,
+      select {
         font-family: Roboto;
         font-style: normal;
         font-weight: 300;
@@ -25,10 +27,11 @@ section {
       }
     }
 
-    input::placeholder, textarea::placeholder {
+    input::placeholder,
+    textarea::placeholder {
       text-align: left;
       letter-spacing: -0.38px;
-      color: #9F9F9F;
+      color: #9f9f9f;
 
       font-family: Roboto;
       font-style: normal;
@@ -42,26 +45,25 @@ section {
       font-weight: 300;
       font-size: 20px;
       line-height: 23px;
-      color: #6F1717;
+      color: #6f1717;
       display: inline-block;
       text-align: left;
       margin-bottom: 15px;
       width: 100%;
     }
-    
-
   }
 
   .open-map-button {
     button {
-      background: linear-gradient(90deg, #EC4C60 0%, #991B0E 100%);
+      background: linear-gradient(90deg, #ec4c60 0%, #991b0e 100%);
     }
   }
 
   form {
+    position: relative;
     & > h6 {
       font-size: 25px;
-      color: #6F1717;
+      color: #6f1717;
       font-weight: 300;
       margin: 0;
       margin-top: 10px;
@@ -120,7 +122,7 @@ section {
 
     .vertical-line {
       height: 25px;
-      border: 1px solid #C0C0C0;
+      border: 1px solid #c0c0c0;
     }
 
     .credit-cards {
@@ -194,8 +196,8 @@ section {
 
     .phone-number-input {
       input {
-        background: #FFFFFF;
-        border: 2px solid #D32626;
+        background: #ffffff;
+        border: 2px solid #d32626;
         box-sizing: border-box;
       }
 
@@ -223,7 +225,7 @@ section {
       flex: 1;
 
       button {
-        background: linear-gradient(90deg, #FF8008 0%, #FFC837 100%);
+        background: linear-gradient(90deg, #ff8008 0%, #ffc837 100%);
         margin-bottom: 20px;
       }
     }
@@ -232,18 +234,16 @@ section {
     }
     @media screen and (min-width: 1024px) {
     }
-
   }
 
   .switchers {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 20px;
     .tabs {
-      flex-wrap: wrap;
+      // flex-wrap: wrap;
     }
   }
-  
+
   .is-intercity {
     margin-left: auto;
     z-index: 2;
@@ -254,7 +254,7 @@ section {
     h6 {
       font-size: 18px;
       margin: 0 0 10px;
-      color: #6F1717;
+      color: #6f1717;
       font-weight: 300;
     }
   }
@@ -306,7 +306,7 @@ section {
     &__steps {
       max-width: 200px;
       margin-bottom: 0;
-      
+
       @media (max-width: 768px) {
         max-width: 150px;
       }
@@ -327,7 +327,7 @@ section {
 
     &__images {
       cursor: pointer;
-      
+
       &-button {
         pointer-events: none;
       }
@@ -344,7 +344,9 @@ section {
     }
   }
 
-  .weight, .courier-auto, .move-type {
+  .weight,
+  .courier-auto,
+  .move-type {
     .tabs {
       width: fit-content;
       flex-wrap: wrap;
@@ -364,7 +366,7 @@ section {
         display: none;
       }
       &::after {
-        content: '';
+        content: "";
         display: inline-block;
         height: 0px;
         width: 0px;
@@ -417,5 +419,46 @@ section {
     margin-top: -30px;
     margin-bottom: 24px;
     justify-content: flex-start !important;
+  }
+}
+
+.form-map-container {
+  height: 60vh;
+}
+
+
+.form-with-map {
+  position: relative;
+}
+
+.form-container {
+  width: 100%;
+  position: absolute;
+  // position: relative;
+  z-index: 499;
+  top: 0vh;
+  background-color: #6f96d5;
+  box-shadow: 0px 0px 12px 2px #000;
+  padding: 24px 8px;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  transition: top .5s ease-in-out;
+
+  &.map-visible {
+    top: calc(60vh - 20px);
+  }
+
+  .map-button {
+    width: 50px;
+    margin: 0 auto;
+    color: #fff;
+    box-shadow: 0px 0px 12px 2px #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    font-size: 13px;
+    border-radius: 50%;
+    background-color: #039;
   }
 }
