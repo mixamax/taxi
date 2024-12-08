@@ -59,6 +59,7 @@ checkBrowsers(paths.appPath, isInteractive)
       fs.emptyDirSync(paths.appBuild)
       // Merge with the public folder
       copyPublicFolder()
+      console.log(chalk.green(`Cleared build directory: ${paths.appBuild}`)); // проверка при сборке
       // Start the webpack build
       return build(previousFileSizes)
    })
