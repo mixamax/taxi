@@ -1,10 +1,4 @@
 {
-    "builds": [
-    {
-      "src": "scripts/build.js",
-      "use": "@vercel/static-build"
-    }
-  ],
   "outputDirectory": "build",
   "headers": [
     {
