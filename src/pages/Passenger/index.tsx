@@ -823,7 +823,7 @@ const PassengerOrder: React.FC<IProps> = ({
                         <div className="form-with-map" ref={formWithMapRef}>
                             <Map
                                 containerClassName="form-map-container"
-                                onClose={() => setIsMapVisible(!isMapVisible)}
+                                // onClose={() => setIsMapVisible(!isMapVisible)}
                             />
                             {/* ******************form-container******************** */}
                             <div
@@ -831,15 +831,16 @@ const PassengerOrder: React.FC<IProps> = ({
                                 className={cn("form-container", {
                                     "map-visible": isMapVisible,
                                 })}
+                                // className="form-container"
                             >
-                                <div
+                                {/* <div
                                     onClick={() =>
                                         setIsMapVisible(!isMapVisible)
                                     }
                                     className="map-button"
                                 >
                                     click
-                                </div>
+                                </div> */}
                                 <CouriersTransportTabs
                                     tab={courierAuto as ECourierAutoTypes}
                                     onChange={(id: typeof courierAuto) =>

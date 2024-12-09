@@ -1,8 +1,10 @@
+import { is } from "immutable";
+
 export function swipe(element: HTMLElement, speed = 300, swipeHeight: number) {
     let startY: number,
         startTime: number,
+        isCanMove = false,
         deltaY = 0,
-        isFastSwipe = false,
         currentY = 0;
 
     element.addEventListener("touchstart", start);
@@ -10,9 +12,10 @@ export function swipe(element: HTMLElement, speed = 300, swipeHeight: number) {
     document.addEventListener("touchend", end);
 
     function start(e: TouchEvent) {
+        console.log("startY", e.touches[0].clientY);
+        isCanMove = true;
         startY = e.touches[0].clientY;
         startTime = Date.now();
-        isFastSwipe = false;
         element.style.transition = "none";
         document.body.style.overflow = "hidden";
 
@@ -20,10 +23,10 @@ export function swipe(element: HTMLElement, speed = 300, swipeHeight: number) {
     }
 
     function move(e: TouchEvent) {
-        console.log(e.touches[0].clientY);
+        if (!isCanMove) return;
+        console.log("canMove");
         deltaY = e.touches[0].clientY - startY;
         element.style.transform = `translateY(${currentY + deltaY}px)`;
-        // element.style.top = `${element.style.top + deltaY}px`;
         console.log("deltaY", deltaY);
     }
     function end() {
@@ -49,6 +52,8 @@ export function swipe(element: HTMLElement, speed = 300, swipeHeight: number) {
             element.style.transform = `translateY(${currentY}px)`;
             console.log("startY in the end", startY);
         }
+
+        isCanMove = false;
     }
 
     return [
