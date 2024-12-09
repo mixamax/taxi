@@ -443,6 +443,9 @@ section {
     border-top-right-radius: 20px;
     transition: top 0.5s ease-in-out;
 
+    height: calc(-173px + 100vh);
+    overflow: auto;
+
     &.map-visible {
         top: calc(60vh - 20px);
     }
