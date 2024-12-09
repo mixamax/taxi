@@ -2680,213 +2680,222 @@ function VotingForm({
 }: TVotingFormProps) {
     return (
         <>
-            <SwitchSlider
-                checked={isIntercity}
-                onValueChanged={(value) => setIsIntercity(value)}
-                startButton={{
-                    label: t(
-                        tab === TABS.MOVE.id
-                            ? TRANSLATION.SAME_STATE
-                            : TRANSLATION.CITY
-                    ),
-                }}
-                endButton={{
-                    label: t(
-                        tab === TABS.MOVE.id
-                            ? TRANSLATION.INTERSTATE
-                            : TRANSLATION.INTERCITY
-                    ),
-                }}
-                wrapperClassName="is-intercity"
-            />
+            <div className="form-container__location-wrapper">
+                <SwitchSlider
+                    checked={isIntercity}
+                    onValueChanged={(value) => setIsIntercity(value)}
+                    startButton={{
+                        label: t(
+                            tab === TABS.MOVE.id
+                                ? TRANSLATION.SAME_STATE
+                                : TRANSLATION.CITY
+                        ),
+                    }}
+                    endButton={{
+                        label: t(
+                            tab === TABS.MOVE.id
+                                ? TRANSLATION.INTERSTATE
+                                : TRANSLATION.INTERCITY
+                        ),
+                    }}
+                    wrapperClassName="is-intercity"
+                />
 
-            <LocationInput
-                onOpenMap={() => {
-                    setIsMapVisible(true);
-                }}
-                type={EPointType.From}
-                isIntercity={isIntercity}
-            />
+                <LocationInput
+                    onOpenMap={() => {
+                        setIsMapVisible(true);
+                    }}
+                    type={EPointType.From}
+                    isIntercity={isIntercity}
+                />
 
-            {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP, WASH  разобраться */}
-            {!(tab === TABS.MOVE.id && moveType === EMoveTypes.Handy) &&
-                tab !== TABS.WASH.id && (
-                    <LocationInput
-                        type={EPointType.To}
-                        onOpenMap={() => {
-                            setIsMapVisible(true);
+                {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP, WASH  разобраться */}
+                {!(tab === TABS.MOVE.id && moveType === EMoveTypes.Handy) &&
+                    tab !== TABS.WASH.id && (
+                        <LocationInput
+                            type={EPointType.To}
+                            onOpenMap={() => {
+                                setIsMapVisible(true);
+                            }}
+                            isIntercity={isIntercity}
+                        />
+                    )}
+            </div>
+            <div className="form-container__others-wrapper">
+                {SITE_CONSTANTS.ENABLE_CUSTOMER_PRICE && (
+                    <Input
+                        inputProps={{
+                            type: "number",
+                            min: 0,
+                            ...register("customer_price"),
                         }}
-                        isIntercity={isIntercity}
+                        label={`${t(TRANSLATION.CUSTOMER_PRICE)}, ${
+                            CURRENCY.SIGN
+                        }`}
+                        error={errors.customer_price?.message}
                     />
                 )}
-            {SITE_CONSTANTS.ENABLE_CUSTOMER_PRICE && (
+                <>
+                    <Separator text={t(TRANSLATION.AUTO_CLASS)} />
+                    <div className="taxi-cards">
+                        {class_auto.map((auto) => {
+                            const _time =
+                                typeof time === "string" ? moment() : time;
+                            const value = getPayment(
+                                null,
+                                null,
+                                distance,
+                                _time,
+                                auto.id
+                            ).value;
+                            const payment = `~${value.toFixed(2)}${
+                                CURRENCY.NAME
+                            }`;
+
+                            return (
+                                <Card
+                                    key={auto.id}
+                                    active={auto.id === carClass}
+                                    src={auto.src}
+                                    text={t(TRANSLATION.CAR_CLASSES[auto.id])}
+                                    onClick={() => setCarClass(auto.id)}
+                                    payment={payment}
+                                />
+                            );
+                        })}
+                    </div>
+                    <div className="waiting-block">
+                        <span>
+                            <img src={images.carAlt} alt={t(TRANSLATION.CAR)} />
+                            <label className="colored">
+                                {t(TRANSLATION.FREE)}: <span>7</span>
+                            </label>
+                        </span>
+                        <div className="vertical-line" />
+                        <span>
+                            <img
+                                src={images.clock}
+                                alt={t(TRANSLATION.CLOCK)}
+                            />
+                            <label className="colored">
+                                {t(TRANSLATION.WAITING)}:{" "}
+                                <span>5 {t(TRANSLATION.MINUTES)}</span>
+                            </label>
+                        </span>
+                    </div>
+                </>
+                <>
+                    <Separator text={t(TRANSLATION.PAYMENT_WAY)} />
+                    <div className="credit-cards">
+                        <Card
+                            src={images.cash}
+                            onClick={() => setPaymentWay(EPaymentWays.Cash)}
+                            text={t(TRANSLATION.PAYMENT_WAYS[1])}
+                            active={
+                                paymentWay === EPaymentWays.Cash ||
+                                !cardPaymentEnabled
+                            }
+                        />
+                        <Card
+                            src={images.card}
+                            onClick={() => setPaymentWay(EPaymentWays.Credit)}
+                            text={t(TRANSLATION.PAYMENT_WAYS[2])}
+                            disabled={true}
+                            // onClick={(e) => {
+                            //   e.preventDefault()
+                            //   setCardActiveClass(2)
+                            //   setTieCardModal(true)
+                            // }}
+                        />
+                    </div>
+                </>
+                <>
+                    <Separator text={t(TRANSLATION.ORDER_DETAILS)} />
+                    <div className="info-block">
+                        <div onClick={() => setPickTimeModal(true)}>
+                            <img
+                                src={images.timer}
+                                alt={t(TRANSLATION.CLOCK)}
+                            />
+                            <label
+                                style={{
+                                    color: SITE_CONSTANTS.PALETTE.primary.dark,
+                                }}
+                            >
+                                {typeof time === "string"
+                                    ? t(TRANSLATION.NOW)
+                                    : time.isSame(new Date(), "day")
+                                    ? `${t(TRANSLATION.TODAY)} ${time.format(
+                                          dateFormatTime
+                                      )}`
+                                    : `${t(TRANSLATION.TOMORROW)} ${time.format(
+                                          dateFormatTime
+                                      )}`}
+                            </label>
+                        </div>
+                        <div onClick={() => setSeatsModal(true)}>
+                            <img
+                                src={images.multipleUsers}
+                                alt={t(TRANSLATION.SEATS)}
+                            />
+                            <label
+                                style={{
+                                    color: SITE_CONSTANTS.PALETTE.primary.dark,
+                                }}
+                            >
+                                {t(TRANSLATION.SEATS)}: <span>{seats}</span>
+                            </label>
+                        </div>
+                        <div onClick={() => setCommentsModal(true)}>
+                            <span
+                                className="comment-controls"
+                                style={{
+                                    height: "55px",
+                                }}
+                            >
+                                <img
+                                    src={images.messageIcon}
+                                    alt={t(TRANSLATION.MESSAGE)}
+                                />
+                            </span>
+                            <label
+                                style={{
+                                    color: SITE_CONSTANTS.PALETTE.primary.dark,
+                                }}
+                            >
+                                {t(TRANSLATION.COMMENT)}
+                            </label>
+                        </div>
+                    </div>
+                </>
                 <Input
                     inputProps={{
-                        type: "number",
-                        min: 0,
-                        ...register("customer_price"),
+                        value: phone || "",
                     }}
-                    label={`${t(TRANSLATION.CUSTOMER_PRICE)}, ${CURRENCY.SIGN}`}
-                    error={errors.customer_price?.message}
-                />
-            )}
-
-            <>
-                <Separator text={t(TRANSLATION.AUTO_CLASS)} />
-                <div className="taxi-cards">
-                    {class_auto.map((auto) => {
-                        const _time =
-                            typeof time === "string" ? moment() : time;
-                        const value = getPayment(
-                            null,
-                            null,
-                            distance,
-                            _time,
-                            auto.id
-                        ).value;
-                        const payment = `~${value.toFixed(2)}${CURRENCY.NAME}`;
-
-                        return (
-                            <Card
-                                key={auto.id}
-                                active={auto.id === carClass}
-                                src={auto.src}
-                                text={t(TRANSLATION.CAR_CLASSES[auto.id])}
-                                onClick={() => setCarClass(auto.id)}
-                                payment={payment}
-                            />
-                        );
-                    })}
-                </div>
-                <div className="waiting-block">
-                    <span>
-                        <img src={images.carAlt} alt={t(TRANSLATION.CAR)} />
-                        <label className="colored">
-                            {t(TRANSLATION.FREE)}: <span>7</span>
-                        </label>
-                    </span>
-                    <div className="vertical-line" />
-                    <span>
-                        <img src={images.clock} alt={t(TRANSLATION.CLOCK)} />
-                        <label className="colored">
-                            {t(TRANSLATION.WAITING)}:{" "}
-                            <span>5 {t(TRANSLATION.MINUTES)}</span>
-                        </label>
-                    </span>
-                </div>
-            </>
-
-            <>
-                <Separator text={t(TRANSLATION.PAYMENT_WAY)} />
-                <div className="credit-cards">
-                    <Card
-                        src={images.cash}
-                        onClick={() => setPaymentWay(EPaymentWays.Cash)}
-                        text={t(TRANSLATION.PAYMENT_WAYS[1])}
-                        active={
-                            paymentWay === EPaymentWays.Cash ||
-                            !cardPaymentEnabled
+                    fieldWrapperClassName="phone-input"
+                    inputType={EInputTypes.MaskedPhone}
+                    error={getPhoneError(phone)}
+                    buttons={[{ src: images.checkMark }]}
+                    defaultValue={user?.u_phone}
+                    onChange={(e) => {
+                        if (typeof e === "string") {
+                            setPhone(e);
                         }
-                    />
-                    <Card
-                        src={images.card}
-                        onClick={() => setPaymentWay(EPaymentWays.Credit)}
-                        text={t(TRANSLATION.PAYMENT_WAYS[2])}
-                        disabled={true}
-                        // onClick={(e) => {
-                        //   e.preventDefault()
-                        //   setCardActiveClass(2)
-                        //   setTieCardModal(true)
-                        // }}
-                    />
-                </div>
-            </>
-
-            <>
-                <Separator text={t(TRANSLATION.ORDER_DETAILS)} />
-                <div className="info-block">
-                    <div onClick={() => setPickTimeModal(true)}>
-                        <img src={images.timer} alt={t(TRANSLATION.CLOCK)} />
-                        <label
-                            style={{
-                                color: SITE_CONSTANTS.PALETTE.primary.dark,
-                            }}
-                        >
-                            {typeof time === "string"
-                                ? t(TRANSLATION.NOW)
-                                : time.isSame(new Date(), "day")
-                                ? `${t(TRANSLATION.TODAY)} ${time.format(
-                                      dateFormatTime
-                                  )}`
-                                : `${t(TRANSLATION.TOMORROW)} ${time.format(
-                                      dateFormatTime
-                                  )}`}
-                        </label>
-                    </div>
-                    <div onClick={() => setSeatsModal(true)}>
-                        <img
-                            src={images.multipleUsers}
-                            alt={t(TRANSLATION.SEATS)}
-                        />
-                        <label
-                            style={{
-                                color: SITE_CONSTANTS.PALETTE.primary.dark,
-                            }}
-                        >
-                            {t(TRANSLATION.SEATS)}: <span>{seats}</span>
-                        </label>
-                    </div>
-                    <div onClick={() => setCommentsModal(true)}>
-                        <span
-                            className="comment-controls"
-                            style={{
-                                height: "55px",
-                            }}
-                        >
-                            <img
-                                src={images.messageIcon}
-                                alt={t(TRANSLATION.MESSAGE)}
-                            />
-                        </span>
-                        <label
-                            style={{
-                                color: SITE_CONSTANTS.PALETTE.primary.dark,
-                            }}
-                        >
-                            {t(TRANSLATION.COMMENT)}
-                        </label>
-                    </div>
-                </div>
-            </>
-
-            <Input
-                inputProps={{
-                    value: phone || "",
-                }}
-                fieldWrapperClassName="phone-input"
-                inputType={EInputTypes.MaskedPhone}
-                error={getPhoneError(phone)}
-                buttons={[{ src: images.checkMark }]}
-                defaultValue={user?.u_phone}
-                onChange={(e) => {
-                    if (typeof e === "string") {
-                        setPhone(e);
-                    }
-                }}
-            />
-
-            <div className="order-vote">
-                <Button
-                    type="submit"
-                    text={t(
-                        tab === TABS.VOTING.id
-                            ? TRANSLATION.VOTE
-                            : TRANSLATION.TO_ORDER,
-                        { toUpper: true }
-                    )}
-                    status={status}
-                    label={message}
+                    }}
                 />
+                <div className="order-vote">
+                    <Button
+                        type="submit"
+                        text={t(
+                            tab === TABS.VOTING.id
+                                ? TRANSLATION.VOTE
+                                : TRANSLATION.TO_ORDER,
+                            { toUpper: true }
+                        )}
+                        status={status}
+                        label={message}
+                    />
+                </div>
             </div>
         </>
     );
