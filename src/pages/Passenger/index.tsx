@@ -2680,38 +2680,34 @@ function VotingForm({
 }: TVotingFormProps) {
     return (
         <>
-            {![TABS.WAGON.id, TABS.MOTORCYCLE.id, TABS.WASH.id].includes(
-                tab
-            ) && (
-                <SwitchSlider
-                    checked={isIntercity}
-                    onValueChanged={(value) => setIsIntercity(value)}
-                    startButton={{
-                        label: t(
-                            tab === TABS.MOVE.id
-                                ? TRANSLATION.SAME_STATE
-                                : TRANSLATION.CITY
-                        ),
-                    }}
-                    endButton={{
-                        label: t(
-                            tab === TABS.MOVE.id
-                                ? TRANSLATION.INTERSTATE
-                                : TRANSLATION.INTERCITY
-                        ),
-                    }}
-                    wrapperClassName="is-intercity"
-                />
-            )}
-            {tab !== TABS.WASH.id && (
-                <LocationInput
-                    onOpenMap={() => {
-                        setIsMapVisible(true);
-                    }}
-                    type={EPointType.From}
-                    isIntercity={isIntercity}
-                />
-            )}
+            <SwitchSlider
+                checked={isIntercity}
+                onValueChanged={(value) => setIsIntercity(value)}
+                startButton={{
+                    label: t(
+                        tab === TABS.MOVE.id
+                            ? TRANSLATION.SAME_STATE
+                            : TRANSLATION.CITY
+                    ),
+                }}
+                endButton={{
+                    label: t(
+                        tab === TABS.MOVE.id
+                            ? TRANSLATION.INTERSTATE
+                            : TRANSLATION.INTERCITY
+                    ),
+                }}
+                wrapperClassName="is-intercity"
+            />
+
+            <LocationInput
+                onOpenMap={() => {
+                    setIsMapVisible(true);
+                }}
+                type={EPointType.From}
+                isIntercity={isIntercity}
+            />
+
             {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP, WASH  разобраться */}
             {!(tab === TABS.MOVE.id && moveType === EMoveTypes.Handy) &&
                 tab !== TABS.WASH.id && (
@@ -2723,210 +2719,175 @@ function VotingForm({
                         isIntercity={isIntercity}
                     />
                 )}
-            {SITE_CONSTANTS.ENABLE_CUSTOMER_PRICE &&
-                ![
-                    TABS.MOVE.id,
-                    TABS.WAGON.id,
-                    TABS.TRIP.id,
-                    TABS.WASH.id,
-                ].includes(tab) && (
-                    <Input
-                        inputProps={{
-                            type: "number",
-                            min: 0,
-                            ...register("customer_price"),
-                        }}
-                        label={`${t(TRANSLATION.CUSTOMER_PRICE)}, ${
-                            CURRENCY.SIGN
-                        }`}
-                        error={errors.customer_price?.message}
-                    />
-                )}
-            {![
-                TABS.DELIVERY.id,
-                TABS.MOTORCYCLE.id,
-                TABS.MOVE.id,
-                TABS.WAGON.id,
-                TABS.TRIP.id,
-                TABS.WASH.id,
-            ].includes(tab) && (
-                <>
-                    <Separator text={t(TRANSLATION.AUTO_CLASS)} />
-                    <div className="taxi-cards">
-                        {class_auto.map((auto) => {
-                            const _time =
-                                typeof time === "string" ? moment() : time;
-                            const value = getPayment(
-                                null,
-                                null,
-                                distance,
-                                _time,
-                                auto.id
-                            ).value;
-                            const payment = `~${value.toFixed(2)}${
-                                CURRENCY.NAME
-                            }`;
-
-                            return (
-                                <Card
-                                    key={auto.id}
-                                    active={auto.id === carClass}
-                                    src={auto.src}
-                                    text={t(TRANSLATION.CAR_CLASSES[auto.id])}
-                                    onClick={() => setCarClass(auto.id)}
-                                    payment={payment}
-                                />
-                            );
-                        })}
-                    </div>
-                    <div className="waiting-block">
-                        <span>
-                            <img src={images.carAlt} alt={t(TRANSLATION.CAR)} />
-                            <label className="colored">
-                                {t(TRANSLATION.FREE)}: <span>7</span>
-                            </label>
-                        </span>
-                        <div className="vertical-line" />
-                        <span>
-                            <img
-                                src={images.clock}
-                                alt={t(TRANSLATION.CLOCK)}
-                            />
-                            <label className="colored">
-                                {t(TRANSLATION.WAITING)}:{" "}
-                                <span>5 {t(TRANSLATION.MINUTES)}</span>
-                            </label>
-                        </span>
-                    </div>
-                </>
-            )}
-            {tab !== TABS.WASH.id && (
-                <>
-                    <Separator text={t(TRANSLATION.PAYMENT_WAY)} />
-                    <div className="credit-cards">
-                        <Card
-                            src={images.cash}
-                            onClick={() => setPaymentWay(EPaymentWays.Cash)}
-                            text={t(TRANSLATION.PAYMENT_WAYS[1])}
-                            active={
-                                paymentWay === EPaymentWays.Cash ||
-                                !cardPaymentEnabled
-                            }
-                        />
-                        <Card
-                            src={images.card}
-                            onClick={() => setPaymentWay(EPaymentWays.Credit)}
-                            text={t(TRANSLATION.PAYMENT_WAYS[2])}
-                            disabled={true}
-                            // onClick={(e) => {
-                            //   e.preventDefault()
-                            //   setCardActiveClass(2)
-                            //   setTieCardModal(true)
-                            // }}
-                        />
-                    </div>
-                </>
-            )}
-            {![
-                TABS.DELIVERY.id,
-                TABS.MOTORCYCLE.id,
-                TABS.MOVE.id,
-                TABS.WAGON.id,
-                TABS.TRIP.id,
-                TABS.WASH.id,
-            ].includes(tab) && (
-                <>
-                    <Separator text={t(TRANSLATION.ORDER_DETAILS)} />
-                    <div className="info-block">
-                        <div onClick={() => setPickTimeModal(true)}>
-                            <img
-                                src={images.timer}
-                                alt={t(TRANSLATION.CLOCK)}
-                            />
-                            <label
-                                style={{
-                                    color: SITE_CONSTANTS.PALETTE.primary.dark,
-                                }}
-                            >
-                                {typeof time === "string"
-                                    ? t(TRANSLATION.NOW)
-                                    : time.isSame(new Date(), "day")
-                                    ? `${t(TRANSLATION.TODAY)} ${time.format(
-                                          dateFormatTime
-                                      )}`
-                                    : `${t(TRANSLATION.TOMORROW)} ${time.format(
-                                          dateFormatTime
-                                      )}`}
-                            </label>
-                        </div>
-                        <div onClick={() => setSeatsModal(true)}>
-                            <img
-                                src={images.multipleUsers}
-                                alt={t(TRANSLATION.SEATS)}
-                            />
-                            <label
-                                style={{
-                                    color: SITE_CONSTANTS.PALETTE.primary.dark,
-                                }}
-                            >
-                                {t(TRANSLATION.SEATS)}: <span>{seats}</span>
-                            </label>
-                        </div>
-                        <div onClick={() => setCommentsModal(true)}>
-                            <span
-                                className="comment-controls"
-                                style={{
-                                    height: "55px",
-                                }}
-                            >
-                                <img
-                                    src={images.messageIcon}
-                                    alt={t(TRANSLATION.MESSAGE)}
-                                />
-                            </span>
-                            <label
-                                style={{
-                                    color: SITE_CONSTANTS.PALETTE.primary.dark,
-                                }}
-                            >
-                                {t(TRANSLATION.COMMENT)}
-                            </label>
-                        </div>
-                    </div>
-                </>
-            )}
-            {![TABS.TRIP.id, TABS.WASH.id].includes(tab) && (
+            {SITE_CONSTANTS.ENABLE_CUSTOMER_PRICE && (
                 <Input
                     inputProps={{
-                        value: phone || "",
+                        type: "number",
+                        min: 0,
+                        ...register("customer_price"),
                     }}
-                    fieldWrapperClassName="phone-input"
-                    inputType={EInputTypes.MaskedPhone}
-                    error={getPhoneError(phone)}
-                    buttons={[{ src: images.checkMark }]}
-                    defaultValue={user?.u_phone}
-                    onChange={(e) => {
-                        if (typeof e === "string") {
-                            setPhone(e);
-                        }
-                    }}
+                    label={`${t(TRANSLATION.CUSTOMER_PRICE)}, ${CURRENCY.SIGN}`}
+                    error={errors.customer_price?.message}
                 />
             )}
-            {tab !== TABS.WASH.id && (
-                <div className="order-vote">
-                    <Button
-                        type="submit"
-                        text={t(
-                            tab === TABS.VOTING.id
-                                ? TRANSLATION.VOTE
-                                : TRANSLATION.TO_ORDER,
-                            { toUpper: true }
-                        )}
-                        status={status}
-                        label={message}
+
+            <>
+                <Separator text={t(TRANSLATION.AUTO_CLASS)} />
+                <div className="taxi-cards">
+                    {class_auto.map((auto) => {
+                        const _time =
+                            typeof time === "string" ? moment() : time;
+                        const value = getPayment(
+                            null,
+                            null,
+                            distance,
+                            _time,
+                            auto.id
+                        ).value;
+                        const payment = `~${value.toFixed(2)}${CURRENCY.NAME}`;
+
+                        return (
+                            <Card
+                                key={auto.id}
+                                active={auto.id === carClass}
+                                src={auto.src}
+                                text={t(TRANSLATION.CAR_CLASSES[auto.id])}
+                                onClick={() => setCarClass(auto.id)}
+                                payment={payment}
+                            />
+                        );
+                    })}
+                </div>
+                <div className="waiting-block">
+                    <span>
+                        <img src={images.carAlt} alt={t(TRANSLATION.CAR)} />
+                        <label className="colored">
+                            {t(TRANSLATION.FREE)}: <span>7</span>
+                        </label>
+                    </span>
+                    <div className="vertical-line" />
+                    <span>
+                        <img src={images.clock} alt={t(TRANSLATION.CLOCK)} />
+                        <label className="colored">
+                            {t(TRANSLATION.WAITING)}:{" "}
+                            <span>5 {t(TRANSLATION.MINUTES)}</span>
+                        </label>
+                    </span>
+                </div>
+            </>
+
+            <>
+                <Separator text={t(TRANSLATION.PAYMENT_WAY)} />
+                <div className="credit-cards">
+                    <Card
+                        src={images.cash}
+                        onClick={() => setPaymentWay(EPaymentWays.Cash)}
+                        text={t(TRANSLATION.PAYMENT_WAYS[1])}
+                        active={
+                            paymentWay === EPaymentWays.Cash ||
+                            !cardPaymentEnabled
+                        }
+                    />
+                    <Card
+                        src={images.card}
+                        onClick={() => setPaymentWay(EPaymentWays.Credit)}
+                        text={t(TRANSLATION.PAYMENT_WAYS[2])}
+                        disabled={true}
+                        // onClick={(e) => {
+                        //   e.preventDefault()
+                        //   setCardActiveClass(2)
+                        //   setTieCardModal(true)
+                        // }}
                     />
                 </div>
-            )}
+            </>
+
+            <>
+                <Separator text={t(TRANSLATION.ORDER_DETAILS)} />
+                <div className="info-block">
+                    <div onClick={() => setPickTimeModal(true)}>
+                        <img src={images.timer} alt={t(TRANSLATION.CLOCK)} />
+                        <label
+                            style={{
+                                color: SITE_CONSTANTS.PALETTE.primary.dark,
+                            }}
+                        >
+                            {typeof time === "string"
+                                ? t(TRANSLATION.NOW)
+                                : time.isSame(new Date(), "day")
+                                ? `${t(TRANSLATION.TODAY)} ${time.format(
+                                      dateFormatTime
+                                  )}`
+                                : `${t(TRANSLATION.TOMORROW)} ${time.format(
+                                      dateFormatTime
+                                  )}`}
+                        </label>
+                    </div>
+                    <div onClick={() => setSeatsModal(true)}>
+                        <img
+                            src={images.multipleUsers}
+                            alt={t(TRANSLATION.SEATS)}
+                        />
+                        <label
+                            style={{
+                                color: SITE_CONSTANTS.PALETTE.primary.dark,
+                            }}
+                        >
+                            {t(TRANSLATION.SEATS)}: <span>{seats}</span>
+                        </label>
+                    </div>
+                    <div onClick={() => setCommentsModal(true)}>
+                        <span
+                            className="comment-controls"
+                            style={{
+                                height: "55px",
+                            }}
+                        >
+                            <img
+                                src={images.messageIcon}
+                                alt={t(TRANSLATION.MESSAGE)}
+                            />
+                        </span>
+                        <label
+                            style={{
+                                color: SITE_CONSTANTS.PALETTE.primary.dark,
+                            }}
+                        >
+                            {t(TRANSLATION.COMMENT)}
+                        </label>
+                    </div>
+                </div>
+            </>
+
+            <Input
+                inputProps={{
+                    value: phone || "",
+                }}
+                fieldWrapperClassName="phone-input"
+                inputType={EInputTypes.MaskedPhone}
+                error={getPhoneError(phone)}
+                buttons={[{ src: images.checkMark }]}
+                defaultValue={user?.u_phone}
+                onChange={(e) => {
+                    if (typeof e === "string") {
+                        setPhone(e);
+                    }
+                }}
+            />
+
+            <div className="order-vote">
+                <Button
+                    type="submit"
+                    text={t(
+                        tab === TABS.VOTING.id
+                            ? TRANSLATION.VOTE
+                            : TRANSLATION.TO_ORDER,
+                        { toUpper: true }
+                    )}
+                    status={status}
+                    label={message}
+                />
+            </div>
         </>
     );
 }
@@ -3260,148 +3221,35 @@ function DeliveryForm({
                 onChange={(id: typeof courierAuto) => setCourierAuto(id)}
                 visible={tab === TABS.DELIVERY.id}
             />
-            {![TABS.WAGON.id, TABS.MOTORCYCLE.id, TABS.WASH.id].includes(
-                tab
-            ) && (
-                <SwitchSlider
-                    checked={isIntercity}
-                    onValueChanged={(value) => setIsIntercity(value)}
-                    startButton={{
-                        label: t(
-                            tab === TABS.MOVE.id
-                                ? TRANSLATION.SAME_STATE
-                                : TRANSLATION.CITY
-                        ),
-                    }}
-                    endButton={{
-                        label: t(
-                            tab === TABS.MOVE.id
-                                ? TRANSLATION.INTERSTATE
-                                : TRANSLATION.INTERCITY
-                        ),
-                    }}
-                    wrapperClassName="is-intercity"
-                />
-            )}
-            {tab !== TABS.WASH.id && (
-                <LocationInput
-                    onOpenMap={() => {
-                        setIsMapVisible(true);
-                    }}
-                    type={EPointType.From}
-                    isIntercity={isIntercity}
-                />
-            )}
-            {[TABS.DELIVERY.id].includes(tab) && (
-                <GroupedInputs>
-                    <Input
-                        inputProps={{
-                            type: "number",
-                            ...register("from_porch"),
-                        }}
-                        label={t(TRANSLATION.PORCH)}
-                        error={errors.from_porch?.message}
-                    />
-                    <Input
-                        inputProps={{
-                            type: "number",
-                            ...register("from_floor"),
-                        }}
-                        label={t(TRANSLATION.FLOOR)}
-                        error={errors.from_floor?.message}
-                    />
-                    <Input
-                        inputProps={{
-                            type: "number",
-                            ...register("from_room"),
-                        }}
-                        label={t(TRANSLATION.ROOM)}
-                        error={errors.from_room?.message}
-                    />
-                </GroupedInputs>
-            )}
-            {[TABS.DELIVERY.id, TABS.MOVE.id].includes(tab) &&
-                SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.fromWay && (
-                    <Input
-                        inputProps={{
-                            ...register("from_way"),
-                        }}
-                        label={t(
-                            tab === TABS.MOVE.id
-                                ? TRANSLATION.COMMENT
-                                : TRANSLATION.WAY
-                        )}
-                        error={errors.from_way?.message}
-                    />
-                )}
-            {[TABS.DELIVERY.id].includes(tab) &&
-                SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility
-                    .fromMission && (
-                    <details>
-                        <summary>{t(TRANSLATION.COURIER_MISSION)}</summary>
-                        <Input
-                            inputProps={{
-                                placeholder: t(
-                                    TRANSLATION.WRITE_COURIER_MISSION
-                                ),
-                                ...register("from_mission"),
-                            }}
-                            inputType={EInputTypes.Textarea}
-                            error={errors.from_mission?.message}
-                        />
-                    </details>
-                )}
-            {(tab === TABS.DELIVERY.id || tab === TABS.MOTORCYCLE.id) && (
-                <Input
-                    inputProps={{
-                        value: fromPhone || "",
-                        onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-                            setFromPhone(e.target.value),
-                    }}
-                    inputType={EInputTypes.MaskedPhone}
-                    error={getPhoneError(fromPhone)}
-                />
-            )}
-            {tab === TABS.DELIVERY.id && (
-                <>
-                    <Input
-                        inputProps={{
-                            value: fromDay,
-                            onChange: handleFromDayChange,
-                        }}
-                        inputType={EInputTypes.Select}
-                        options={getDayOptions()}
-                    />
-                    <GroupedInputs>
-                        <Input
-                            inputProps={{
-                                value: fromTimeFrom || "",
-                                onChange: (
-                                    e: React.ChangeEvent<HTMLSelectElement>
-                                ) => setFromTimeFrom(e.target.value),
-                            }}
-                            inputType={EInputTypes.Select}
-                            label={t(TRANSLATION.TIME_FROM)}
-                            options={fromTimeFromOptions}
-                        />
-                        <Input
-                            inputProps={{
-                                value: fromTimeTill || "",
-                                onChange: (
-                                    e: React.ChangeEvent<HTMLSelectElement>
-                                ) => setFromTimeTill(e.target.value),
-                            }}
-                            inputType={EInputTypes.Select}
-                            label={t(TRANSLATION.TIME_TILL)}
-                            options={getTimeOptions(
-                                fromTimeFrom
-                                    ? moment(fromTimeFrom, dateFormatTime)
-                                    : null
-                            )}
-                        />
-                    </GroupedInputs>
-                </>
-            )}
+
+            <SwitchSlider
+                checked={isIntercity}
+                onValueChanged={(value) => setIsIntercity(value)}
+                startButton={{
+                    label: t(
+                        tab === TABS.MOVE.id
+                            ? TRANSLATION.SAME_STATE
+                            : TRANSLATION.CITY
+                    ),
+                }}
+                endButton={{
+                    label: t(
+                        tab === TABS.MOVE.id
+                            ? TRANSLATION.INTERSTATE
+                            : TRANSLATION.INTERCITY
+                    ),
+                }}
+                wrapperClassName="is-intercity"
+            />
+
+            <LocationInput
+                onOpenMap={() => {
+                    setIsMapVisible(true);
+                }}
+                type={EPointType.From}
+                isIntercity={isIntercity}
+            />
+
             {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP, WASH  разобраться */}
             {!(tab === TABS.MOVE.id && moveType === EMoveTypes.Handy) &&
                 tab !== TABS.WASH.id && (
@@ -3413,293 +3261,374 @@ function DeliveryForm({
                         isIntercity={isIntercity}
                     />
                 )}
-            {SITE_CONSTANTS.ENABLE_CUSTOMER_PRICE &&
-                ![
-                    TABS.MOVE.id,
-                    TABS.WAGON.id,
-                    TABS.TRIP.id,
-                    TABS.WASH.id,
-                ].includes(tab) && (
+
+            <GroupedInputs>
+                <Input
+                    inputProps={{
+                        type: "number",
+                        ...register("from_porch"),
+                    }}
+                    label={t(TRANSLATION.PORCH)}
+                    error={errors.from_porch?.message}
+                />
+                <Input
+                    inputProps={{
+                        type: "number",
+                        ...register("from_floor"),
+                    }}
+                    label={t(TRANSLATION.FLOOR)}
+                    error={errors.from_floor?.message}
+                />
+                <Input
+                    inputProps={{
+                        type: "number",
+                        ...register("from_room"),
+                    }}
+                    label={t(TRANSLATION.ROOM)}
+                    error={errors.from_room?.message}
+                />
+            </GroupedInputs>
+
+            {SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.fromWay && (
+                <Input
+                    inputProps={{
+                        ...register("from_way"),
+                    }}
+                    label={t(
+                        tab === TABS.MOVE.id
+                            ? TRANSLATION.COMMENT
+                            : TRANSLATION.WAY
+                    )}
+                    error={errors.from_way?.message}
+                />
+            )}
+            {SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.fromMission && (
+                <details>
+                    <summary>{t(TRANSLATION.COURIER_MISSION)}</summary>
                     <Input
                         inputProps={{
-                            type: "number",
-                            min: 0,
-                            ...register("customer_price"),
+                            placeholder: t(TRANSLATION.WRITE_COURIER_MISSION),
+                            ...register("from_mission"),
                         }}
-                        label={`${t(TRANSLATION.CUSTOMER_PRICE)}, ${
-                            CURRENCY.SIGN
-                        }`}
-                        error={errors.customer_price?.message}
+                        inputType={EInputTypes.Textarea}
+                        error={errors.from_mission?.message}
                     />
-                )}
-            {[TABS.DELIVERY.id].includes(tab) && (
+                </details>
+            )}
+
+            <Input
+                inputProps={{
+                    value: fromPhone || "",
+                    onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+                        setFromPhone(e.target.value),
+                }}
+                inputType={EInputTypes.MaskedPhone}
+                error={getPhoneError(fromPhone)}
+            />
+
+            <>
+                <Input
+                    inputProps={{
+                        value: fromDay,
+                        onChange: handleFromDayChange,
+                    }}
+                    inputType={EInputTypes.Select}
+                    options={getDayOptions()}
+                />
                 <GroupedInputs>
                     <Input
                         inputProps={{
-                            type: "number",
-                            ...register("to_porch"),
-                        }}
-                        label={t(TRANSLATION.PORCH)}
-                        error={errors.to_porch?.message}
-                    />
-                    <Input
-                        inputProps={{
-                            type: "number",
-                            ...register("to_floor"),
-                        }}
-                        label={t(TRANSLATION.FLOOR)}
-                        error={errors.to_floor?.message}
-                    />
-                    <Input
-                        inputProps={{
-                            type: "number",
-                            ...register("to_room"),
-                        }}
-                        label={t(TRANSLATION.ROOM)}
-                        error={errors.to_room?.message}
-                    />
-                </GroupedInputs>
-            )}
-            {([TABS.DELIVERY.id].includes(tab) ||
-                (tab === TABS.MOVE.id && moveType !== EMoveTypes.Handy)) &&
-                SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.toWay && (
-                    <Input
-                        inputProps={{
-                            ...register("to_way"),
-                        }}
-                        label={t(
-                            tab === TABS.MOVE.id
-                                ? TRANSLATION.COMMENT
-                                : TRANSLATION.WAY
-                        )}
-                        error={errors.to_way?.message}
-                    />
-                )}
-            {[TABS.DELIVERY.id].includes(tab) &&
-                SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.toMission && (
-                    <details>
-                        <summary>
-                            <span>{t(TRANSLATION.COURIER_MISSION)}</span>
-                        </summary>
-                        <Input
-                            inputProps={{
-                                placeholder: t(
-                                    TRANSLATION.WRITE_COURIER_MISSION
-                                ),
-                                ...register("to_mission"),
-                            }}
-                            inputType={EInputTypes.Textarea}
-                            error={errors.to_mission?.message}
-                        />
-                    </details>
-                )}
-            {(tab === TABS.DELIVERY.id || tab === TABS.MOTORCYCLE.id) && (
-                <Input
-                    inputProps={{
-                        value: toPhone || "",
-                        onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-                            setToPhone(e.target.value),
-                    }}
-                    inputType={EInputTypes.MaskedPhone}
-                    error={getPhoneError(toPhone)}
-                />
-            )}
-            {tab === TABS.DELIVERY.id && (
-                <>
-                    <Input
-                        inputProps={{
-                            value: toDay,
+                            value: fromTimeFrom || "",
                             onChange: (
                                 e: React.ChangeEvent<HTMLSelectElement>
-                            ) => setToDay(e.target.value),
+                            ) => setFromTimeFrom(e.target.value),
                         }}
                         inputType={EInputTypes.Select}
-                        options={getDayOptions(moment(fromDay, dateFormatDate))}
+                        label={t(TRANSLATION.TIME_FROM)}
+                        options={fromTimeFromOptions}
                     />
-                    <GroupedInputs>
-                        <Input
-                            inputProps={{
-                                value: toTimeFrom || "",
-                                onChange: (
-                                    e: React.ChangeEvent<HTMLSelectElement>
-                                ) => setToTimeFrom(e.target.value),
-                            }}
-                            inputType={EInputTypes.Select}
-                            label={t(TRANSLATION.TIME_FROM)}
-                            options={getTimeOptions(
-                                moment(toDay, dateFormatDate).days() ===
-                                    moment().days()
-                                    ? moment()
-                                    : null
-                            )}
-                        />
-                        <Input
-                            inputProps={{
-                                value: toTimeTill || "",
-                                onChange: (
-                                    e: React.ChangeEvent<HTMLSelectElement>
-                                ) => setToTimeTill(e.target.value),
-                            }}
-                            inputType={EInputTypes.Select}
-                            label={t(TRANSLATION.TIME_TILL)}
-                            options={getTimeOptions(
-                                toTimeFrom
-                                    ? moment(toTimeFrom, dateFormatTime)
-                                    : null
-                            )}
-                        />
-                    </GroupedInputs>
-                </>
-            )}
-            {(tab === TABS.DELIVERY.id || tab === TABS.MOTORCYCLE.id) && (
-                <>
                     <Input
                         inputProps={{
-                            ...register("object"),
+                            value: fromTimeTill || "",
+                            onChange: (
+                                e: React.ChangeEvent<HTMLSelectElement>
+                            ) => setFromTimeTill(e.target.value),
                         }}
-                        label={t(TRANSLATION.WHAT_WE_DELIVERING)}
-                        error={errors.object?.message}
-                    />
-                    <Hints
-                        hints={[
-                            t(TRANSLATION.DOCUMENTS),
-                            t(TRANSLATION.GROCERIES),
-                            t(TRANSLATION.GIFT),
-                            t(TRANSLATION.FLOWERS),
-                        ]}
-                        onClick={(item) => setValue("object", item)}
-                    />
-                </>
-            )}
-            {tab === TABS.DELIVERY.id && (
-                <div className="weight">
-                    <Tabs
-                        tabs={SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.values.weight.map(
-                            (item) => ({
-                                ...item,
-                                label: `${t(TRANSLATION.NUMBER_TILL)} ${
-                                    item.id
-                                }${t(TRANSLATION.KG)}`,
-                            })
+                        inputType={EInputTypes.Select}
+                        label={t(TRANSLATION.TIME_TILL)}
+                        options={getTimeOptions(
+                            fromTimeFrom
+                                ? moment(fromTimeFrom, dateFormatTime)
+                                : null
                         )}
-                        activeTabID={weight}
-                        onChange={(id) => setWeight(id as typeof weight)}
                     />
-                </div>
-            )}
-            {(tab === TABS.DELIVERY.id || tab === TABS.MOTORCYCLE.id) && (
-                <>
-                    <Checkbox
-                        label={t(TRANSLATION.LARGE_PACKAGE)}
-                        {...register("is_big_size")}
-                    />
-                    <GroupedInputs className="groupped-inputs--cost">
-                        {tab === TABS.DELIVERY.id ? (
-                            <Input
-                                inputProps={{
-                                    type: "number",
-                                    ...register("cost"),
-                                }}
-                                label={t(TRANSLATION.COST)}
-                                error={errors.cost?.message}
-                            />
-                        ) : (
-                            <CostTabs
-                                defaultValue={cost}
-                                onChange={(id) => setCost(id)}
-                            />
-                        )}
-                        {distance ? (
-                            <span className="order-payment colored">
-                                {tab !== TABS.DELIVERY.id &&
-                                    getPayment(
-                                        null,
-                                        null,
-                                        distance,
-                                        moment(fromTimeFrom, dateFormatTime),
-                                        carClass
-                                    ).text}
-                            </span>
-                        ) : null}
-                    </GroupedInputs>
-                </>
-            )}
-            {tab === TABS.DELIVERY.id && (
-                <>
-                    <div
-                        className="info"
-                        style={{
-                            color: SITE_CONSTANTS.PALETTE.primary.light,
-                        }}
-                    >
-                        {t(TRANSLATION.DELIVERY_INFO)}
-                    </div>
+                </GroupedInputs>
+            </>
 
-                    <Checkbox
-                        {...register("loading")}
-                        label={t(TRANSLATION.BOXING_REQUIRED)}
-                    />
-                </>
-            )}
-            {tab !== TABS.WASH.id && (
-                <>
-                    <Separator text={t(TRANSLATION.PAYMENT_WAY)} />
-                    <div className="credit-cards">
-                        <Card
-                            src={images.cash}
-                            onClick={() => setPaymentWay(EPaymentWays.Cash)}
-                            text={t(TRANSLATION.PAYMENT_WAYS[1])}
-                            active={
-                                paymentWay === EPaymentWays.Cash ||
-                                !cardPaymentEnabled
-                            }
-                        />
-                        <Card
-                            src={images.card}
-                            onClick={() => setPaymentWay(EPaymentWays.Credit)}
-                            text={t(TRANSLATION.PAYMENT_WAYS[2])}
-                            disabled={true}
-                            // onClick={(e) => {
-                            //   e.preventDefault()
-                            //   setCardActiveClass(2)
-                            //   setTieCardModal(true)
-                            // }}
-                        />
-                    </div>
-                </>
-            )}
-            {![TABS.TRIP.id, TABS.WASH.id].includes(tab) && (
+            {SITE_CONSTANTS.ENABLE_CUSTOMER_PRICE && (
                 <Input
                     inputProps={{
-                        value: phone || "",
+                        type: "number",
+                        min: 0,
+                        ...register("customer_price"),
                     }}
-                    fieldWrapperClassName="phone-input"
-                    inputType={EInputTypes.MaskedPhone}
-                    error={getPhoneError(phone)}
-                    buttons={[{ src: images.checkMark }]}
-                    defaultValue={user?.u_phone}
-                    onChange={(e) => {
-                        if (typeof e === "string") {
-                            setPhone(e);
-                        }
-                    }}
+                    label={`${t(TRANSLATION.CUSTOMER_PRICE)}, ${CURRENCY.SIGN}`}
+                    error={errors.customer_price?.message}
                 />
             )}
-            {tab !== TABS.WASH.id && (
-                <div className="order-vote">
-                    <Button
-                        type="submit"
-                        text={t(
-                            tab === TABS.VOTING.id
-                                ? TRANSLATION.VOTE
-                                : TRANSLATION.TO_ORDER,
-                            { toUpper: true }
+
+            <GroupedInputs>
+                <Input
+                    inputProps={{
+                        type: "number",
+                        ...register("to_porch"),
+                    }}
+                    label={t(TRANSLATION.PORCH)}
+                    error={errors.to_porch?.message}
+                />
+                <Input
+                    inputProps={{
+                        type: "number",
+                        ...register("to_floor"),
+                    }}
+                    label={t(TRANSLATION.FLOOR)}
+                    error={errors.to_floor?.message}
+                />
+                <Input
+                    inputProps={{
+                        type: "number",
+                        ...register("to_room"),
+                    }}
+                    label={t(TRANSLATION.ROOM)}
+                    error={errors.to_room?.message}
+                />
+            </GroupedInputs>
+
+            {SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.toWay && (
+                <Input
+                    inputProps={{
+                        ...register("to_way"),
+                    }}
+                    label={t(
+                        tab === TABS.MOVE.id
+                            ? TRANSLATION.COMMENT
+                            : TRANSLATION.WAY
+                    )}
+                    error={errors.to_way?.message}
+                />
+            )}
+            {SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.toMission && (
+                <details>
+                    <summary>
+                        <span>{t(TRANSLATION.COURIER_MISSION)}</span>
+                    </summary>
+                    <Input
+                        inputProps={{
+                            placeholder: t(TRANSLATION.WRITE_COURIER_MISSION),
+                            ...register("to_mission"),
+                        }}
+                        inputType={EInputTypes.Textarea}
+                        error={errors.to_mission?.message}
+                    />
+                </details>
+            )}
+
+            <Input
+                inputProps={{
+                    value: toPhone || "",
+                    onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+                        setToPhone(e.target.value),
+                }}
+                inputType={EInputTypes.MaskedPhone}
+                error={getPhoneError(toPhone)}
+            />
+
+            <>
+                <Input
+                    inputProps={{
+                        value: toDay,
+                        onChange: (e: React.ChangeEvent<HTMLSelectElement>) =>
+                            setToDay(e.target.value),
+                    }}
+                    inputType={EInputTypes.Select}
+                    options={getDayOptions(moment(fromDay, dateFormatDate))}
+                />
+                <GroupedInputs>
+                    <Input
+                        inputProps={{
+                            value: toTimeFrom || "",
+                            onChange: (
+                                e: React.ChangeEvent<HTMLSelectElement>
+                            ) => setToTimeFrom(e.target.value),
+                        }}
+                        inputType={EInputTypes.Select}
+                        label={t(TRANSLATION.TIME_FROM)}
+                        options={getTimeOptions(
+                            moment(toDay, dateFormatDate).days() ===
+                                moment().days()
+                                ? moment()
+                                : null
                         )}
-                        status={status}
-                        label={message}
+                    />
+                    <Input
+                        inputProps={{
+                            value: toTimeTill || "",
+                            onChange: (
+                                e: React.ChangeEvent<HTMLSelectElement>
+                            ) => setToTimeTill(e.target.value),
+                        }}
+                        inputType={EInputTypes.Select}
+                        label={t(TRANSLATION.TIME_TILL)}
+                        options={getTimeOptions(
+                            toTimeFrom
+                                ? moment(toTimeFrom, dateFormatTime)
+                                : null
+                        )}
+                    />
+                </GroupedInputs>
+            </>
+
+            <>
+                <Input
+                    inputProps={{
+                        ...register("object"),
+                    }}
+                    label={t(TRANSLATION.WHAT_WE_DELIVERING)}
+                    error={errors.object?.message}
+                />
+                <Hints
+                    hints={[
+                        t(TRANSLATION.DOCUMENTS),
+                        t(TRANSLATION.GROCERIES),
+                        t(TRANSLATION.GIFT),
+                        t(TRANSLATION.FLOWERS),
+                    ]}
+                    onClick={(item) => setValue("object", item)}
+                />
+            </>
+
+            <div className="weight">
+                <Tabs
+                    tabs={SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.values.weight.map(
+                        (item) => ({
+                            ...item,
+                            label: `${t(TRANSLATION.NUMBER_TILL)} ${item.id}${t(
+                                TRANSLATION.KG
+                            )}`,
+                        })
+                    )}
+                    activeTabID={weight}
+                    onChange={(id) => setWeight(id as typeof weight)}
+                />
+            </div>
+
+            <>
+                <Checkbox
+                    label={t(TRANSLATION.LARGE_PACKAGE)}
+                    {...register("is_big_size")}
+                />
+                <GroupedInputs className="groupped-inputs--cost">
+                    {tab === TABS.DELIVERY.id ? (
+                        <Input
+                            inputProps={{
+                                type: "number",
+                                ...register("cost"),
+                            }}
+                            label={t(TRANSLATION.COST)}
+                            error={errors.cost?.message}
+                        />
+                    ) : (
+                        <CostTabs
+                            defaultValue={cost}
+                            onChange={(id) => setCost(id)}
+                        />
+                    )}
+                    {distance ? (
+                        <span className="order-payment colored">
+                            {tab !== TABS.DELIVERY.id &&
+                                getPayment(
+                                    null,
+                                    null,
+                                    distance,
+                                    moment(fromTimeFrom, dateFormatTime),
+                                    carClass
+                                ).text}
+                        </span>
+                    ) : null}
+                </GroupedInputs>
+            </>
+
+            <>
+                <div
+                    className="info"
+                    style={{
+                        color: SITE_CONSTANTS.PALETTE.primary.light,
+                    }}
+                >
+                    {t(TRANSLATION.DELIVERY_INFO)}
+                </div>
+
+                <Checkbox
+                    {...register("loading")}
+                    label={t(TRANSLATION.BOXING_REQUIRED)}
+                />
+            </>
+
+            <>
+                <Separator text={t(TRANSLATION.PAYMENT_WAY)} />
+                <div className="credit-cards">
+                    <Card
+                        src={images.cash}
+                        onClick={() => setPaymentWay(EPaymentWays.Cash)}
+                        text={t(TRANSLATION.PAYMENT_WAYS[1])}
+                        active={
+                            paymentWay === EPaymentWays.Cash ||
+                            !cardPaymentEnabled
+                        }
+                    />
+                    <Card
+                        src={images.card}
+                        onClick={() => setPaymentWay(EPaymentWays.Credit)}
+                        text={t(TRANSLATION.PAYMENT_WAYS[2])}
+                        disabled={true}
+                        // onClick={(e) => {
+                        //   e.preventDefault()
+                        //   setCardActiveClass(2)
+                        //   setTieCardModal(true)
+                        // }}
                     />
                 </div>
-            )}
+            </>
+
+            <Input
+                inputProps={{
+                    value: phone || "",
+                }}
+                fieldWrapperClassName="phone-input"
+                inputType={EInputTypes.MaskedPhone}
+                error={getPhoneError(phone)}
+                buttons={[{ src: images.checkMark }]}
+                defaultValue={user?.u_phone}
+                onChange={(e) => {
+                    if (typeof e === "string") {
+                        setPhone(e);
+                    }
+                }}
+            />
+
+            <div className="order-vote">
+                <Button
+                    type="submit"
+                    text={t(
+                        tab === TABS.VOTING.id
+                            ? TRANSLATION.VOTE
+                            : TRANSLATION.TO_ORDER,
+                        { toUpper: true }
+                    )}
+                    status={status}
+                    label={message}
+                />
+            </div>
         </>
     );
 }
