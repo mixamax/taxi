@@ -1,15 +1,17 @@
 import { is } from "immutable";
+import { removeListener } from "process";
 
 export function swipe(
     element: HTMLElement,
     speed = 300,
     swipeHeight: number,
-    scrollingElement: HTMLElement
+    scrollingElement: HTMLElement,
+    noneScrollingElement: HTMLElement
 ) {
     let startY: number,
         startTime: number,
         isCanMove = false,
-        // isScrolling = false,
+        isScrolling = false,
         deltaY = 0,
         currentY = 0;
 
@@ -32,13 +34,27 @@ export function swipe(
         startTime = Date.now();
         element.style.transition = "none";
         document.body.style.overflow = "hidden";
-        isCanMove = true;
-        console.log("swipeHeight", swipeHeight, "startY", startY);
+        if (scrollingElement.scrollTop > 0) {
+            isCanMove = false;
+        } else {
+            isCanMove = true;
+        }
     }
 
     function move(e: TouchEvent) {
-        console.log(isCanMove, "moving");
+        if (scrollingElement.scrollTop > 0) {
+            noneScrollingElement.style.boxShadow =
+                "0px 17px 19px 0px rgba(34, 60, 80, 0.7)";
+        } else {
+            noneScrollingElement.style.boxShadow = "none";
+        }
         if (!isCanMove) return;
+
+        if (scrollingElement.scrollTop > 0) {
+            isScrolling = true;
+        } else {
+            isScrolling = false;
+        }
 
         deltaY = e.touches[0].clientY - startY;
         if (

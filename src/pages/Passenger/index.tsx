@@ -3,6 +3,7 @@ import React, {
     useEffect /* , useRef */,
     useRef,
     forwardRef,
+    useImperativeHandle,
 } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import {
@@ -332,21 +333,36 @@ const PassengerOrder: React.FC<IProps> = ({
     const [refresh, setRefresh] = useState(false);
 
     const [isMapVisible, setIsMapVisible] = useState(true);
+    // const [isScrolling, setIsScrolling] = useState(false);
+    // console.log(isScrolling, "scrolling passenger");
 
     const formContainerRef = useRef<HTMLDivElement>(null);
     const formWithMapRef = useRef<HTMLDivElement>(null);
-    const votingFormRef = useRef<HTMLDivElement>(null);
+    // const votingFormRef = useRef<HTMLDivElement>(null);
+    const votingFormRef = useRef({
+        locationWrapperRef: useRef<HTMLDivElement>(null),
+        otherWrapperRef: useRef<HTMLDivElement>(null),
+    });
+
     // *********************swipe*********************
     useEffect(() => {
         const element = formContainerRef.current;
         const formWithMap = formWithMapRef.current;
-        const votingElement = votingFormRef.current;
-        console.log(votingElement);
+        const { locationWrapperRef, otherWrapperRef } = votingFormRef.current;
+        const locationWrapper = locationWrapperRef.current;
+        const otherWrapper = otherWrapperRef.current;
+
         let removeLsts: (() => void)[] = [];
 
-        if (element && formWithMap && votingElement) {
-            const height = formWithMap.clientHeight - 20; // форма заходит на карту на 20px
-            removeLsts = swipe(element, 300, height, votingElement);
+        if (element && formWithMap && locationWrapper && otherWrapper) {
+            const height = formWithMap.clientHeight - 20 + 120; // форма заходит на карту на 20px
+            removeLsts = swipe(
+                element,
+                300,
+                height,
+                otherWrapper,
+                locationWrapper
+            );
         }
         return () => {
             if (removeLsts) {
@@ -356,7 +372,8 @@ const PassengerOrder: React.FC<IProps> = ({
     }, [
         formContainerRef.current,
         formWithMapRef.current,
-        votingFormRef.current,
+        votingFormRef.current.locationWrapperRef.current,
+        votingFormRef.current.otherWrapperRef.current,
     ]);
     //передать ресайз в зависимости
     // *********************/swipe*********************
@@ -2693,17 +2710,22 @@ const VotingForm = forwardRef(function VotingForm(
         status,
         message,
     }: TVotingFormProps,
-    ref: React.ForwardedRef<HTMLDivElement>
+    ref: React.ForwardedRef<{}>
 ) {
-    // const ref2 = useRef<HTMLDivElement>(null);
-    // useEffect(() => {
-    //     if (ref2.current) {
-    //         console.log(ref2.current)
-    //     }
-    // },[])
+    const locationWrapperRef = useRef<HTMLDivElement>(null);
+    const otherWrapperRef = useRef<HTMLDivElement>(null);
+
+    useImperativeHandle(ref, () => ({
+        locationWrapperRef,
+        otherWrapperRef,
+    }));
+
     return (
         <>
-            <div className="form-container__location-wrapper">
+            <div
+                className="form-container__location-wrapper"
+                ref={locationWrapperRef}
+            >
                 <SwitchSlider
                     checked={isIntercity}
                     onValueChanged={(value) => setIsIntercity(value)}
@@ -2744,7 +2766,10 @@ const VotingForm = forwardRef(function VotingForm(
                         />
                     )}
             </div>
-            <div className="form-container__others-wrapper" ref={ref}>
+            <div
+                className="form-container__others-wrapper"
+                ref={otherWrapperRef}
+            >
                 {SITE_CONSTANTS.ENABLE_CUSTOMER_PRICE && (
                     <Input
                         inputProps={{
