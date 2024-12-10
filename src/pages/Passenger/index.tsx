@@ -1,4 +1,9 @@
-import React, { useState, useEffect /* , useRef */, useRef } from "react";
+import React, {
+    useState,
+    useEffect /* , useRef */,
+    useRef,
+    forwardRef,
+} from "react";
 import { connect, ConnectedProps } from "react-redux";
 import {
     useForm,
@@ -330,22 +335,29 @@ const PassengerOrder: React.FC<IProps> = ({
 
     const formContainerRef = useRef<HTMLDivElement>(null);
     const formWithMapRef = useRef<HTMLDivElement>(null);
+    const votingFormRef = useRef<HTMLDivElement>(null);
     // *********************swipe*********************
     useEffect(() => {
         const element = formContainerRef.current;
         const formWithMap = formWithMapRef.current;
+        const votingElement = votingFormRef.current;
+        console.log(votingElement);
         let removeLsts: (() => void)[] = [];
 
-        if (element && formWithMap) {
+        if (element && formWithMap && votingElement) {
             const height = formWithMap.clientHeight - 20; // форма заходит на карту на 20px
-            removeLsts = swipe(element, 300, height);
+            removeLsts = swipe(element, 300, height, votingElement);
         }
         return () => {
             if (removeLsts) {
                 removeLsts.forEach((lst) => lst());
             }
         };
-    }, []);
+    }, [
+        formContainerRef.current,
+        formWithMapRef.current,
+        votingFormRef.current,
+    ]);
     //передать ресайз в зависимости
     // *********************/swipe*********************
 
@@ -874,6 +886,7 @@ const PassengerOrder: React.FC<IProps> = ({
                                         setPhone={setPhone}
                                         status={status}
                                         message={message}
+                                        ref={votingFormRef}
                                     />
                                 )}
                                 {TABS.WAITING.id === tab && (
@@ -2439,6 +2452,7 @@ type TVotingFormProps = {
     setPickTimeModal: IProps["setPickTimeModal"];
     setSeatsModal: IProps["setSeatsModal"];
     setCommentsModal: IProps["setCommentsModal"];
+    // ref: any;
 };
 
 type TWaitingFormProps = {
@@ -2652,32 +2666,41 @@ type TWashFormProps = {
     // t: any;
 };
 
-function VotingForm({
-    tab,
-    isIntercity,
-    setIsIntercity,
-    moveType,
-    setIsMapVisible,
-    register,
-    time,
-    distance,
-    errors,
-    setPaymentWay,
-    paymentWay,
-    t,
-    cardPaymentEnabled,
-    setPickTimeModal,
-    setSeatsModal,
-    setCommentsModal,
-    carClass,
-    setCarClass,
-    phone,
-    user,
-    seats,
-    setPhone,
-    status,
-    message,
-}: TVotingFormProps) {
+const VotingForm = forwardRef(function VotingForm(
+    {
+        tab,
+        isIntercity,
+        setIsIntercity,
+        moveType,
+        setIsMapVisible,
+        register,
+        time,
+        distance,
+        errors,
+        setPaymentWay,
+        paymentWay,
+        t,
+        cardPaymentEnabled,
+        setPickTimeModal,
+        setSeatsModal,
+        setCommentsModal,
+        carClass,
+        setCarClass,
+        phone,
+        user,
+        seats,
+        setPhone,
+        status,
+        message,
+    }: TVotingFormProps,
+    ref: React.ForwardedRef<HTMLDivElement>
+) {
+    // const ref2 = useRef<HTMLDivElement>(null);
+    // useEffect(() => {
+    //     if (ref2.current) {
+    //         console.log(ref2.current)
+    //     }
+    // },[])
     return (
         <>
             <div className="form-container__location-wrapper">
@@ -2721,7 +2744,7 @@ function VotingForm({
                         />
                     )}
             </div>
-            <div className="form-container__others-wrapper">
+            <div className="form-container__others-wrapper" ref={ref}>
                 {SITE_CONSTANTS.ENABLE_CUSTOMER_PRICE && (
                     <Input
                         inputProps={{
@@ -2899,7 +2922,7 @@ function VotingForm({
             </div>
         </>
     );
-}
+});
 
 function WaitingForm({
     tab,

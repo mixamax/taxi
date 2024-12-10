@@ -1,33 +1,56 @@
 import { is } from "immutable";
 
-export function swipe(element: HTMLElement, speed = 300, swipeHeight: number) {
+export function swipe(
+    element: HTMLElement,
+    speed = 300,
+    swipeHeight: number,
+    scrollingElement: HTMLElement
+) {
     let startY: number,
         startTime: number,
         isCanMove = false,
+        // isScrolling = false,
         deltaY = 0,
         currentY = 0;
 
     element.addEventListener("touchstart", start);
     document.addEventListener("touchmove", move);
     document.addEventListener("touchend", end);
+    scrollingElement.addEventListener("scroll", scrolling);
+
+    function scrolling() {
+        isCanMove = false;
+        console.log(isCanMove);
+        // console.log("scrolling", isScrolling);
+        // element.style.transition = "none";
+        // document.body.style.overflow = "hidden";
+    }
 
     function start(e: TouchEvent) {
         console.log("startY", e.touches[0].clientY);
-        isCanMove = true;
         startY = e.touches[0].clientY;
         startTime = Date.now();
         element.style.transition = "none";
         document.body.style.overflow = "hidden";
-
+        isCanMove = true;
         console.log("swipeHeight", swipeHeight, "startY", startY);
     }
 
     function move(e: TouchEvent) {
+        console.log(isCanMove, "moving");
         if (!isCanMove) return;
-        console.log("canMove");
+
         deltaY = e.touches[0].clientY - startY;
+        if (
+            deltaY < 0 &&
+            element.style.transform === `translateY(${-swipeHeight}px)`
+        ) {
+            return;
+        }
+        if (deltaY > 0 && element.style.transform === `translateY(${0}px)`) {
+            return;
+        }
         element.style.transform = `translateY(${currentY + deltaY}px)`;
-        console.log("deltaY", deltaY);
     }
     function end() {
         const endTime = Date.now();
@@ -65,6 +88,9 @@ export function swipe(element: HTMLElement, speed = 300, swipeHeight: number) {
         },
         () => {
             element.removeEventListener("touchend", end);
+        },
+        () => {
+            scrollingElement.removeEventListener("scroll", scrolling);
         },
     ];
 }
