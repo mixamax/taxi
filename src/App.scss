@@ -14,7 +14,7 @@ a {
 }
 
 #root {
-    min-height: 100vh;
+    // min-height: 100vh;
     main {
         max-width: 900px;
         margin: auto;
@@ -22,7 +22,7 @@ a {
         flex-direction: column;
         top: 0;
         left: 0;
-        height: 100svh;
+        height: 100dvh;
         overflow: hidden;
         background: #fffbf4;
     }
