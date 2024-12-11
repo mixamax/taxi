@@ -35,6 +35,7 @@ export const ActionTypes = {
   SET_PROFILE_MODAL: `${prefix}/SET_PROFILE_MODAL`,
   SET_CANDIDATES_MODAL: `${prefix}/SET_CANDIDATES_MODAL`,
   SET_DELETE_FILES_MODAL: `${prefix}/SET_DELETE_FILES_MODAL`,
+  SET_SHOW_SWITCHERS_MENU: `${prefix}/SET_SHOW_SWITCHERS_MENU`,
 } as const
 
 export enum EMapModalTypes {
@@ -54,6 +55,7 @@ export interface IModalsState {
   isSeatsModalOpen: boolean,
   isLoginModalOpen: boolean,
   isCandidatesModalOpen: boolean
+  isShowSwitchersMenu: boolean
   WACodeModal: {
     isOpen: boolean,
     login: any,

@@ -70,7 +70,7 @@ const DateTimeIntervalInput: React.FC<IProps> = ({ value, onChange, isSimple }) 
   const isTimeInterval = value.timeType === ETimeTypes.Interval
 
   return (
-    <div className={cn({ 'date-time__fields': (!isDateInterval && !isTimeInterval) || value.dateDisabled || value.timeDisabled })}>
+    <div className={cn('date-time-container',{ 'date-time__fields': (!isDateInterval && !isTimeInterval) || value.dateDisabled || value.timeDisabled })}>
       <div className="date-time__fields date-time__fields--bottom">
         <Input
           label={t(TRANSLATION.DATE_P)}

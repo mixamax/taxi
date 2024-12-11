@@ -29,6 +29,7 @@ const connector = connect(mapStateToProps, mapDispatchToProps)
 interface IProps extends ConnectedProps<typeof connector>{
   type: EPointType
   isIntercity: boolean
+  onOpenMap: () => void
 }
 
 const debouncedGetPointSuggestion = _.debounce((callback, ...args) => {
@@ -37,7 +38,7 @@ const debouncedGetPointSuggestion = _.debounce((callback, ...args) => {
   ).then(callback)
 }, 500)
 
-const LocationInput: React.FC<IProps> = ({ type, isIntercity, from, to, setFrom, setTo, setMapModal }) => {
+const LocationInput: React.FC<IProps> = ({ type, isIntercity, from, to, setFrom, setTo, setMapModal, onOpenMap }) => {
   const point = type === EPointType.From ? from : to
   const setPoint = type === EPointType.From ? setFrom : setTo
 
@@ -71,11 +72,13 @@ const LocationInput: React.FC<IProps> = ({ type, isIntercity, from, to, setFrom,
     },
     {
       src: images.activeMarker,
-      onClick: () => setMapModal({
+      onClick: () => 
+        { if (onOpenMap) return onOpenMap()
+          setMapModal({
         isOpen: true,
         type: EMapModalTypes.Client,
         defaultCenter: point?.latitude && point.longitude ? [point.latitude, point.longitude] : undefined,
-      }),
+      })},
     },
   ]
 
