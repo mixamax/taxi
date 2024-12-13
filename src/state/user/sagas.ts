@@ -21,6 +21,7 @@ export const saga = function* () {
     takeEvery(ActionTypes.LOGOUT_REQUEST, logoutSaga),
     takeEvery(ActionTypes.REMIND_PASSWORD_REQUEST, remindPasswordSaga),
     takeEvery(ActionTypes.INIT_USER, initUserSaga),
+    takeEvery(ActionTypes.WHATSAPP_SIGNUP_REQUEST, whatsappSignUpSaga),
   ])
 }
 
@@ -30,6 +31,13 @@ function* loginSaga(data: TAction) {
     const result = yield* call<PromiseReturn<ReturnType<typeof API.login>>>(API.login, data.payload)
 
     if (!result) throw new Error('Wrong login response')
+
+    if(result.data !== null && result.data === 'wrong phone') {
+      yield put({ type: ActionTypes.WHATSAPP_SIGNUP_START, payload: data.payload.login })
+      yield put(setLoginModal(false))
+      yield put(setRefCodeModal({ isOpen: true }))
+      return
+    }
 
     if(result.data !== null && result.data === 'code sent') {
       yield put({ type: ActionTypes.LOGIN_WHATSAPP })
@@ -165,3 +173,19 @@ function* initUserSaga() {
     yield put({ type: ActionTypes.REMIND_PASSWORD_FAIL })
   }
 }
+
+function* whatsappSignUpSaga(data: TAction) {
+    try {
+      const result = yield* call<PromiseReturn<ReturnType<typeof API.whatsappSignUp>>>(API.whatsappSignUp, data.payload)
+      if (!result) throw new Error('Wrong whatsappSignUp response')
+
+      yield put(setRefCodeModal({ isOpen: false }))  
+      yield put({ type: ActionTypes.WHATSAPP_SIGNUP_SUCCESS, payload: result })
+      console.log("запускаем loginSaga")
+      yield* call(loginSaga, {type:ActionTypes.LOGIN_REQUEST, payload: { login: data.payload.login, type: data.payload.type }})
+
+    } catch (error) {
+      console.error(error)
+      yield put({ type: ActionTypes.WHATSAPP_SIGNUP_FAIL })
+    }
+  }
