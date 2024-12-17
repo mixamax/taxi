@@ -10,6 +10,7 @@ import { IRootState } from './state'
 import { EStatuses, EUserRoles, IUser } from './types/types'
 import { userSelectors } from './state/user'
 import Sandbox from './pages/Sandbox'
+import AdminPanel from './pages/AdminPanel'
 
 const PassengerOrder = lazy(() => import('./pages/Passenger'))
 const Order = lazy(() => import('./pages/Order'))
@@ -90,6 +91,7 @@ const AppRoutes: React.FC<{user: IUser | null}> = ({ user }) => (
     <Route path="/driver-order" component={DriverOrder}/>
     <Route path="/driver-order-test" component={DriverOrder}/>
     <Route path="/sandbox" component={Sandbox}/>
+    <Route path="/admin" component={AdminPanel}/>
     <Redirect
       from='*'
       to={

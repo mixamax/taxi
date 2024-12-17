@@ -76,6 +76,11 @@ const Header: React.FC<IProps> = ({
     action: () => setProfileModal({ isOpen: true }),
   })
 
+  menuItems.push({
+    label: "admin panel",
+    action: () => history.push('/admin'),
+  })
+
   useInterval(() => {
     if (clientOrder) {
       if (driver) return setSeconds(0)
