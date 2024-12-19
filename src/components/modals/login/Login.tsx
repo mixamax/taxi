@@ -19,6 +19,7 @@ import { useVisibility } from '../../../tools/hooks'
 import { GoogleLoginButton } from 'react-social-login-buttons'
 import { useLocation } from 'react-router-dom'
 import { modalsActionCreators,  modalsSelectors } from '../../../state/modals'
+import {login as adminLogin} from "../../../admin/utils/api"
 
 
 const mapStateToProps = (state: IRootState) => ({
@@ -188,6 +189,7 @@ const LoginForm: React.FC<IProps> = ({
         login: data.login
       } : data
       login(loginData)
+      adminLogin({login:loginData.login, password:loginData.password}) // вход для админ панели, временно только через мыло и пароль
     }
   }
 

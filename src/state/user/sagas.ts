@@ -181,7 +181,6 @@ function* whatsappSignUpSaga(data: TAction) {
 
       yield put(setRefCodeModal({ isOpen: false }))  
       yield put({ type: ActionTypes.WHATSAPP_SIGNUP_SUCCESS, payload: result })
-      console.log("запускаем loginSaga")
       yield* call(loginSaga, {type:ActionTypes.LOGIN_REQUEST, payload: { login: data.payload.login, type: data.payload.type }})
 
     } catch (error) {

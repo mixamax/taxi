@@ -19,6 +19,8 @@ import { HamburgerButton } from 'react-hamburger-button'
 import cn from 'classnames'
 import { gradient } from '../../tools/theme'
 
+import { useHistory } from 'react-router-dom'
+
 interface IMenuItem {
   label: string
   action?: (index: number) => any
@@ -75,10 +77,10 @@ const Header: React.FC<IProps> = ({
     label: t('profile'),
     action: () => setProfileModal({ isOpen: true }),
   })
-
+const historyRouter = useHistory();
   menuItems.push({
     label: "admin panel",
-    action: () => history.push('/admin'),
+    action: () => historyRouter.push('/admin'),
   })
 
   useInterval(() => {

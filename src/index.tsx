@@ -12,6 +12,15 @@ import store from './state'
 import App from './App'
 import { MuiPickersUtilsProvider } from '@material-ui/pickers'
 import MomentUtils from '@date-io/moment'
+import { QueryClient, QueryClientProvider } from 'react-query'
+
+//   из админки
+// import dayjs from 'dayjs'
+// import utc from 'dayjs/plugin/utc'
+
+// dayjs.extend(utc)
+//  /из админки
+
 
 import * as serviceWorker from './serviceWorker'
 
@@ -25,15 +34,19 @@ if(process.env.NODE_ENV === 'production') {
   })
 }
 
+const queryClient = new QueryClient()
+
 ReactDOM.render(
   <React.StrictMode>
     <Router history={history}>
       <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
         <MuiPickersUtilsProvider utils={MomentUtils}>
           <Sentry.ErrorBoundary>
             <App/>
           </Sentry.ErrorBoundary>
         </MuiPickersUtilsProvider>
+        </QueryClientProvider>
       </Provider>
     </Router>
   </React.StrictMode>,
