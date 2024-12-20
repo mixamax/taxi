@@ -4,7 +4,7 @@ import { Row } from "antd";
 // import { Route, Routes, useNavigate, useLocation } from 'react-router-dom'
 import React, { lazy, Suspense } from "react";
 import { Switch, Route, Redirect, Router, useHistory } from "react-router-dom";
-import Cookies from 'universal-cookie'
+import Cookies from "universal-cookie";
 import PageDataset from "./pages/Dataset";
 // import PageLogin from './pages/Login'
 // import PageUsers from './pages/Users'
@@ -12,34 +12,34 @@ import PageDataset from "./pages/Dataset";
 import Layout from "./components/Layout";
 import { useAuthorization } from "./utils/hooks";
 
-
-const cookies = new Cookies()
+const cookies = new Cookies();
 
 function Admin({ match }) {
   //   const navigate = useNavigate()
   //   const location = useLocation()
-  const history = useHistory();
+//   const history = useHistory();
 
-  const isLoginPage = location.pathname === "/login";
+//   const isLoginPage = location.pathname === "admin/login";
 
-    const token = cookies.get('token')
-    const u_hash = cookies.get('u_hash')
+  const token = cookies.get("token");
+  const u_hash = cookies.get("u_hash");
 
-//   const tokensString = localStorage.getItem("tokens");
-//   const tokens = tokensString ? JSON.parse(tokensString) : {};
-//   const { token, u_hash } = tokens;
-  
+  //   const tokensString = localStorage.getItem("tokens");
+  //   const tokens = tokensString ? JSON.parse(tokensString) : {};
+  //   const { token, u_hash } = tokens;
+
   const user = useAuthorization({ token, u_hash });
 
-  //   useEffect(() => {
-  //     if (user.isLoading) return
-  //     const role = user.data?.u_role
-  //     if (!role) {
-  //       history.push('/login', { replace: true })
-  //     } else if (isLoginPage) {
-  //       history.push(role === '4' ? '/users' : '/tickets', { replace: true })
-  //     }
-  //   }, [user.isLoading, user.data?.u_role, isLoginPage])
+//   useEffect(() => {
+//     if (user.isLoading) return;
+//     const role = user.data?.u_role;
+//     if (!role) {
+//       history.push("/", { replace: true });
+//     }
+//     //   else if (isLoginPage) {
+//     //     history.push(role === '4' ? '/users' : '/tickets', { replace: true })
+//     //   }
+//   }, [user.isLoading, user.data?.u_role, isLoginPage]);
 
   //   if ((user.isLoading || !user.data?.authorized) && !isLoginPage) {
   //     return (
@@ -68,15 +68,13 @@ function Admin({ match }) {
   //       </Routes>
   //     </div>
   //   )
-
+  if (user.isLoading) return <div>Loading...</div>;
+  if (!user.data?.authorized) return <Redirect to="/" />;
   return (
-    <Layout user={user.data} refetchUser={user.refetch}>
-      <Suspense fallback={<div>Loading...</div>}>
-        <Switch>
-          {/* <Route path={`${match.url}`} exact> */}
+    <Suspense fallback={<div>Loading...</div>}>
+      <Switch>
+        <Layout user={user.data} refetchUser={user.refetch}>
           <Switch>
-            {/* <Route path={`${match.url}/adminka/users`} exact component={PageUsers} />
-              <Route path={`${match.url}/adminka/users/:id`} component={PageUser} /> */}
             <Route
               path={`${match.url}/metaadm/:selectionId/:itemId?`}
               component={() => <PageDataset user={user.data} />}
@@ -94,14 +92,13 @@ function Admin({ match }) {
                   <iframe width='100%' height='100%' frameBorder='0' src='https://www.makesense.ai/' />
                 </div>
               )} /> */}
+            {/* </Route> */}
           </Switch>
-          {/* </Route> */}
-          {/* <Route path='/login' component={PageLogin} /> */}
-        </Switch>
-      </Suspense>
-    </Layout>
+        </Layout>
+        {/* <Route path='admin/login' Redirect={{ to: '/' }} /> */}
+      </Switch>
+    </Suspense>
   );
 }
 
 export default Admin;
-
