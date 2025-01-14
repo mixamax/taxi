@@ -103,6 +103,7 @@ import RadioCheckbox from "../../components/RadioCheckbox";
 import Map from "../../components/Map";
 import Layout from "../../components/Layout";
 import { swipe } from "../../tools/swipe";
+import { BoundaryButtons } from "../../components/BoundaryButtons/BoundaryButtons";
 
 const mapStateToProps = (state: IRootState) => ({
     seats: clientOrderSelectors.seats(state),
@@ -157,7 +158,7 @@ interface IFormValues {
     bigTruckCarLogic: ELogic;
 }
 
-interface IProps extends ConnectedProps<typeof connector> {}
+interface IProps extends ConnectedProps<typeof connector> { }
 
 let prevSelectedOrder: IOrder | null | undefined = null;
 
@@ -337,33 +338,39 @@ const PassengerOrder: React.FC<IProps> = ({
     // console.log(isScrolling, "scrolling passenger");
 
     const formContainerRef = useRef<HTMLDivElement>(null);
-    const formWithMapRef = useRef<HTMLDivElement>(null);
+    const draggableRef = useRef<HTMLFormElement>(null)
+    // const formWithMapRef = useRef<HTMLDivElement>(null);
     // const votingFormRef = useRef<HTMLDivElement>(null);
-    const votingFormRef = useRef({
-        locationWrapperRef: useRef<HTMLDivElement>(null),
-        otherWrapperRef: useRef<HTMLDivElement>(null),
-    });
+    // const votingFormRef = useRef({
+    //     locationWrapperRef: useRef<HTMLDivElement>(null),
+    //     otherWrapperRef: useRef<HTMLDivElement>(null),
+    // });
 
     // *********************swipe*********************
     useEffect(() => {
         const element = formContainerRef.current;
-        const formWithMap = formWithMapRef.current;
-        const { locationWrapperRef, otherWrapperRef } = votingFormRef.current;
-        const locationWrapper = locationWrapperRef.current;
-        const otherWrapper = otherWrapperRef.current;
+        // const formWithMap = formWithMapRef.current;
+        // const { locationWrapperRef, otherWrapperRef } = votingFormRef.current;
+        // const locationWrapper = locationWrapperRef.current;
+        // const otherWrapper = otherWrapperRef.current;
+        const draggable = draggableRef.current
 
         let removeLsts: (() => void)[] = [];
 
-        if (element && formWithMap && locationWrapper && otherWrapper) {
-            const height = formWithMap.clientHeight - 20 + 120; // форма заходит на карту на 20px
-            removeLsts = swipe(
-                element,
-                300,
-                height,
-                otherWrapper,
-                locationWrapper
-            );
+        if (element && draggable) {
+            removeLsts = swipe(element, draggable);
         }
+
+        // if (element && formWithMap && locationWrapper && otherWrapper) {
+        //     const height = formWithMap.clientHeight - 20 + 120; // форма заходит на карту на 20px
+        //     removeLsts = swipe(
+        //         element,
+        //         300,
+        //         height,
+        //         otherWrapper,
+        //         locationWrapper
+        //     );
+        // }
         return () => {
             if (removeLsts) {
                 removeLsts.forEach((lst) => lst());
@@ -371,9 +378,7 @@ const PassengerOrder: React.FC<IProps> = ({
         };
     }, [
         formContainerRef.current,
-        formWithMapRef.current,
-        votingFormRef.current.locationWrapperRef.current,
-        votingFormRef.current.otherWrapperRef.current,
+        draggableRef.current
     ]);
     //передать ресайз в зависимости
     // *********************/swipe*********************
@@ -433,8 +438,8 @@ const PassengerOrder: React.FC<IProps> = ({
                 order.b_voting &&
                 order.b_start_datetime &&
                 (order.b_max_waiting || SITE_CONSTANTS.WAITING_INTERVAL) -
-                    moment().diff(order.b_start_datetime, "seconds") <=
-                    0
+                moment().diff(order.b_start_datetime, "seconds") <=
+                0
             ) {
                 API.cancelDrive(order.b_id);
                 return API.postDrive({
@@ -482,8 +487,8 @@ const PassengerOrder: React.FC<IProps> = ({
                 selectedOrder.b_start_datetime &&
                 (selectedOrder.b_max_waiting ||
                     SITE_CONSTANTS.WAITING_INTERVAL) -
-                    moment().diff(selectedOrder.b_start_datetime, "seconds") <=
-                    0
+                moment().diff(selectedOrder.b_start_datetime, "seconds") <=
+                0
             ) {
                 API.cancelDrive(selectedOrder.b_id);
                 return API.postDrive({
@@ -655,10 +660,9 @@ const PassengerOrder: React.FC<IProps> = ({
             let startTime: Moment;
             if ([TABS.DELIVERY.id, TABS.MOVE.id].includes(tab)) {
                 startTime = moment(
-                    `${fromDay} ${
-                        fromTimeFrom === "now"
-                            ? moment().format(dateFormatTime)
-                            : fromTimeFrom || "23:59"
+                    `${fromDay} ${fromTimeFrom === "now"
+                        ? moment().format(dateFormatTime)
+                        : fromTimeFrom || "23:59"
                     }`,
                     dateFormat
                 );
@@ -744,15 +748,15 @@ const PassengerOrder: React.FC<IProps> = ({
                 b_start_longitude: from.longitude,
                 ...(tab === TABS.MOVE.id && moveType === EMoveTypes.Apartament
                     ? {
-                          // b_destination_address: from.address,
-                          // b_destination_latitude: from.latitude,
-                          // b_destination_longitude: from.longitude,
-                      }
+                        // b_destination_address: from.address,
+                        // b_destination_latitude: from.latitude,
+                        // b_destination_longitude: from.longitude,
+                    }
                     : {
-                          b_destination_address: to?.address,
-                          b_destination_latitude: to?.latitude,
-                          b_destination_longitude: to?.longitude,
-                      }),
+                        b_destination_address: to?.address,
+                        b_destination_latitude: to?.latitude,
+                        b_destination_longitude: to?.longitude,
+                    }),
                 ...commentObj,
                 b_contact: phone,
                 b_start_datetime: startTime,
@@ -774,8 +778,8 @@ const PassengerOrder: React.FC<IProps> = ({
                     tab === TABS.VOTING.id
                         ? SITE_CONSTANTS.WAITING_INTERVAL
                         : tab === TABS.WAITING.id
-                        ? 7200
-                        : 3600,
+                            ? 7200
+                            : 3600,
                 b_services:
                     tab === TABS.VOTING.id ? [EServices.Voting.toString()] : [],
                 b_options: options,
@@ -834,7 +838,7 @@ const PassengerOrder: React.FC<IProps> = ({
     let cardPaymentEnabled = false;
     const mode =
         SITE_CONSTANTS.MONEY_MODES[
-            (Object.values(TABS).find((i) => i.id === tab) as any).sid
+        (Object.values(TABS).find((i) => i.id === tab) as any).sid
         ];
     if (typeof mode === "object") {
         if (tab === TABS.DELIVERY.id) cardPaymentEnabled = mode[courierAuto];
@@ -846,28 +850,33 @@ const PassengerOrder: React.FC<IProps> = ({
             <Layout>
                 <section>
                     <PassengerMiniOrders handleOrderClick={handleOrderClick} />
-                    <form
-                        onSubmit={formHandleSubmit(handleSubmit)}
-                        className="input-groups"
+                    <Map
+                        containerClassName="form-map-container"
+                    // onClose={() => setIsMapVisible(!isMapVisible)}
+                    />
+                    <div
+                        ref={formContainerRef}
+                        // className={cn("form-container", {
+                        //     "map-visible": isMapVisible,
+                        // })}
+                        className="form-container"
                     >
-                        <TabsSwitcher
+                        <BoundaryButtons onIsIntercityChanged={(value) => setIsIntercity(value)} isIntercity={isIntercity} />
+                        <form
+                            onSubmit={formHandleSubmit(handleSubmit)}
+                            className="input-group"
+                            ref={draggableRef}
+                        >
+                            <div className="swipe-line"></div>
+                            {/* <TabsSwitcher
                             tab={tab}
                             onChange={(id: typeof tab) => setTab(id)}
-                        />
-                        <div className="form-with-map" ref={formWithMapRef}>
-                            <Map
-                                containerClassName="form-map-container"
-                                // onClose={() => setIsMapVisible(!isMapVisible)}
-                            />
+                        /> */}
+                            {/* <div className="form-with-map" ref={formWithMapRef}> */}
+
                             {/* ******************form-container******************** */}
-                            <div
-                                ref={formContainerRef}
-                                className={cn("form-container", {
-                                    "map-visible": isMapVisible,
-                                })}
-                                // className="form-container"
-                            >
-                                {/* <div
+
+                            {/* <div
                                     onClick={() =>
                                         setIsMapVisible(!isMapVisible)
                                     }
@@ -876,37 +885,37 @@ const PassengerOrder: React.FC<IProps> = ({
                                     click
                                 </div> */}
 
-                                {/* *********************ФОРМЫ**************** */}
-                                {TABS.VOTING.id === tab && (
-                                    <VotingForm
-                                        tab={tab}
-                                        isIntercity={isIntercity}
-                                        setIsIntercity={setIsIntercity}
-                                        moveType={moveType}
-                                        setIsMapVisible={setIsMapVisible}
-                                        register={register}
-                                        time={time}
-                                        distance={distance}
-                                        errors={errors}
-                                        setPaymentWay={setPaymentWay}
-                                        paymentWay={paymentWay}
-                                        t={t}
-                                        cardPaymentEnabled={cardPaymentEnabled}
-                                        setPickTimeModal={setPickTimeModal}
-                                        setSeatsModal={setSeatsModal}
-                                        setCommentsModal={setCommentsModal}
-                                        carClass={carClass}
-                                        setCarClass={setCarClass}
-                                        phone={phone}
-                                        user={user}
-                                        seats={seats}
-                                        setPhone={setPhone}
-                                        status={status}
-                                        message={message}
-                                        ref={votingFormRef}
-                                    />
-                                )}
-                                {TABS.WAITING.id === tab && (
+                            {/* *********************ФОРМЫ**************** */}
+                            {(TABS.VOTING.id === tab || TABS.WAITING.id === tab) && (
+                                <VotingForm
+                                    tab={tab}
+                                    isIntercity={isIntercity}
+                                    setIsIntercity={setIsIntercity}
+                                    moveType={moveType}
+                                    setIsMapVisible={setIsMapVisible}
+                                    register={register}
+                                    time={time}
+                                    distance={distance}
+                                    errors={errors}
+                                    setPaymentWay={setPaymentWay}
+                                    paymentWay={paymentWay}
+                                    t={t}
+                                    cardPaymentEnabled={cardPaymentEnabled}
+                                    setPickTimeModal={setPickTimeModal}
+                                    setSeatsModal={setSeatsModal}
+                                    setCommentsModal={setCommentsModal}
+                                    carClass={carClass}
+                                    setCarClass={setCarClass}
+                                    phone={phone}
+                                    user={user}
+                                    seats={seats}
+                                    setPhone={setPhone}
+                                    status={status}
+                                    message={message}
+                                // ref={votingFormRef}
+                                />
+                            )}
+                            {/* {TABS.WAITING.id === tab && (
                                     <WaitingForm
                                         tab={tab}
                                         isIntercity={isIntercity}
@@ -933,217 +942,217 @@ const PassengerOrder: React.FC<IProps> = ({
                                         status={status}
                                         message={message}
                                     />
-                                )}
-                                {TABS.DELIVERY.id === tab && (
-                                    <DeliveryForm
-                                        tab={tab}
-                                        courierAuto={courierAuto}
-                                        setCourierAuto={setCourierAuto} //если оставить ECourierAutoTypes не соберется
-                                        isIntercity={isIntercity}
-                                        setIsIntercity={setIsIntercity}
-                                        moveType={moveType}
-                                        setIsMapVisible={setIsMapVisible}
-                                        register={register}
-                                        distance={distance}
-                                        errors={errors}
-                                        setPaymentWay={setPaymentWay}
-                                        paymentWay={paymentWay}
-                                        t={t}
-                                        cardPaymentEnabled={cardPaymentEnabled}
-                                        carClass={carClass}
-                                        phone={phone}
-                                        user={user}
-                                        setPhone={setPhone}
-                                        status={status}
-                                        message={message}
-                                        fromPhone={fromPhone}
-                                        fromDay={fromDay}
-                                        handleFromDayChange={
-                                            handleFromDayChange
-                                        }
-                                        fromTimeFrom={fromTimeFrom}
-                                        setFromPhone={setFromPhone}
-                                        setFromTimeFrom={setFromTimeFrom}
-                                        fromTimeFromOptions={
-                                            fromTimeFromOptions
-                                        }
-                                        fromTimeTill={fromTimeTill}
-                                        setFromTimeTill={setFromTimeTill}
-                                        toPhone={toPhone}
-                                        setToPhone={setToPhone}
-                                        setToDay={setToDay}
-                                        toDay={toDay}
-                                        setToTimeFrom={setToTimeFrom}
-                                        toTimeFrom={toTimeFrom}
-                                        toTimeTill={toTimeTill}
-                                        setToTimeTill={setToTimeTill}
-                                        setValue={setValue}
-                                        weight={weight}
-                                        setWeight={setWeight}
-                                        cost={cost}
-                                        setCost={setCost}
-                                    />
-                                )}
-                                {TABS.MOTORCYCLE.id === tab && (
-                                    <MotorcycleForm
-                                        tab={tab}
-                                        isIntercity={isIntercity}
-                                        setIsIntercity={setIsIntercity}
-                                        moveType={moveType}
-                                        setIsMapVisible={setIsMapVisible}
-                                        register={register}
-                                        distance={distance}
-                                        errors={errors}
-                                        setPaymentWay={setPaymentWay}
-                                        paymentWay={paymentWay}
-                                        t={t}
-                                        cardPaymentEnabled={cardPaymentEnabled}
-                                        carClass={carClass}
-                                        phone={phone}
-                                        user={user}
-                                        setPhone={setPhone}
-                                        status={status}
-                                        message={message}
-                                        fromPhone={fromPhone}
-                                        fromTimeFrom={fromTimeFrom}
-                                        setFromPhone={setFromPhone}
-                                        toPhone={toPhone}
-                                        setToPhone={setToPhone}
-                                        setValue={setValue}
-                                        cost={cost}
-                                        setCost={setCost}
-                                    />
-                                )}
-                                {TABS.MOVE.id === tab && (
-                                    <MoveForm
-                                        tab={tab}
-                                        setMoveType={setMoveType}
-                                        room={room}
-                                        setRoom={setRoom}
-                                        elevator={elevator}
-                                        setElevator={setElevator}
-                                        handleDeleteMoveFile={
-                                            handleDeleteMoveFile
-                                        }
-                                        handleDeleteMoveFiles={
-                                            handleDeleteMoveFiles
-                                        }
-                                        moveFiles={moveFiles}
-                                        furniture={furniture}
-                                        isIntercity={isIntercity}
-                                        setIsIntercity={setIsIntercity}
-                                        moveType={moveType}
-                                        setIsMapVisible={setIsMapVisible}
-                                        register={register}
-                                        errors={errors}
-                                        setPaymentWay={setPaymentWay}
-                                        paymentWay={paymentWay}
-                                        t={t}
-                                        cardPaymentEnabled={cardPaymentEnabled}
-                                        phone={phone}
-                                        user={user}
-                                        setPhone={setPhone}
-                                        status={status}
-                                        message={message}
-                                        handleFurnitureChange={
-                                            handleFurnitureChange
-                                        }
-                                        roomFurniture={roomFurniture}
-                                        fromDay={fromDay}
-                                        handleFromDayChange={
-                                            handleFromDayChange
-                                        }
-                                        fromTimeFrom={fromTimeFrom}
-                                        setFromTimeFrom={setFromTimeFrom}
-                                        fromTimeFromOptions={
-                                            fromTimeFromOptions
-                                        }
-                                    />
-                                )}
-                                {TABS.WAGON.id === tab && (
-                                    <WagonForm
-                                        tab={tab}
-                                        moveType={moveType}
-                                        isIntercity={isIntercity}
-                                        // setIsIntercity={setIsIntercity}
-                                        setIsMapVisible={setIsMapVisible}
-                                        register={register}
-                                        // errors={errors}
-                                        setPaymentWay={setPaymentWay}
-                                        paymentWay={paymentWay}
-                                        t={t}
-                                        cardPaymentEnabled={cardPaymentEnabled}
-                                        phone={phone}
-                                        user={user}
-                                        setPhone={setPhone}
-                                        status={status}
-                                        message={message}
-                                        insertCargoTypeIntoCargoDescription={
-                                            insertCargoTypeIntoCargoDescription
-                                        }
-                                        tillTimeInterval={tillTimeInterval}
-                                        setTillTimeInterval={
-                                            setTillTimeInterval
-                                        }
-                                        setCargoDescription={
-                                            setCargoDescription
-                                        }
-                                        cargoDescription={cargoDescription}
-                                        fromTimeInterval={fromTimeInterval}
-                                        setFromTimeInterval={
-                                            setFromTimeInterval
-                                        }
-                                        handleLogicChange={handleLogicChange}
-                                        values={values}
-                                        email={email}
-                                        setEmail={setEmail}
-                                        setBigTruckServices={
-                                            setBigTruckServices
-                                        }
-                                        bigTruckServices={bigTruckServices}
-                                    />
-                                )}
-                                {TABS.TRIP.id === tab && (
-                                    <TripForm
-                                        tab={tab}
-                                        moveType={moveType}
-                                        isIntercity={isIntercity}
-                                        setIsIntercity={setIsIntercity}
-                                        setIsMapVisible={setIsMapVisible}
-                                        // register={register}
-                                        // errors={errors}
-                                        setPaymentWay={setPaymentWay}
-                                        paymentWay={paymentWay}
-                                        t={t}
-                                        cardPaymentEnabled={cardPaymentEnabled}
-                                        status={status}
-                                        message={message}
-                                        tillTimeInterval={tillTimeInterval}
-                                        setTillTimeInterval={
-                                            setTillTimeInterval
-                                        }
-                                        fromTimeInterval={fromTimeInterval}
-                                        setFromTimeInterval={
-                                            setFromTimeInterval
-                                        }
-                                    />
-                                )}
-                                {TABS.WASH.id === tab && (
-                                    <WashForm
-                                        tab={tab}
-                                        moveType={moveType}
-                                        isIntercity={isIntercity}
-                                        // setIsIntercity={setIsIntercity}
-                                        setIsMapVisible={setIsMapVisible}
-                                        // register={register}
-                                        // errors={errors}
-                                        // t={t}
-                                    />
-                                )}
-                                {/* ******************************формы****************************** */}
-                                <>
-                                    {/* DELIVERY */}
-                                    {/* <CouriersTransportTabs
+                                )} */}
+                            {TABS.DELIVERY.id === tab && (
+                                <DeliveryForm
+                                    tab={tab}
+                                    courierAuto={courierAuto}
+                                    setCourierAuto={setCourierAuto} //если оставить ECourierAutoTypes не соберется
+                                    isIntercity={isIntercity}
+                                    setIsIntercity={setIsIntercity}
+                                    moveType={moveType}
+                                    setIsMapVisible={setIsMapVisible}
+                                    register={register}
+                                    distance={distance}
+                                    errors={errors}
+                                    setPaymentWay={setPaymentWay}
+                                    paymentWay={paymentWay}
+                                    t={t}
+                                    cardPaymentEnabled={cardPaymentEnabled}
+                                    carClass={carClass}
+                                    phone={phone}
+                                    user={user}
+                                    setPhone={setPhone}
+                                    status={status}
+                                    message={message}
+                                    fromPhone={fromPhone}
+                                    fromDay={fromDay}
+                                    handleFromDayChange={
+                                        handleFromDayChange
+                                    }
+                                    fromTimeFrom={fromTimeFrom}
+                                    setFromPhone={setFromPhone}
+                                    setFromTimeFrom={setFromTimeFrom}
+                                    fromTimeFromOptions={
+                                        fromTimeFromOptions
+                                    }
+                                    fromTimeTill={fromTimeTill}
+                                    setFromTimeTill={setFromTimeTill}
+                                    toPhone={toPhone}
+                                    setToPhone={setToPhone}
+                                    setToDay={setToDay}
+                                    toDay={toDay}
+                                    setToTimeFrom={setToTimeFrom}
+                                    toTimeFrom={toTimeFrom}
+                                    toTimeTill={toTimeTill}
+                                    setToTimeTill={setToTimeTill}
+                                    setValue={setValue}
+                                    weight={weight}
+                                    setWeight={setWeight}
+                                    cost={cost}
+                                    setCost={setCost}
+                                />
+                            )}
+                            {TABS.MOTORCYCLE.id === tab && (
+                                <MotorcycleForm
+                                    tab={tab}
+                                    isIntercity={isIntercity}
+                                    setIsIntercity={setIsIntercity}
+                                    moveType={moveType}
+                                    setIsMapVisible={setIsMapVisible}
+                                    register={register}
+                                    distance={distance}
+                                    errors={errors}
+                                    setPaymentWay={setPaymentWay}
+                                    paymentWay={paymentWay}
+                                    t={t}
+                                    cardPaymentEnabled={cardPaymentEnabled}
+                                    carClass={carClass}
+                                    phone={phone}
+                                    user={user}
+                                    setPhone={setPhone}
+                                    status={status}
+                                    message={message}
+                                    fromPhone={fromPhone}
+                                    fromTimeFrom={fromTimeFrom}
+                                    setFromPhone={setFromPhone}
+                                    toPhone={toPhone}
+                                    setToPhone={setToPhone}
+                                    setValue={setValue}
+                                    cost={cost}
+                                    setCost={setCost}
+                                />
+                            )}
+                            {TABS.MOVE.id === tab && (
+                                <MoveForm
+                                    tab={tab}
+                                    setMoveType={setMoveType}
+                                    room={room}
+                                    setRoom={setRoom}
+                                    elevator={elevator}
+                                    setElevator={setElevator}
+                                    handleDeleteMoveFile={
+                                        handleDeleteMoveFile
+                                    }
+                                    handleDeleteMoveFiles={
+                                        handleDeleteMoveFiles
+                                    }
+                                    moveFiles={moveFiles}
+                                    furniture={furniture}
+                                    isIntercity={isIntercity}
+                                    setIsIntercity={setIsIntercity}
+                                    moveType={moveType}
+                                    setIsMapVisible={setIsMapVisible}
+                                    register={register}
+                                    errors={errors}
+                                    setPaymentWay={setPaymentWay}
+                                    paymentWay={paymentWay}
+                                    t={t}
+                                    cardPaymentEnabled={cardPaymentEnabled}
+                                    phone={phone}
+                                    user={user}
+                                    setPhone={setPhone}
+                                    status={status}
+                                    message={message}
+                                    handleFurnitureChange={
+                                        handleFurnitureChange
+                                    }
+                                    roomFurniture={roomFurniture}
+                                    fromDay={fromDay}
+                                    handleFromDayChange={
+                                        handleFromDayChange
+                                    }
+                                    fromTimeFrom={fromTimeFrom}
+                                    setFromTimeFrom={setFromTimeFrom}
+                                    fromTimeFromOptions={
+                                        fromTimeFromOptions
+                                    }
+                                />
+                            )}
+                            {TABS.WAGON.id === tab && (
+                                <WagonForm
+                                    tab={tab}
+                                    moveType={moveType}
+                                    isIntercity={isIntercity}
+                                    // setIsIntercity={setIsIntercity}
+                                    setIsMapVisible={setIsMapVisible}
+                                    register={register}
+                                    // errors={errors}
+                                    setPaymentWay={setPaymentWay}
+                                    paymentWay={paymentWay}
+                                    t={t}
+                                    cardPaymentEnabled={cardPaymentEnabled}
+                                    phone={phone}
+                                    user={user}
+                                    setPhone={setPhone}
+                                    status={status}
+                                    message={message}
+                                    insertCargoTypeIntoCargoDescription={
+                                        insertCargoTypeIntoCargoDescription
+                                    }
+                                    tillTimeInterval={tillTimeInterval}
+                                    setTillTimeInterval={
+                                        setTillTimeInterval
+                                    }
+                                    setCargoDescription={
+                                        setCargoDescription
+                                    }
+                                    cargoDescription={cargoDescription}
+                                    fromTimeInterval={fromTimeInterval}
+                                    setFromTimeInterval={
+                                        setFromTimeInterval
+                                    }
+                                    handleLogicChange={handleLogicChange}
+                                    values={values}
+                                    email={email}
+                                    setEmail={setEmail}
+                                    setBigTruckServices={
+                                        setBigTruckServices
+                                    }
+                                    bigTruckServices={bigTruckServices}
+                                />
+                            )}
+                            {TABS.TRIP.id === tab && (
+                                <TripForm
+                                    tab={tab}
+                                    moveType={moveType}
+                                    isIntercity={isIntercity}
+                                    setIsIntercity={setIsIntercity}
+                                    setIsMapVisible={setIsMapVisible}
+                                    // register={register}
+                                    // errors={errors}
+                                    setPaymentWay={setPaymentWay}
+                                    paymentWay={paymentWay}
+                                    t={t}
+                                    cardPaymentEnabled={cardPaymentEnabled}
+                                    status={status}
+                                    message={message}
+                                    tillTimeInterval={tillTimeInterval}
+                                    setTillTimeInterval={
+                                        setTillTimeInterval
+                                    }
+                                    fromTimeInterval={fromTimeInterval}
+                                    setFromTimeInterval={
+                                        setFromTimeInterval
+                                    }
+                                />
+                            )}
+                            {TABS.WASH.id === tab && (
+                                <WashForm
+                                    tab={tab}
+                                    moveType={moveType}
+                                    isIntercity={isIntercity}
+                                    // setIsIntercity={setIsIntercity}
+                                    setIsMapVisible={setIsMapVisible}
+                                // register={register}
+                                // errors={errors}
+                                // t={t}
+                                />
+                            )}
+                            {/* ******************************формы****************************** */}
+                            <>
+                                {/* DELIVERY */}
+                                {/* <CouriersTransportTabs
                                         tab={courierAuto as ECourierAutoTypes}
                                         onChange={(id: typeof courierAuto) =>
                                             setCourierAuto(id)
@@ -1151,8 +1160,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                         visible={tab === TABS.DELIVERY.id}
                                     /> */}
 
-                                    {/* MOVE */}
-                                    {/* <MoveTypeTabs
+                                {/* MOVE */}
+                                {/* <MoveTypeTabs
                                         tab={moveType as EMoveTypes}
                                         onChange={(id: typeof moveType) =>
                                             setMoveType(id)
@@ -1160,8 +1169,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                         visible={tab === TABS.MOVE.id}
                                     /> */}
 
-                                    {/* MOVE */}
-                                    {/* {tab === TABS.MOVE.id &&
+                                {/* MOVE */}
+                                {/* {tab === TABS.MOVE.id &&
                                         moveType === EMoveTypes.Apartament && (
                                             <>
                                                 <Rooms
@@ -1331,8 +1340,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                             </>
                                         )} */}
 
-                                    {/* MOVE */}
-                                    {/* {tab === TABS.MOVE.id && (
+                                {/* MOVE */}
+                                {/* {tab === TABS.MOVE.id && (
                                         <>
                                             <Furniture
                                                 value={roomFurniture}
@@ -1380,8 +1389,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                         </>
                                     )} */}
 
-                                    {/*VOTING, WAITING, DELIVERY, MOVE, TRIP  */}
-                                    {/* {![
+                                {/*VOTING, WAITING, DELIVERY, MOVE, TRIP  */}
+                                {/* {![
                                         TABS.WAGON.id,
                                         TABS.MOTORCYCLE.id,
                                         TABS.WASH.id,
@@ -1409,8 +1418,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                         />
                                     )} */}
 
-                                    {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP */}
-                                    {/* {tab !== TABS.WASH.id && (
+                                {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP */}
+                                {/* {tab !== TABS.WASH.id && (
                                         <LocationInput
                                             onOpenMap={() => {
                                                 setIsMapVisible(true);
@@ -1419,8 +1428,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                             isIntercity={isIntercity}
                                         />
                                     )} */}
-                                    {/* WAGON, TRIP */}
-                                    {/* {[TABS.WAGON.id, TABS.TRIP.id].includes(
+                                {/* WAGON, TRIP */}
+                                {/* {[TABS.WAGON.id, TABS.TRIP.id].includes(
                                         tab
                                     ) && (
                                         <DateTimeIntervalInput
@@ -1429,8 +1438,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                             isSimple={tab === TABS.TRIP.id}
                                         />
                                     )} */}
-                                    {/*DELIVERY */}
-                                    {/* {[TABS.DELIVERY.id].includes(tab) && (
+                                {/*DELIVERY */}
+                                {/* {[TABS.DELIVERY.id].includes(tab) && (
                                         <GroupedInputs>
                                             <Input
                                                 inputProps={{
@@ -1464,8 +1473,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                             />
                                         </GroupedInputs>
                                     )} */}
-                                    {/*DELIVERY,  MOVE */}
-                                    {/* {[TABS.DELIVERY.id, TABS.MOVE.id].includes(
+                                {/*DELIVERY,  MOVE */}
+                                {/* {[TABS.DELIVERY.id, TABS.MOVE.id].includes(
                                         tab
                                     ) &&
                                         SITE_CONSTANTS.PASSENGER_ORDER_CONFIG
@@ -1482,8 +1491,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                                 error={errors.from_way?.message}
                                             />
                                         )} */}
-                                    {/*DELIVERY */}
-                                    {/* {[TABS.DELIVERY.id].includes(tab) &&
+                                {/*DELIVERY */}
+                                {/* {[TABS.DELIVERY.id].includes(tab) &&
                                         SITE_CONSTANTS.PASSENGER_ORDER_CONFIG
                                             .visibility.fromMission && (
                                             <details>
@@ -1511,8 +1520,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                                 />
                                             </details>
                                         )} */}
-                                    {/*DELIVERY, MOTORCYCLE */}
-                                    {/* {(tab === TABS.DELIVERY.id ||
+                                {/*DELIVERY, MOTORCYCLE */}
+                                {/* {(tab === TABS.DELIVERY.id ||
                                         tab === TABS.MOTORCYCLE.id) && (
                                         <Input
                                             inputProps={{
@@ -1529,8 +1538,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                         />
                                     )} */}
 
-                                    {/*DELIVERY */}
-                                    {/* {tab === TABS.DELIVERY.id && (
+                                {/*DELIVERY */}
+                                {/* {tab === TABS.DELIVERY.id && (
                                         <>
                                             <Input
                                                 inputProps={{
@@ -1593,8 +1602,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                         </>
                                     )} */}
 
-                                    {/* MOVE */}
-                                    {/* {[TABS.MOVE.id].includes(tab) && (
+                                {/* MOVE */}
+                                {/* {[TABS.MOVE.id].includes(tab) && (
                                         <GroupedInputs>
                                             <Input
                                                 inputProps={{
@@ -1626,8 +1635,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                         </GroupedInputs>
                                     )} */}
 
-                                    {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP, WASH  разобраться */}
-                                    {/* {!(
+                                {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP, WASH  разобраться */}
+                                {/* {!(
                                         tab === TABS.MOVE.id &&
                                         moveType === EMoveTypes.Handy
                                     ) &&
@@ -1640,8 +1649,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                                 isIntercity={isIntercity}
                                             />
                                         )} */}
-                                    {/* WAGON, TRIP  */}
-                                    {/* {[TABS.WAGON.id, TABS.TRIP.id].includes(
+                                {/* WAGON, TRIP  */}
+                                {/* {[TABS.WAGON.id, TABS.TRIP.id].includes(
                                         tab
                                     ) && (
                                         <DateTimeIntervalInput
@@ -1650,8 +1659,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                             isSimple={tab === TABS.TRIP.id}
                                         />
                                     )} */}
-                                    {/*WAGON  */}
-                                    {/* {tab === TABS.WAGON.id && (
+                                {/*WAGON  */}
+                                {/* {tab === TABS.WAGON.id && (
                                         <>
                                             <Input
                                                 inputType={EInputTypes.Select}
@@ -1812,8 +1821,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                             />
                                         </>
                                     )} */}
-                                    {/*VOTING, WAITING, DELIVERY, MOTORCYCLE  */}
-                                    {/* {SITE_CONSTANTS.ENABLE_CUSTOMER_PRICE &&
+                                {/*VOTING, WAITING, DELIVERY, MOTORCYCLE  */}
+                                {/* {SITE_CONSTANTS.ENABLE_CUSTOMER_PRICE &&
                                         ![
                                             TABS.MOVE.id,
                                             TABS.WAGON.id,
@@ -1837,8 +1846,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                                 }
                                             />
                                         )} */}
-                                    {/*DELIVERY  */}
-                                    {/* {[TABS.DELIVERY.id].includes(tab) && (
+                                {/*DELIVERY  */}
+                                {/* {[TABS.DELIVERY.id].includes(tab) && (
                                         <GroupedInputs>
                                             <Input
                                                 inputProps={{
@@ -1866,8 +1875,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                             />
                                         </GroupedInputs>
                                     )} */}
-                                    {/*DELIVERY, MOVE  */}
-                                    {/* {([TABS.DELIVERY.id].includes(tab) ||
+                                {/*DELIVERY, MOVE  */}
+                                {/* {([TABS.DELIVERY.id].includes(tab) ||
                                         (tab === TABS.MOVE.id &&
                                             moveType !== EMoveTypes.Handy)) &&
                                         SITE_CONSTANTS.PASSENGER_ORDER_CONFIG
@@ -1884,8 +1893,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                                 error={errors.to_way?.message}
                                             />
                                         )} */}
-                                    {/*DELIVERY */}
-                                    {/* {[TABS.DELIVERY.id].includes(tab) &&
+                                {/*DELIVERY */}
+                                {/* {[TABS.DELIVERY.id].includes(tab) &&
                                         SITE_CONSTANTS.PASSENGER_ORDER_CONFIG
                                             .visibility.toMission && (
                                             <details>
@@ -1915,8 +1924,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                                 />
                                             </details>
                                         )} */}
-                                    {/* DELIVERY, MOTORCYCLE */}
-                                    {/* {(tab === TABS.DELIVERY.id ||
+                                {/* DELIVERY, MOTORCYCLE */}
+                                {/* {(tab === TABS.DELIVERY.id ||
                                         tab === TABS.MOTORCYCLE.id) && (
                                         <Input
                                             inputProps={{
@@ -1929,8 +1938,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                             error={getPhoneError(toPhone)}
                                         />
                                     )} */}
-                                    {/* DELIVERY  */}
-                                    {/* {tab === TABS.DELIVERY.id && (
+                                {/* DELIVERY  */}
+                                {/* {tab === TABS.DELIVERY.id && (
                                         <>
                                             <Input
                                                 inputProps={{
@@ -2005,8 +2014,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                             </GroupedInputs>
                                         </>
                                     )} */}
-                                    {/*DELIVERY, MOTORCYCLE  */}
-                                    {/* {(tab === TABS.DELIVERY.id ||
+                                {/*DELIVERY, MOTORCYCLE  */}
+                                {/* {(tab === TABS.DELIVERY.id ||
                                         tab === TABS.MOTORCYCLE.id) && (
                                         <>
                                             <Input
@@ -2031,8 +2040,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                             />
                                         </>
                                     )} */}
-                                    {/*DELIVERY  */}
-                                    {/* {tab === TABS.DELIVERY.id && (
+                                {/*DELIVERY  */}
+                                {/* {tab === TABS.DELIVERY.id && (
                                         <div className="weight">
                                             <Tabs
                                                 tabs={SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.values.weight.map(
@@ -2054,8 +2063,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                             />
                                         </div>
                                     )} */}
-                                    {/* DELIVERY, MOTORCYCLE  */}
-                                    {/* {(tab === TABS.DELIVERY.id ||
+                                {/* DELIVERY, MOTORCYCLE  */}
+                                {/* {(tab === TABS.DELIVERY.id ||
                                         tab === TABS.MOTORCYCLE.id) && (
                                         <>
                                             <Checkbox
@@ -2105,8 +2114,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                             </GroupedInputs>
                                         </>
                                     )} */}
-                                    {/*DELIVERY  */}
-                                    {/* {tab === TABS.DELIVERY.id && (
+                                {/*DELIVERY  */}
+                                {/* {tab === TABS.DELIVERY.id && (
                                         <>
                                             <div
                                                 className="info"
@@ -2126,8 +2135,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                             />
                                         </>
                                     )} */}
-                                    {/*VOTING, WAITING */}
-                                    {/* {![
+                                {/*VOTING, WAITING */}
+                                {/* {![
                                         TABS.DELIVERY.id,
                                         TABS.MOTORCYCLE.id,
                                         TABS.MOVE.id,
@@ -2213,8 +2222,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                             </div>
                                         </>
                                     )} */}
-                                    {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP  */}
-                                    {/* {tab !== TABS.WASH.id && (
+                                {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP  */}
+                                {/* {tab !== TABS.WASH.id && (
                                         <>
                                             <Separator
                                                 text={t(
@@ -2260,8 +2269,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                             </div>
                                         </>
                                     )} */}
-                                    {/*VOTING, WAITING  */}
-                                    {/* {![
+                                {/*VOTING, WAITING  */}
+                                {/* {![
                                         TABS.DELIVERY.id,
                                         TABS.MOTORCYCLE.id,
                                         TABS.MOVE.id,
@@ -2370,8 +2379,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                             </div>
                                         </>
                                     )} */}
-                                    {/*WAGON */}
-                                    {/* {tab === TABS.WAGON.id && (
+                                {/*WAGON */}
+                                {/* {tab === TABS.WAGON.id && (
                                         <Input
                                             inputProps={{
                                                 placeholder: t(
@@ -2389,8 +2398,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                         />
                                     )} */}
 
-                                    {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON  */}
-                                    {/* {![TABS.TRIP.id, TABS.WASH.id].includes(
+                                {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON  */}
+                                {/* {![TABS.TRIP.id, TABS.WASH.id].includes(
                                         tab
                                     ) && (
                                         <Input
@@ -2412,8 +2421,8 @@ const PassengerOrder: React.FC<IProps> = ({
                                         />
                                     )} */}
 
-                                    {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP  */}
-                                    {/* {tab !== TABS.WASH.id && (
+                                {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP  */}
+                                {/* {tab !== TABS.WASH.id && (
                                         <div className="order-vote">
                                             <Button
                                                 type="submit"
@@ -2428,10 +2437,11 @@ const PassengerOrder: React.FC<IProps> = ({
                                             />
                                         </div>
                                     )} */}
-                                </>
-                            </div>
-                        </div>
-                    </form>
+                            </>
+
+                            {/* </div> */}
+                        </form>
+                    </div>
                 </section>
             </Layout>
 
@@ -2710,23 +2720,23 @@ const VotingForm = forwardRef(function VotingForm(
         status,
         message,
     }: TVotingFormProps,
-    ref: React.ForwardedRef<{}>
+    // ref: React.ForwardedRef<{}>
 ) {
-    const locationWrapperRef = useRef<HTMLDivElement>(null);
+    // const locationWrapperRef = useRef<HTMLDivElement>(null);
     const otherWrapperRef = useRef<HTMLDivElement>(null);
 
-    useImperativeHandle(ref, () => ({
-        locationWrapperRef,
-        otherWrapperRef,
-    }));
+    // useImperativeHandle(ref, () => ({
+    //     locationWrapperRef,
+    //     otherWrapperRef,
+    // }));
 
     return (
         <>
             <div
                 className="form-container__location-wrapper"
-                ref={locationWrapperRef}
+            // ref={locationWrapperRef}
             >
-                <SwitchSlider
+                {/* <SwitchSlider
                     checked={isIntercity}
                     onValueChanged={(value) => setIsIntercity(value)}
                     startButton={{
@@ -2744,7 +2754,7 @@ const VotingForm = forwardRef(function VotingForm(
                         ),
                     }}
                     wrapperClassName="is-intercity"
-                />
+                /> */}
 
                 <LocationInput
                     onOpenMap={() => {
@@ -2755,16 +2765,15 @@ const VotingForm = forwardRef(function VotingForm(
                 />
 
                 {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP, WASH  разобраться */}
-                {!(tab === TABS.MOVE.id && moveType === EMoveTypes.Handy) &&
-                    tab !== TABS.WASH.id && (
-                        <LocationInput
-                            type={EPointType.To}
-                            onOpenMap={() => {
-                                setIsMapVisible(true);
-                            }}
-                            isIntercity={isIntercity}
-                        />
-                    )}
+
+                <LocationInput
+                    type={EPointType.To}
+                    onOpenMap={() => {
+                        setIsMapVisible(true);
+                    }}
+                    isIntercity={isIntercity}
+                />
+
             </div>
             <div
                 className="form-container__others-wrapper"
@@ -2777,9 +2786,8 @@ const VotingForm = forwardRef(function VotingForm(
                             min: 0,
                             ...register("customer_price"),
                         }}
-                        label={`${t(TRANSLATION.CUSTOMER_PRICE)}, ${
-                            CURRENCY.SIGN
-                        }`}
+                        label={`${t(TRANSLATION.CUSTOMER_PRICE)}, ${CURRENCY.SIGN
+                            }`}
                         error={errors.customer_price?.message}
                     />
                 )}
@@ -2796,9 +2804,8 @@ const VotingForm = forwardRef(function VotingForm(
                                 _time,
                                 auto.id
                             ).value;
-                            const payment = `~${value.toFixed(2)}${
-                                CURRENCY.NAME
-                            }`;
+                            const payment = `~${value.toFixed(2)}${CURRENCY.NAME
+                                }`;
 
                             return (
                                 <Card
@@ -2849,11 +2856,11 @@ const VotingForm = forwardRef(function VotingForm(
                             onClick={() => setPaymentWay(EPaymentWays.Credit)}
                             text={t(TRANSLATION.PAYMENT_WAYS[2])}
                             disabled={true}
-                            // onClick={(e) => {
-                            //   e.preventDefault()
-                            //   setCardActiveClass(2)
-                            //   setTieCardModal(true)
-                            // }}
+                        // onClick={(e) => {
+                        //   e.preventDefault()
+                        //   setCardActiveClass(2)
+                        //   setTieCardModal(true)
+                        // }}
                         />
                     </div>
                 </>
@@ -2873,12 +2880,12 @@ const VotingForm = forwardRef(function VotingForm(
                                 {typeof time === "string"
                                     ? t(TRANSLATION.NOW)
                                     : time.isSame(new Date(), "day")
-                                    ? `${t(TRANSLATION.TODAY)} ${time.format(
-                                          dateFormatTime
-                                      )}`
-                                    : `${t(TRANSLATION.TOMORROW)} ${time.format(
-                                          dateFormatTime
-                                      )}`}
+                                        ? `${t(TRANSLATION.TODAY)} ${time.format(
+                                            dateFormatTime
+                                        )}`
+                                        : `${t(TRANSLATION.TOMORROW)} ${time.format(
+                                            dateFormatTime
+                                        )}`}
                             </label>
                         </div>
                         <div onClick={() => setSeatsModal(true)}>
@@ -2980,26 +2987,26 @@ function WaitingForm({
             {![TABS.WAGON.id, TABS.MOTORCYCLE.id, TABS.WASH.id].includes(
                 tab
             ) && (
-                <SwitchSlider
-                    checked={isIntercity}
-                    onValueChanged={(value) => setIsIntercity(value)}
-                    startButton={{
-                        label: t(
-                            tab === TABS.MOVE.id
-                                ? TRANSLATION.SAME_STATE
-                                : TRANSLATION.CITY
-                        ),
-                    }}
-                    endButton={{
-                        label: t(
-                            tab === TABS.MOVE.id
-                                ? TRANSLATION.INTERSTATE
-                                : TRANSLATION.INTERCITY
-                        ),
-                    }}
-                    wrapperClassName="is-intercity"
-                />
-            )}
+                    <SwitchSlider
+                        checked={isIntercity}
+                        onValueChanged={(value) => setIsIntercity(value)}
+                        startButton={{
+                            label: t(
+                                tab === TABS.MOVE.id
+                                    ? TRANSLATION.SAME_STATE
+                                    : TRANSLATION.CITY
+                            ),
+                        }}
+                        endButton={{
+                            label: t(
+                                tab === TABS.MOVE.id
+                                    ? TRANSLATION.INTERSTATE
+                                    : TRANSLATION.INTERCITY
+                            ),
+                        }}
+                        wrapperClassName="is-intercity"
+                    />
+                )}
             {tab !== TABS.WASH.id && (
                 <LocationInput
                     onOpenMap={() => {
@@ -3033,9 +3040,8 @@ function WaitingForm({
                             min: 0,
                             ...register("customer_price"),
                         }}
-                        label={`${t(TRANSLATION.CUSTOMER_PRICE)}, ${
-                            CURRENCY.SIGN
-                        }`}
+                        label={`${t(TRANSLATION.CUSTOMER_PRICE)}, ${CURRENCY.SIGN
+                            }`}
                         error={errors.customer_price?.message}
                     />
                 )}
@@ -3047,56 +3053,55 @@ function WaitingForm({
                 TABS.TRIP.id,
                 TABS.WASH.id,
             ].includes(tab) && (
-                <>
-                    <Separator text={t(TRANSLATION.AUTO_CLASS)} />
-                    <div className="taxi-cards">
-                        {class_auto.map((auto) => {
-                            const _time =
-                                typeof time === "string" ? moment() : time;
-                            const value = getPayment(
-                                null,
-                                null,
-                                distance,
-                                _time,
-                                auto.id
-                            ).value;
-                            const payment = `~${value.toFixed(2)}${
-                                CURRENCY.NAME
-                            }`;
+                    <>
+                        <Separator text={t(TRANSLATION.AUTO_CLASS)} />
+                        <div className="taxi-cards">
+                            {class_auto.map((auto) => {
+                                const _time =
+                                    typeof time === "string" ? moment() : time;
+                                const value = getPayment(
+                                    null,
+                                    null,
+                                    distance,
+                                    _time,
+                                    auto.id
+                                ).value;
+                                const payment = `~${value.toFixed(2)}${CURRENCY.NAME
+                                    }`;
 
-                            return (
-                                <Card
-                                    key={auto.id}
-                                    active={auto.id === carClass}
-                                    src={auto.src}
-                                    text={t(TRANSLATION.CAR_CLASSES[auto.id])}
-                                    onClick={() => setCarClass(auto.id)}
-                                    payment={payment}
+                                return (
+                                    <Card
+                                        key={auto.id}
+                                        active={auto.id === carClass}
+                                        src={auto.src}
+                                        text={t(TRANSLATION.CAR_CLASSES[auto.id])}
+                                        onClick={() => setCarClass(auto.id)}
+                                        payment={payment}
+                                    />
+                                );
+                            })}
+                        </div>
+                        <div className="waiting-block">
+                            <span>
+                                <img src={images.carAlt} alt={t(TRANSLATION.CAR)} />
+                                <label className="colored">
+                                    {t(TRANSLATION.FREE)}: <span>7</span>
+                                </label>
+                            </span>
+                            <div className="vertical-line" />
+                            <span>
+                                <img
+                                    src={images.clock}
+                                    alt={t(TRANSLATION.CLOCK)}
                                 />
-                            );
-                        })}
-                    </div>
-                    <div className="waiting-block">
-                        <span>
-                            <img src={images.carAlt} alt={t(TRANSLATION.CAR)} />
-                            <label className="colored">
-                                {t(TRANSLATION.FREE)}: <span>7</span>
-                            </label>
-                        </span>
-                        <div className="vertical-line" />
-                        <span>
-                            <img
-                                src={images.clock}
-                                alt={t(TRANSLATION.CLOCK)}
-                            />
-                            <label className="colored">
-                                {t(TRANSLATION.WAITING)}:{" "}
-                                <span>5 {t(TRANSLATION.MINUTES)}</span>
-                            </label>
-                        </span>
-                    </div>
-                </>
-            )}
+                                <label className="colored">
+                                    {t(TRANSLATION.WAITING)}:{" "}
+                                    <span>5 {t(TRANSLATION.MINUTES)}</span>
+                                </label>
+                            </span>
+                        </div>
+                    </>
+                )}
             {tab !== TABS.WASH.id && (
                 <>
                     <Separator text={t(TRANSLATION.PAYMENT_WAY)} />
@@ -3115,11 +3120,11 @@ function WaitingForm({
                             onClick={() => setPaymentWay(EPaymentWays.Credit)}
                             text={t(TRANSLATION.PAYMENT_WAYS[2])}
                             disabled={true}
-                            // onClick={(e) => {
-                            //   e.preventDefault()
-                            //   setCardActiveClass(2)
-                            //   setTieCardModal(true)
-                            // }}
+                        // onClick={(e) => {
+                        //   e.preventDefault()
+                        //   setCardActiveClass(2)
+                        //   setTieCardModal(true)
+                        // }}
                         />
                     </div>
                 </>
@@ -3132,66 +3137,66 @@ function WaitingForm({
                 TABS.TRIP.id,
                 TABS.WASH.id,
             ].includes(tab) && (
-                <>
-                    <Separator text={t(TRANSLATION.ORDER_DETAILS)} />
-                    <div className="info-block">
-                        <div onClick={() => setPickTimeModal(true)}>
-                            <img
-                                src={images.timer}
-                                alt={t(TRANSLATION.CLOCK)}
-                            />
-                            <label
-                                style={{
-                                    color: SITE_CONSTANTS.PALETTE.primary.dark,
-                                }}
-                            >
-                                {typeof time === "string"
-                                    ? t(TRANSLATION.NOW)
-                                    : time.isSame(new Date(), "day")
-                                    ? `${t(TRANSLATION.TODAY)} ${time.format(
-                                          dateFormatTime
-                                      )}`
-                                    : `${t(TRANSLATION.TOMORROW)} ${time.format(
-                                          dateFormatTime
-                                      )}`}
-                            </label>
-                        </div>
-                        <div onClick={() => setSeatsModal(true)}>
-                            <img
-                                src={images.multipleUsers}
-                                alt={t(TRANSLATION.SEATS)}
-                            />
-                            <label
-                                style={{
-                                    color: SITE_CONSTANTS.PALETTE.primary.dark,
-                                }}
-                            >
-                                {t(TRANSLATION.SEATS)}: <span>{seats}</span>
-                            </label>
-                        </div>
-                        <div onClick={() => setCommentsModal(true)}>
-                            <span
-                                className="comment-controls"
-                                style={{
-                                    height: "55px",
-                                }}
-                            >
+                    <>
+                        <Separator text={t(TRANSLATION.ORDER_DETAILS)} />
+                        <div className="info-block">
+                            <div onClick={() => setPickTimeModal(true)}>
                                 <img
-                                    src={images.messageIcon}
-                                    alt={t(TRANSLATION.MESSAGE)}
+                                    src={images.timer}
+                                    alt={t(TRANSLATION.CLOCK)}
                                 />
-                            </span>
-                            <label
-                                style={{
-                                    color: SITE_CONSTANTS.PALETTE.primary.dark,
-                                }}
-                            >
-                                {t(TRANSLATION.COMMENT)}
-                            </label>
+                                <label
+                                    style={{
+                                        color: SITE_CONSTANTS.PALETTE.primary.dark,
+                                    }}
+                                >
+                                    {typeof time === "string"
+                                        ? t(TRANSLATION.NOW)
+                                        : time.isSame(new Date(), "day")
+                                            ? `${t(TRANSLATION.TODAY)} ${time.format(
+                                                dateFormatTime
+                                            )}`
+                                            : `${t(TRANSLATION.TOMORROW)} ${time.format(
+                                                dateFormatTime
+                                            )}`}
+                                </label>
+                            </div>
+                            <div onClick={() => setSeatsModal(true)}>
+                                <img
+                                    src={images.multipleUsers}
+                                    alt={t(TRANSLATION.SEATS)}
+                                />
+                                <label
+                                    style={{
+                                        color: SITE_CONSTANTS.PALETTE.primary.dark,
+                                    }}
+                                >
+                                    {t(TRANSLATION.SEATS)}: <span>{seats}</span>
+                                </label>
+                            </div>
+                            <div onClick={() => setCommentsModal(true)}>
+                                <span
+                                    className="comment-controls"
+                                    style={{
+                                        height: "55px",
+                                    }}
+                                >
+                                    <img
+                                        src={images.messageIcon}
+                                        alt={t(TRANSLATION.MESSAGE)}
+                                    />
+                                </span>
+                                <label
+                                    style={{
+                                        color: SITE_CONSTANTS.PALETTE.primary.dark,
+                                    }}
+                                >
+                                    {t(TRANSLATION.COMMENT)}
+                                </label>
+                            </div>
                         </div>
-                    </div>
-                </>
-            )}
+                    </>
+                )}
             {![TABS.TRIP.id, TABS.WASH.id].includes(tab) && (
                 <Input
                     inputProps={{
@@ -3648,11 +3653,11 @@ function DeliveryForm({
                         onClick={() => setPaymentWay(EPaymentWays.Credit)}
                         text={t(TRANSLATION.PAYMENT_WAYS[2])}
                         disabled={true}
-                        // onClick={(e) => {
-                        //   e.preventDefault()
-                        //   setCardActiveClass(2)
-                        //   setTieCardModal(true)
-                        // }}
+                    // onClick={(e) => {
+                    //   e.preventDefault()
+                    //   setCardActiveClass(2)
+                    //   setTieCardModal(true)
+                    // }}
                     />
                 </div>
             </>
@@ -3763,9 +3768,8 @@ function MotorcycleForm({
                             min: 0,
                             ...register("customer_price"),
                         }}
-                        label={`${t(TRANSLATION.CUSTOMER_PRICE)}, ${
-                            CURRENCY.SIGN
-                        }`}
+                        label={`${t(TRANSLATION.CUSTOMER_PRICE)}, ${CURRENCY.SIGN
+                            }`}
                         error={errors.customer_price?.message}
                     />
                 )}
@@ -3855,11 +3859,11 @@ function MotorcycleForm({
                             onClick={() => setPaymentWay(EPaymentWays.Credit)}
                             text={t(TRANSLATION.PAYMENT_WAYS[2])}
                             disabled={true}
-                            // onClick={(e) => {
-                            //   e.preventDefault()
-                            //   setCardActiveClass(2)
-                            //   setTieCardModal(true)
-                            // }}
+                        // onClick={(e) => {
+                        //   e.preventDefault()
+                        //   setCardActiveClass(2)
+                        //   setTieCardModal(true)
+                        // }}
                         />
                     </div>
                 </>
@@ -3956,7 +3960,7 @@ function MoveForm({
                                     disabled: room === null,
                                     value:
                                         room !== null &&
-                                        elevator.steps[room] !== undefined
+                                            elevator.steps[room] !== undefined
                                             ? elevator.steps[room]
                                             : "",
                                     onChange: (
@@ -4051,13 +4055,13 @@ function MoveForm({
                         total={
                             moveType === EMoveTypes.Apartament
                                 ? Object.values(furniture.house).reduce(
-                                      (sum, i) => sum + _.sum(Object.values(i)),
-                                      0
-                                  )
+                                    (sum, i) => sum + _.sum(Object.values(i)),
+                                    0
+                                )
                                 : _.sum(Object.values(furniture.room))
                         }
-                        // roomsChoosen={Object.values(roomFurniture)
-                        // .reduce((sum, i) => sum + (_.sum(Object.values(i)) > 0 ? 1 : 0), 0)}
+                    // roomsChoosen={Object.values(roomFurniture)
+                    // .reduce((sum, i) => sum + (_.sum(Object.values(i)) > 0 ? 1 : 0), 0)}
                     />
                     <hr
                         className="move__separator"
@@ -4071,26 +4075,26 @@ function MoveForm({
             {![TABS.WAGON.id, TABS.MOTORCYCLE.id, TABS.WASH.id].includes(
                 tab
             ) && (
-                <SwitchSlider
-                    checked={isIntercity}
-                    onValueChanged={(value) => setIsIntercity(value)}
-                    startButton={{
-                        label: t(
-                            tab === TABS.MOVE.id
-                                ? TRANSLATION.SAME_STATE
-                                : TRANSLATION.CITY
-                        ),
-                    }}
-                    endButton={{
-                        label: t(
-                            tab === TABS.MOVE.id
-                                ? TRANSLATION.INTERSTATE
-                                : TRANSLATION.INTERCITY
-                        ),
-                    }}
-                    wrapperClassName="is-intercity"
-                />
-            )}
+                    <SwitchSlider
+                        checked={isIntercity}
+                        onValueChanged={(value) => setIsIntercity(value)}
+                        startButton={{
+                            label: t(
+                                tab === TABS.MOVE.id
+                                    ? TRANSLATION.SAME_STATE
+                                    : TRANSLATION.CITY
+                            ),
+                        }}
+                        endButton={{
+                            label: t(
+                                tab === TABS.MOVE.id
+                                    ? TRANSLATION.INTERSTATE
+                                    : TRANSLATION.INTERCITY
+                            ),
+                        }}
+                        wrapperClassName="is-intercity"
+                    />
+                )}
             {tab !== TABS.WASH.id && (
                 <LocationInput
                     onOpenMap={() => {
@@ -4181,11 +4185,11 @@ function MoveForm({
                             onClick={() => setPaymentWay(EPaymentWays.Credit)}
                             text={t(TRANSLATION.PAYMENT_WAYS[2])}
                             disabled={true}
-                            // onClick={(e) => {
-                            //   e.preventDefault()
-                            //   setCardActiveClass(2)
-                            //   setTieCardModal(true)
-                            // }}
+                        // onClick={(e) => {
+                        //   e.preventDefault()
+                        //   setCardActiveClass(2)
+                        //   setTieCardModal(true)
+                        // }}
                         />
                     </div>
                 </>
@@ -4432,11 +4436,11 @@ function WagonForm({
                             onClick={() => setPaymentWay(EPaymentWays.Credit)}
                             text={t(TRANSLATION.PAYMENT_WAYS[2])}
                             disabled={true}
-                            // onClick={(e) => {
-                            //   e.preventDefault()
-                            //   setCardActiveClass(2)
-                            //   setTieCardModal(true)
-                            // }}
+                        // onClick={(e) => {
+                        //   e.preventDefault()
+                        //   setCardActiveClass(2)
+                        //   setTieCardModal(true)
+                        // }}
                         />
                     </div>
                 </>
@@ -4516,26 +4520,26 @@ function TripForm({
             {![TABS.WAGON.id, TABS.MOTORCYCLE.id, TABS.WASH.id].includes(
                 tab
             ) && (
-                <SwitchSlider
-                    checked={isIntercity}
-                    onValueChanged={(value) => setIsIntercity(value)}
-                    startButton={{
-                        label: t(
-                            tab === TABS.MOVE.id
-                                ? TRANSLATION.SAME_STATE
-                                : TRANSLATION.CITY
-                        ),
-                    }}
-                    endButton={{
-                        label: t(
-                            tab === TABS.MOVE.id
-                                ? TRANSLATION.INTERSTATE
-                                : TRANSLATION.INTERCITY
-                        ),
-                    }}
-                    wrapperClassName="is-intercity"
-                />
-            )}
+                    <SwitchSlider
+                        checked={isIntercity}
+                        onValueChanged={(value) => setIsIntercity(value)}
+                        startButton={{
+                            label: t(
+                                tab === TABS.MOVE.id
+                                    ? TRANSLATION.SAME_STATE
+                                    : TRANSLATION.CITY
+                            ),
+                        }}
+                        endButton={{
+                            label: t(
+                                tab === TABS.MOVE.id
+                                    ? TRANSLATION.INTERSTATE
+                                    : TRANSLATION.INTERCITY
+                            ),
+                        }}
+                        wrapperClassName="is-intercity"
+                    />
+                )}
             {tab !== TABS.WASH.id && (
                 <LocationInput
                     onOpenMap={() => {
@@ -4588,11 +4592,11 @@ function TripForm({
                             onClick={() => setPaymentWay(EPaymentWays.Credit)}
                             text={t(TRANSLATION.PAYMENT_WAYS[2])}
                             disabled={true}
-                            // onClick={(e) => {
-                            //   e.preventDefault()
-                            //   setCardActiveClass(2)
-                            //   setTieCardModal(true)
-                            // }}
+                        // onClick={(e) => {
+                        //   e.preventDefault()
+                        //   setCardActiveClass(2)
+                        //   setTieCardModal(true)
+                        // }}
                         />
                     </div>
                 </>
@@ -4622,9 +4626,9 @@ function WashForm({
     // setIsIntercity,
     setIsMapVisible,
 }: // register,
-// errors,
-// t,
-TWashFormProps) {
+    // errors,
+    // t,
+    TWashFormProps) {
     return (
         <>
             {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP, WASH  разобраться */}

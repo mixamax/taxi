@@ -4,6 +4,8 @@ body {
     background: #fffbf4;
     margin: 0;
     //   padding-bottom: 20px;
+    height: 100dvh;
+    overflow: hidden;
 }
 
 a:active,
@@ -14,14 +16,11 @@ a {
 }
 
 #root {
-    // min-height: 100vh;
     main {
         max-width: 900px;
         margin: auto;
         display: flex;
         flex-direction: column;
-        top: 0;
-        left: 0;
         height: 100dvh;
         overflow: hidden;
         background: #fffbf4;

@@ -329,7 +329,7 @@ const Map: React.FC<IProps> = ({
             alt="Центр"
             tabIndex={0}
           />
-          {!disableButtons && <div className={cn('modal-buttons',{'z-indexed': isModal})}>
+          {/* {!disableButtons && <div className={cn('modal-buttons',{'z-indexed': isModal})}>
             {!!setFrom && (
               <Button
                 className='modal-button'
@@ -368,7 +368,7 @@ const Map: React.FC<IProps> = ({
                 setMapModal({ ...defaultMapModal })
               }}
             />
-          </div>}
+          </div>} */}
           <TileLayer
             attribution={getAttribution()}
             url={getTileServerUrl()}
