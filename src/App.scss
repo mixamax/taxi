@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Roboto:wght@300;400;500&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Mulish:wght@200..1000&display=swap');
 
 body {
     background: #fffbf4;
@@ -49,7 +50,7 @@ a {
         .loading-frame__title {
             margin-top: 30px;
             font-size: 20px;
-            font-family: "Roboto";
+            font-family: "Mulish", sans-serif;
             font-weight: bolder;
         }
     }
@@ -69,7 +70,7 @@ a {
     }
 
     .error-message {
-        font-family: Roboto;
+        font-family: "Mulish", sans-serif;
         font-weight: normal;
         margin: 0;
         color: red;
@@ -110,7 +111,7 @@ a {
 
     .error-message-status {
         color: red;
-        font-family: Roboto;
+        font-family: "Mulish", sans-serif;
         text-align: center;
         font-size: 20px;
         margin: 0 auto;
@@ -151,7 +152,7 @@ img {
 * {
     font-size: 18px;
     box-sizing: border-box;
-    font-family: Roboto;
+    font-family: "Mulish", sans-serif;
 }
 
 *:not(b) {
