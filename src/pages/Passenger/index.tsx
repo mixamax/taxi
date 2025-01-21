@@ -4,6 +4,7 @@ import React, {
     useRef,
     forwardRef,
     useImperativeHandle,
+    Ref,
 } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import {
@@ -12,7 +13,7 @@ import {
     UseFormRegister,
     UseFormSetValue,
 } from "react-hook-form";
-import Input, { EInputTypes } from "../../components/Input";
+import Input, { EInputTypes } from "../../components/InputNew";
 import Separator from "../../components/separator/Separator";
 import Card from "../../components/Card/Card";
 import Button from "../../components/Button";
@@ -96,14 +97,21 @@ import GroupedInputs from "../../components/GrouppedInputs/GrouppedInputs";
 import PassengerMiniOrders from "../../components/passenger-order/MiniOrders";
 import { ETimeTypes, IDateTime } from "../../tools/dateTime";
 import { ECompareVariants } from "../../components/CompareVariants";
-import LocationInput from "../../components/LocationInput";
+import LocationInput from "../../components/LocationInputNew";
 import { IBigTruckService } from "../../constants/bigTruckServices";
 import Checkbox from "../../components/Checkbox";
 import RadioCheckbox from "../../components/RadioCheckbox";
 import Map from "../../components/Map";
 import Layout from "../../components/Layout";
-import { swipe } from "../../tools/swipe";
+// import { swipe } from "../../tools/swipe";
+import { useSwipe } from "../../tools/swipe";
 import { BoundaryButtons } from "../../components/BoundaryButtons/BoundaryButtons";
+import { ShortInfo } from "../../components/ShortInfo/ShortInfo";
+import SeatSlider from "../../components/SeatSlider";
+import { CarClassSlider } from "../../components/CarClassSlider";
+import { OpacityLayer } from "../../components/OpacityLayer";
+import { PriceInputGroup } from "../../components/Inputs/PriceInput";
+import { PointInput } from "../../components/Inputs/PointInput";
 
 const mapStateToProps = (state: IRootState) => ({
     seats: clientOrderSelectors.seats(state),
@@ -118,6 +126,11 @@ const mapStateToProps = (state: IRootState) => ({
     user: userSelectors.user(state),
 });
 
+// const mapDispatchToProps = {
+//     setSeats: clientOrderActionCreators.setSeats,
+//     setSeatsModal: modalsActionCreators.setSeatsModal,
+//   }
+
 const mapDispatchToProps = {
     ...clientOrderActionCreators,
     getActiveOrders: ordersActionCreators.getActiveOrders,
@@ -126,10 +139,11 @@ const mapDispatchToProps = {
     setMessageModal: modalsActionCreators.setMessageModal,
     setPickTimeModal: modalsActionCreators.setPickTimeModal,
     setCommentsModal: modalsActionCreators.setCommentsModal,
-    setSeatsModal: modalsActionCreators.setSeatsModal,
+    // setSeatsModal: modalsActionCreators.setSeatsModal,
     setOnTheWayModal: modalsActionCreators.setOnTheWayModal,
     setRatingModal: modalsActionCreators.setRatingModal,
     setCandidatesModal: modalsActionCreators.setCandidatesModal,
+    setSeats: clientOrderActionCreators.setSeats,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -173,6 +187,8 @@ const defaultDateTimeIntervalValue = {
     timeComparator: ECompareVariants.Equal,
 };
 
+const menuLiftingHeight = 312
+
 const PassengerOrder: React.FC<IProps> = ({
     seats,
     from,
@@ -193,11 +209,12 @@ const PassengerOrder: React.FC<IProps> = ({
     setDriverModal,
     setMessageModal,
     setPickTimeModal,
-    setSeatsModal,
+    // setSeatsModal,
     setCommentsModal,
     setOnTheWayModal,
     setRatingModal,
     setCandidatesModal,
+    setSeats,
 }) => {
     // Cards, tabs
     const [paymentWay, setPaymentWay] = useCachedState(
@@ -334,11 +351,12 @@ const PassengerOrder: React.FC<IProps> = ({
     const [refresh, setRefresh] = useState(false);
 
     const [isMapVisible, setIsMapVisible] = useState(true);
-    // const [isScrolling, setIsScrolling] = useState(false);
-    // console.log(isScrolling, "scrolling passenger");
 
     const formContainerRef = useRef<HTMLDivElement>(null);
     const draggableRef = useRef<HTMLFormElement>(null)
+
+    const { isExpanded } = useSwipe(formContainerRef.current, draggableRef.current, menuLiftingHeight);
+
     // const formWithMapRef = useRef<HTMLDivElement>(null);
     // const votingFormRef = useRef<HTMLDivElement>(null);
     // const votingFormRef = useRef({
@@ -347,39 +365,23 @@ const PassengerOrder: React.FC<IProps> = ({
     // });
 
     // *********************swipe*********************
-    useEffect(() => {
-        const element = formContainerRef.current;
-        // const formWithMap = formWithMapRef.current;
-        // const { locationWrapperRef, otherWrapperRef } = votingFormRef.current;
-        // const locationWrapper = locationWrapperRef.current;
-        // const otherWrapper = otherWrapperRef.current;
-        const draggable = draggableRef.current
+    // useEffect(() => {
+    //     const element = formContainerRef.current;
+    //     const draggable = draggableRef.current
+    //     let removeLsts: (() => void)[] = [];
 
-        let removeLsts: (() => void)[] = [];
-
-        if (element && draggable) {
-            removeLsts = swipe(element, draggable);
-        }
-
-        // if (element && formWithMap && locationWrapper && otherWrapper) {
-        //     const height = formWithMap.clientHeight - 20 + 120; // форма заходит на карту на 20px
-        //     removeLsts = swipe(
-        //         element,
-        //         300,
-        //         height,
-        //         otherWrapper,
-        //         locationWrapper
-        //     );
-        // }
-        return () => {
-            if (removeLsts) {
-                removeLsts.forEach((lst) => lst());
-            }
-        };
-    }, [
-        formContainerRef.current,
-        draggableRef.current
-    ]);
+    //     if (element && draggable) {
+    //         removeLsts = swipe(element, draggable);
+    //     }
+    //     return () => {
+    //         if (removeLsts) {
+    //             removeLsts.forEach((lst) => lst());
+    //         }
+    //     };
+    // }, [
+    //     formContainerRef.current,
+    //     draggableRef.current
+    // ]);
     //передать ресайз в зависимости
     // *********************/swipe*********************
 
@@ -902,7 +904,7 @@ const PassengerOrder: React.FC<IProps> = ({
                                     t={t}
                                     cardPaymentEnabled={cardPaymentEnabled}
                                     setPickTimeModal={setPickTimeModal}
-                                    setSeatsModal={setSeatsModal}
+                                    // setSeatsModal={setSeatsModal}
                                     setCommentsModal={setCommentsModal}
                                     carClass={carClass}
                                     setCarClass={setCarClass}
@@ -912,7 +914,9 @@ const PassengerOrder: React.FC<IProps> = ({
                                     setPhone={setPhone}
                                     status={status}
                                     message={message}
-                                // ref={votingFormRef}
+                                    setSeats={setSeats}
+                                    isExpanded={isExpanded}
+                                    draggableElement={draggableRef.current}
                                 />
                             )}
                             {/* {TABS.WAITING.id === tab && (
@@ -2454,6 +2458,8 @@ const PassengerOrder: React.FC<IProps> = ({
 
 export default connector(PassengerOrder);
 
+
+{/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP, WASH */ }
 type TVotingFormProps = {
     tab: (typeof TABS)[keyof typeof TABS]["id"];
     isIntercity: boolean;
@@ -2477,8 +2483,11 @@ type TVotingFormProps = {
     status: IProps["status"];
     message: IProps["message"];
     setPickTimeModal: IProps["setPickTimeModal"];
-    setSeatsModal: IProps["setSeatsModal"];
+    // setSeatsModal: IProps["setSeatsModal"];
+    setSeats: IProps["setSeats"];
     setCommentsModal: IProps["setCommentsModal"];
+    isExpanded: boolean;
+    draggableElement: HTMLFormElement | null
     // ref: any;
 };
 
@@ -2505,7 +2514,7 @@ type TWaitingFormProps = {
     status: IProps["status"];
     message: IProps["message"];
     setPickTimeModal: IProps["setPickTimeModal"];
-    setSeatsModal: IProps["setSeatsModal"];
+    // setSeatsModal: IProps["setSeatsModal"];
     setCommentsModal: IProps["setCommentsModal"];
 };
 
@@ -2709,7 +2718,7 @@ const VotingForm = forwardRef(function VotingForm(
         t,
         cardPaymentEnabled,
         setPickTimeModal,
-        setSeatsModal,
+        // setSeatsModal,
         setCommentsModal,
         carClass,
         setCarClass,
@@ -2719,239 +2728,290 @@ const VotingForm = forwardRef(function VotingForm(
         setPhone,
         status,
         message,
+        setSeats,
+        isExpanded,
+        draggableElement,
     }: TVotingFormProps,
     // ref: React.ForwardedRef<{}>
 ) {
-    // const locationWrapperRef = useRef<HTMLDivElement>(null);
-    const otherWrapperRef = useRef<HTMLDivElement>(null);
 
-    // useImperativeHandle(ref, () => ({
-    //     locationWrapperRef,
-    //     otherWrapperRef,
-    // }));
 
     return (
         <>
             <div
                 className="form-container__location-wrapper"
-            // ref={locationWrapperRef}
             >
-                {/* <SwitchSlider
-                    checked={isIntercity}
-                    onValueChanged={(value) => setIsIntercity(value)}
-                    startButton={{
-                        label: t(
-                            tab === TABS.MOVE.id
-                                ? TRANSLATION.SAME_STATE
-                                : TRANSLATION.CITY
-                        ),
-                    }}
-                    endButton={{
-                        label: t(
-                            tab === TABS.MOVE.id
-                                ? TRANSLATION.INTERSTATE
-                                : TRANSLATION.INTERCITY
-                        ),
-                    }}
-                    wrapperClassName="is-intercity"
-                /> */}
 
-                <LocationInput
+                <PointInput pointType={EPointType.From} isExpanded={isExpanded} />
+                <PointInput pointType={EPointType.To} isExpanded={isExpanded} />
+                {/* <LocationInput
                     onOpenMap={() => {
                         setIsMapVisible(true);
                     }}
                     type={EPointType.From}
                     isIntercity={isIntercity}
-                />
-
-                {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP, WASH  разобраться */}
-
-                <LocationInput
+                /> */}
+                {/* <LocationInput
                     type={EPointType.To}
                     onOpenMap={() => {
                         setIsMapVisible(true);
                     }}
                     isIntercity={isIntercity}
-                />
-
+                /> */}
             </div>
-            <div
-                className="form-container__others-wrapper"
-                ref={otherWrapperRef}
-            >
-                {SITE_CONSTANTS.ENABLE_CUSTOMER_PRICE && (
-                    <Input
-                        inputProps={{
-                            type: "number",
-                            min: 0,
-                            ...register("customer_price"),
-                        }}
-                        label={`${t(TRANSLATION.CUSTOMER_PRICE)}, ${CURRENCY.SIGN
-                            }`}
-                        error={errors.customer_price?.message}
-                    />
-                )}
-                <>
-                    <Separator text={t(TRANSLATION.AUTO_CLASS)} />
-                    <div className="taxi-cards">
-                        {class_auto.map((auto) => {
-                            const _time =
-                                typeof time === "string" ? moment() : time;
-                            const value = getPayment(
-                                null,
-                                null,
-                                distance,
-                                _time,
-                                auto.id
-                            ).value;
-                            const payment = `~${value.toFixed(2)}${CURRENCY.NAME
-                                }`;
-
-                            return (
-                                <Card
-                                    key={auto.id}
-                                    active={auto.id === carClass}
-                                    src={auto.src}
-                                    text={t(TRANSLATION.CAR_CLASSES[auto.id])}
-                                    onClick={() => setCarClass(auto.id)}
-                                    payment={payment}
-                                />
-                            );
-                        })}
-                    </div>
-                    <div className="waiting-block">
-                        <span>
-                            <img src={images.carAlt} alt={t(TRANSLATION.CAR)} />
-                            <label className="colored">
-                                {t(TRANSLATION.FREE)}: <span>7</span>
-                            </label>
-                        </span>
-                        <div className="vertical-line" />
-                        <span>
-                            <img
-                                src={images.clock}
-                                alt={t(TRANSLATION.CLOCK)}
-                            />
-                            <label className="colored">
-                                {t(TRANSLATION.WAITING)}:{" "}
-                                <span>5 {t(TRANSLATION.MINUTES)}</span>
-                            </label>
-                        </span>
-                    </div>
-                </>
-                <>
-                    <Separator text={t(TRANSLATION.PAYMENT_WAY)} />
-                    <div className="credit-cards">
-                        <Card
-                            src={images.cash}
-                            onClick={() => setPaymentWay(EPaymentWays.Cash)}
-                            text={t(TRANSLATION.PAYMENT_WAYS[1])}
-                            active={
-                                paymentWay === EPaymentWays.Cash ||
-                                !cardPaymentEnabled
-                            }
-                        />
-                        <Card
-                            src={images.card}
-                            onClick={() => setPaymentWay(EPaymentWays.Credit)}
-                            text={t(TRANSLATION.PAYMENT_WAYS[2])}
-                            disabled={true}
-                        // onClick={(e) => {
-                        //   e.preventDefault()
-                        //   setCardActiveClass(2)
-                        //   setTieCardModal(true)
-                        // }}
-                        />
-                    </div>
-                </>
-                <>
-                    <Separator text={t(TRANSLATION.ORDER_DETAILS)} />
-                    <div className="info-block">
-                        <div onClick={() => setPickTimeModal(true)}>
-                            <img
-                                src={images.timer}
-                                alt={t(TRANSLATION.CLOCK)}
-                            />
-                            <label
-                                style={{
-                                    color: SITE_CONSTANTS.PALETTE.primary.dark,
-                                }}
-                            >
-                                {typeof time === "string"
-                                    ? t(TRANSLATION.NOW)
-                                    : time.isSame(new Date(), "day")
-                                        ? `${t(TRANSLATION.TODAY)} ${time.format(
-                                            dateFormatTime
-                                        )}`
-                                        : `${t(TRANSLATION.TOMORROW)} ${time.format(
-                                            dateFormatTime
-                                        )}`}
-                            </label>
-                        </div>
-                        <div onClick={() => setSeatsModal(true)}>
-                            <img
-                                src={images.multipleUsers}
-                                alt={t(TRANSLATION.SEATS)}
-                            />
-                            <label
-                                style={{
-                                    color: SITE_CONSTANTS.PALETTE.primary.dark,
-                                }}
-                            >
-                                {t(TRANSLATION.SEATS)}: <span>{seats}</span>
-                            </label>
-                        </div>
-                        <div onClick={() => setCommentsModal(true)}>
-                            <span
-                                className="comment-controls"
-                                style={{
-                                    height: "55px",
-                                }}
-                            >
-                                <img
-                                    src={images.messageIcon}
-                                    alt={t(TRANSLATION.MESSAGE)}
-                                />
-                            </span>
-                            <label
-                                style={{
-                                    color: SITE_CONSTANTS.PALETTE.primary.dark,
-                                }}
-                            >
-                                {t(TRANSLATION.COMMENT)}
-                            </label>
-                        </div>
-                    </div>
-                </>
-                <Input
-                    inputProps={{
-                        value: phone || "",
-                    }}
-                    fieldWrapperClassName="phone-input"
-                    inputType={EInputTypes.MaskedPhone}
-                    error={getPhoneError(phone)}
-                    buttons={[{ src: images.checkMark }]}
-                    defaultValue={user?.u_phone}
-                    onChange={(e) => {
-                        if (typeof e === "string") {
-                            setPhone(e);
-                        }
-                    }}
-                />
-                <div className="order-vote">
+            <OpacityLayer isShown={!isExpanded} threshold={menuLiftingHeight} draggableElement={draggableElement}><ShortInfo /></OpacityLayer>
+            <OpacityLayer isShown={!isExpanded} threshold={menuLiftingHeight} draggableElement={draggableElement}>
+                <div key="order-button-wrapper" className="form-container__order-button-wrapper">
                     <Button
                         type="submit"
                         text={t(
                             tab === TABS.VOTING.id
                                 ? TRANSLATION.VOTE
                                 : TRANSLATION.TO_ORDER,
-                            { toUpper: true }
+                            { toUpper: false }
+                        )}
+                        status={status}
+                        label={message}
+                    />
+                    <Button
+                        type="submit"
+                        text={t(TRANSLATION.TO_ORDER,
+                            { toUpper: false }
                         )}
                         status={status}
                         label={message}
                     />
                 </div>
+            </OpacityLayer>
+            <div className="form-container__seats-and-time">
+                <div className="form-container__seats">
+                    <span className="form-container__seats-title">{t(TRANSLATION.SEATS)}</span>
+                    <SeatSlider seatNumber={6} setSeats={setSeats} seats={seats} />
+                </div>
+                <div className="form-container__time">
+                    <div className="form-container__time-wrapper">
+                        <span className="form-container__time-title">{"Время поездки"}</span>
+                        <span className="form-container__time-value">19 Dec, 20:49</span>
+                    </div>
+                    <button className="form-container__time-btn" onClick={() => setPickTimeModal(true)}><img src={images.alarmIcon} width={18} ></img></button>
+                </div>
             </div>
+
+            <div className="form-container__car-class">
+                <div className="form-container__car-class-header">
+                    <span className="form-container__car-class-title">{t(TRANSLATION.AUTO_CLASS)}</span>
+                    <div className="form-container__car-nearby-info">
+                        <img src={images.carNearbyIcon} width={16} ></img>
+                        <span className="form-container__car-nearby-info-text">{7} автомобилей рядом</span>
+                    </div>
+                    <div className="form-container__car-nearby-info">
+                        <img src={images.timeWaitIcon} width={16} ></img>
+                        <span className="form-container__car-nearby-info-text">~{5} минут</span>
+                    </div>
+                </div>
+                <CarClassSlider />
+            </div>
+            <div className="form-container__comments">
+                <div className="form-container__comments-wrapper">
+                    <span className="form-container__comments-title">{t(TRANSLATION.COMMENTS)}</span>
+                    <span className="form-container__comments-value">{"Тут будет комментарий водителю"}</span>
+                </div>
+                <button className="form-container__comments-btn" onClick={() => setCommentsModal(true)}><img src={images.seatSliderArrowRight} width={16} ></img></button>
+            </div>
+
+            {/* {SITE_CONSTANTS.ENABLE_CUSTOMER_PRICE && (
+                <Input
+                    inputProps={{
+                        type: "number",
+                        min: 0,
+                        ...register("customer_price"),
+                    }}
+                    label={`${t(TRANSLATION.CUSTOMER_PRICE)}, ${CURRENCY.SIGN
+                        }`}
+                    error={errors.customer_price?.message}
+                />
+            )} */}
+            <>
+                {/* <Separator text={t(TRANSLATION.AUTO_CLASS)} />
+                <div className="taxi-cards">
+                    {class_auto.map((auto) => {
+                        const _time =
+                            typeof time === "string" ? moment() : time;
+                        const value = getPayment(
+                            null,
+                            null,
+                            distance,
+                            _time,
+                            auto.id
+                        ).value;
+                        const payment = `~${value.toFixed(2)}${CURRENCY.NAME
+                            }`;
+
+                        return (
+                            <Card
+                                key={auto.id}
+                                active={auto.id === carClass}
+                                src={auto.src}
+                                text={t(TRANSLATION.CAR_CLASSES[auto.id])}
+                                onClick={() => setCarClass(auto.id)}
+                                payment={payment}
+                            />
+                        );
+                    })}
+                </div> */}
+                {/* <div className="waiting-block">
+                    <span>
+                        <img src={images.carAlt} alt={t(TRANSLATION.CAR)} />
+                        <label className="colored">
+                            {t(TRANSLATION.FREE)}: <span>7</span>
+                        </label>
+                    </span>
+                    <div className="vertical-line" />
+                    <span>
+                        <img
+                            src={images.clock}
+                            alt={t(TRANSLATION.CLOCK)}
+                        />
+                        <label className="colored">
+                            {t(TRANSLATION.WAITING)}:{" "}
+                            <span>5 {t(TRANSLATION.MINUTES)}</span>
+                        </label>
+                    </span>
+                </div> */}
+            </>
+            <>
+                {/* <Separator text={t(TRANSLATION.PAYMENT_WAY)} />
+                <div className="credit-cards">
+                    <Card
+                        src={images.cash}
+                        onClick={() => setPaymentWay(EPaymentWays.Cash)}
+                        text={t(TRANSLATION.PAYMENT_WAYS[1])}
+                        active={
+                            paymentWay === EPaymentWays.Cash ||
+                            !cardPaymentEnabled
+                        }
+                    />
+                    <Card
+                        src={images.card}
+                        onClick={() => setPaymentWay(EPaymentWays.Credit)}
+                        text={t(TRANSLATION.PAYMENT_WAYS[2])}
+                        disabled={true}
+                        onClick={(e) => {
+                            e.preventDefault()
+                            setCardActiveClass(2)
+                            setTieCardModal(true)
+                        }}
+                    />
+                </div> */}
+            </>
+            <>
+                {/* <Separator text={t(TRANSLATION.ORDER_DETAILS)} /> */}
+                {/* <div className="info-block">
+                    <div onClick={() => setPickTimeModal(true)}>
+                        <img
+                            src={images.timer}
+                            alt={t(TRANSLATION.CLOCK)}
+                        />
+                        <label
+                            style={{
+                                color: SITE_CONSTANTS.PALETTE.primary.dark,
+                            }}
+                        >
+                            {typeof time === "string"
+                                ? t(TRANSLATION.NOW)
+                                : time.isSame(new Date(), "day")
+                                    ? `${t(TRANSLATION.TODAY)} ${time.format(
+                                        dateFormatTime
+                                    )}`
+                                    : `${t(TRANSLATION.TOMORROW)} ${time.format(
+                                        dateFormatTime
+                                    )}`}
+                        </label>
+                    </div> */}
+                {/* <div onClick={() => setSeatsModal(true)}>
+                        <img
+                            src={images.multipleUsers}
+                            alt={t(TRANSLATION.SEATS)}
+                        />
+                        <label
+                            style={{
+                                color: SITE_CONSTANTS.PALETTE.primary.dark,
+                            }}
+                        >
+                            {t(TRANSLATION.SEATS)}: <span>{seats}</span>
+                        </label>
+                    </div> */}
+                {/* <div onClick={() => setCommentsModal(true)}>
+                        <span
+                            className="comment-controls"
+                            style={{
+                                height: "55px",
+                            }}
+                        >
+                            <img
+                                src={images.messageIcon}
+                                alt={t(TRANSLATION.MESSAGE)}
+                            />
+                        </span>
+                        <label
+                            style={{
+                                color: SITE_CONSTANTS.PALETTE.primary.dark,
+                            }}
+                        >
+                            {t(TRANSLATION.COMMENT)}
+                        </label>
+                    </div> */}
+                {/* </div> */}
+            </>
+            <Input
+                inputProps={{
+                    value: phone || "",
+                }}
+                // fieldWrapperClassName="phone-input"
+                inputType={EInputTypes.MaskedPhone}
+                error={getPhoneError(phone)}
+                buttons={[{ src: images.checkMarkRed }]}
+                defaultValue={user?.u_phone}
+                onChange={(e) => {
+                    if (typeof e === "string") {
+                        setPhone(e);
+                    }
+                }}
+            />
+            {/* <Input
+                inputProps={{
+                    type: "number",
+                    min: 0,
+                    ...register("customer_price"),
+                }}
+                // label={`${t(TRANSLATION.CUSTOMER_PRICE)}, ${CURRENCY.SIGN
+                //     }`}
+                error={errors.customer_price?.message}
+            /> */}
+            <PriceInputGroup />
+
+            {isExpanded && <div key="order-button-wrapper" className="form-container__order-button-wrapper">
+                <Button
+                    type="submit"
+                    text={t(
+                        tab === TABS.VOTING.id
+                            ? TRANSLATION.VOTE
+                            : TRANSLATION.TO_ORDER,
+                        { toUpper: false }
+                    )}
+                    status={status}
+                    label={message}
+                />
+                <Button
+                    type="submit"
+                    text={t(TRANSLATION.TO_ORDER,
+                        { toUpper: false }
+                    )}
+                    status={status}
+                    label={message}
+                />
+            </div>}
+
         </>
     );
 });
@@ -2971,7 +3031,7 @@ function WaitingForm({
     t,
     cardPaymentEnabled,
     setPickTimeModal,
-    setSeatsModal,
+    // setSeatsModal,
     setCommentsModal,
     carClass,
     setCarClass,
@@ -3161,7 +3221,7 @@ function WaitingForm({
                                             )}`}
                                 </label>
                             </div>
-                            <div onClick={() => setSeatsModal(true)}>
+                            {/* <div onClick={() => setSeatsModal(true)}>
                                 <img
                                     src={images.multipleUsers}
                                     alt={t(TRANSLATION.SEATS)}
@@ -3173,7 +3233,7 @@ function WaitingForm({
                                 >
                                     {t(TRANSLATION.SEATS)}: <span>{seats}</span>
                                 </label>
-                            </div>
+                            </div> */}
                             <div onClick={() => setCommentsModal(true)}>
                                 <span
                                     className="comment-controls"

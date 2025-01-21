@@ -71,7 +71,7 @@ const LocationInput: React.FC<IProps> = ({ type, isIntercity, from, to, setFrom,
       onClick: () => setIsAddressShort(prev => !prev),
     },
     {
-      src: images.activeMarker,
+      src: images.pointOnMap,
       onClick: () => 
         { if (onOpenMap) return onOpenMap()
           setMapModal({
@@ -90,7 +90,7 @@ const LocationInput: React.FC<IProps> = ({ type, isIntercity, from, to, setFrom,
         onChange: (e: React.ChangeEvent<HTMLInputElement>) => setPoint({ address: e.target.value }),
         disabled: isAddressCurrent,
       }}
-      label={t(type === EPointType.From ? TRANSLATION.FROM : TRANSLATION.TO)}
+    //   label={t(type === EPointType.From ? TRANSLATION.FROM : TRANSLATION.TO)}
       error={getPointError(point)}
       buttons={
         point?.shortAddress ?

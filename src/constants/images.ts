@@ -105,6 +105,21 @@ const names = {
   handUp: 'handup-icon.svg',
   noImgAvatar: 'no-img-avatar.svg',
   noUserAvatar: 'no-user-avatar.svg',
+  pointOnMap: 'pointOnMapIcon.svg',
+  callIcon: 'call-icon.svg',
+  moneyIcon: 'money-icon.svg',
+  carIcon: 'car-icon.svg',
+  peopleIcon: 'people-icon.svg',
+  alarmIcon: 'alarm-icon.svg',
+  carNearbyIcon: 'car-nearby-icon.svg',
+  msgIcon: 'msg-icon.svg',
+  seatSliderArrowRight: 'slider-arrow-right.svg',
+  timeWaitIcon: 'time-wait-icon.svg',
+  checkMarkRed: 'check-mark-red.svg',
+  dollarIcon: 'dollar-icon.svg',
+  arrowDownFrame: 'arrow-down-frame.svg',
+  arrowUpFrame: 'arrow-up-frame.svg',
+  cameraIcon: 'camera-icon.svg',
 }
 
 export default new Proxy({}, {

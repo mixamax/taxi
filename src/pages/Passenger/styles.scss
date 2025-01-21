@@ -2,6 +2,9 @@
 
 section {
     .input-group {
+        display: flex;
+        flex-direction: column;
+        row-gap: 16px;
         background-color: #ffffff;
         border-radius: 16px 16px 0 0;
         margin-top: 8px;
@@ -10,14 +13,19 @@ section {
         .input {
             position: relative;
             width: 100%;
-            height: fit-content;
-            min-height: 54px;
+            // height: fit-content;
+            // min-height: 54px;
+            height: 40px;
             text-align: left;
-
-            background: #ffffff;
-            border: 1px solid #858585;
+            font-size: 13px;
+            background: #E7E7E7;
+            border: none;
             box-sizing: border-box;
-            border-radius: 14px;
+            border-radius: 16px;
+
+            &::placeholder {
+                font-size: 13px;
+            }
 
             input,
             textarea,
@@ -485,18 +493,137 @@ section {
         border-radius: 50%;
         background-color: #039;
     }
-}
 
-.form-container__location-wrapper {
-    position: relative;
-    height: 280px;
-    width: 100%;
-    border-radius: 10px;
-    z-index: 500;
-}
+    &__order-button-wrapper {
+        display: flex;
+        column-gap: 8px;
+    }
 
-.form-container__others-wrapper {
-    width: 100%;
-    overflow-y: auto;
-    height: calc(-100px + 100vh - 300px);
+    &__location-wrapper {
+        display: flex;
+        flex-direction: column;
+        row-gap: 8px;
+        position: relative;
+        // height: 280px;
+        // width: 100%;
+        // border-radius: 10px;
+        // z-index: 500;
+    }
+
+    &__others-wrapper {
+        width: 100%;
+        overflow-y: auto;
+        height: calc(-100px + 100vh - 300px);
+    }
+
+    &__seats-and-time {
+        display: flex;
+        column-gap: 12px;
+        height: 56px;
+        padding-top: 6px;
+    }
+
+    &__seats {
+        display: flex;
+        flex-direction: column;
+        row-gap: 6px;
+        width: 50%
+    }
+
+    &__time {
+        width: 50%;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    &__seats-title,
+    &__time-title,
+    &__car-class-title {
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    &__time-wrapper {
+        display: flex;
+        flex-direction: column;
+        height: 28px;
+    }
+
+    &__time-value {
+        font-size: 10px;
+        font-weight: 500;
+        color: rgb(0, 0, 0, 0.5);
+    }
+
+    &__time-btn {
+        border: none;
+        background: none;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        // align-items: center;
+        justify-content: flex-end;
+        padding-top: 5px;
+    }
+
+    &__car-class {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        row-gap: 8px;
+    }
+
+    &__car-class-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 10px;
+        font-weight: 500;
+    }
+
+    &__car-nearby-info {
+        display: flex;
+        column-gap: 4px;
+        align-items: center;
+    }
+
+    &__car-nearby-info-text {
+        font-size: 10px;
+        font-weight: 500;
+    }
+
+    &__comments {
+        width: 100%;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    &__comments-wrapper {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__comments-title {
+        font-size: 13px;
+        font-weight: 500;
+        color: #000000
+    }
+
+    &__comments-value {
+        font-size: 10px;
+        font-weight: 500;
+        color: rgb(0, 0, 0, 0.5);
+    }
+
+    &__comments-btn {
+        border: none;
+        background: none;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
 }
