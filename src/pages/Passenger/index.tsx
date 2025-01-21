@@ -354,15 +354,16 @@ const PassengerOrder: React.FC<IProps> = ({
 
   const formContainerRef = useRef<HTMLDivElement>(null)
   const draggableRef = useRef<HTMLFormElement>(null)
-
-  const { isExpanded } = useSwipe(formContainerRef.current, draggableRef.current, menuLiftingHeight)
+  //   const formSlidersRef = useRef({
+  //     carSliderRef: HTMLDivElement,
+  //     seatSliderRef: HTMLDivElement,
+  // })
+  const formSlidersRef = useRef({ carSliderRef: null, seatSliderRef: null })
+  const { isExpanded } = useSwipe(formContainerRef.current, draggableRef.current, menuLiftingHeight, formSlidersRef)
 
   // const formWithMapRef = useRef<HTMLDivElement>(null);
   // const votingFormRef = useRef<HTMLDivElement>(null);
-  // const votingFormRef = useRef({
-  //     locationWrapperRef: useRef<HTMLDivElement>(null),
-  //     otherWrapperRef: useRef<HTMLDivElement>(null),
-  // });
+
 
   // *********************swipe*********************
   // useEffect(() => {
@@ -846,7 +847,7 @@ const PassengerOrder: React.FC<IProps> = ({
     if (tab === TABS.DELIVERY.id) cardPaymentEnabled = mode[courierAuto]
     if (tab === TABS.MOVE.id) cardPaymentEnabled = mode[moveType]
   } else cardPaymentEnabled = mode
-  console.log(isMapVisible)
+
   return (
     <>
       <Layout>
@@ -917,6 +918,7 @@ const PassengerOrder: React.FC<IProps> = ({
                   setSeats={setSeats}
                   isExpanded={isExpanded}
                   draggableElement={draggableRef.current}
+                  ref={formSlidersRef}
                 />
               )}
               {/* {TABS.WAITING.id === tab && (
@@ -2732,9 +2734,16 @@ const VotingForm = forwardRef(function VotingForm(
     isExpanded,
     draggableElement,
   }: TVotingFormProps,
-  // ref: React.ForwardedRef<{}>
+  ref: React.ForwardedRef<{}>,
 ) {
 
+  const carSliderRef = useRef<HTMLDivElement>(null)
+  const seatSliderRef = useRef<HTMLDivElement>(null)
+
+  useImperativeHandle(ref, () => ({
+    carSliderRef: carSliderRef.current,
+    seatSliderRef: seatSliderRef.current,
+  }))
 
   return (
     <>
@@ -2759,8 +2768,9 @@ const VotingForm = forwardRef(function VotingForm(
                     isIntercity={isIntercity}
                 /> */}
       </div>
-      <OpacityLayer isShown={!isExpanded} threshold={menuLiftingHeight} draggableElement={draggableElement}><ShortInfo /></OpacityLayer>
-      <OpacityLayer isShown={!isExpanded} threshold={menuLiftingHeight} draggableElement={draggableElement}>
+      {!isExpanded &&
+      <>
+        <ShortInfo />
         <div key="order-button-wrapper" className="form-container__order-button-wrapper">
           <Button
             type="submit"
@@ -2782,11 +2792,14 @@ const VotingForm = forwardRef(function VotingForm(
             label={message}
           />
         </div>
-      </OpacityLayer>
+      </>
+      }
       <div className="form-container__seats-and-time">
         <div className="form-container__seats">
           <span className="form-container__seats-title">{t(TRANSLATION.SEATS)}</span>
-          <SeatSlider seatNumber={6} setSeats={setSeats} seats={seats} />
+          <div ref={seatSliderRef}>
+            <SeatSlider seatNumber={6} setSeats={setSeats} seats={seats} />
+          </div>
         </div>
         <div className="form-container__time">
           <div className="form-container__time-wrapper">
@@ -2809,7 +2822,9 @@ const VotingForm = forwardRef(function VotingForm(
             <span className="form-container__car-nearby-info-text">~{5} минут</span>
           </div>
         </div>
-        <CarClassSlider />
+        <div ref={carSliderRef}>
+          <CarClassSlider />
+        </div>
       </div>
       <div className="form-container__comments">
         <div className="form-container__comments-wrapper">

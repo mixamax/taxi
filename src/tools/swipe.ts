@@ -4,10 +4,17 @@ export function useSwipe(
   element: HTMLElement | null,
   draggable:HTMLElement | null,
   height: number,
+  noSwipeElementsRef?:  React.MutableRefObject<{
+      carSliderRef: HTMLDivElement | null;
+      seatSliderRef: HTMLDivElement | null;
+    }>,
   speed = 300,
 ) {
 
   const [isExpanded, setIsExpanded] = useState(false)
+
+  let carSlider: HTMLDivElement | null | undefined = null
+  let seatSlider: HTMLDivElement | null | undefined = null
 
   let startY: number,
     startTime: number,
@@ -18,6 +25,8 @@ export function useSwipe(
 
   useEffect(() => {
     if (!draggable || !element) return
+    carSlider = noSwipeElementsRef?.current?.carSliderRef
+    seatSlider = noSwipeElementsRef?.current?.seatSliderRef
     draggable.addEventListener('touchstart', start)
     document.addEventListener('touchmove', move)
     document.addEventListener('touchend', end)
@@ -27,12 +36,19 @@ export function useSwipe(
       document.removeEventListener('touchmove', move)
       document.removeEventListener('touchend', end)
     }
-  }, [draggable, element])
+  }, [draggable, element, noSwipeElementsRef?.current?.carSliderRef, noSwipeElementsRef?.current?.seatSliderRef])
 
 
 
   function start(e: TouchEvent) {
     if (!element) return
+    if (carSlider?.contains(e.target as Node) || seatSlider?.contains(e.target as Node)) {
+      canMove
+      return
+    }
+    // console.log(carSlider)
+    // console.log( seatSlider)
+    // console.log(noSwipeElementsRef?.current.carSliderRef)
     // console.log(e.target)
     canMove = true
     startY = e.touches[0].clientY

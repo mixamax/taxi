@@ -6,17 +6,13 @@
         margin: 0;
     }
 
-    // & ul li {
-    //     font-size: 10px;
-    // }
-
     &__slide {
         display: flex;
         flex-direction: column;
-        min-width: 84px;
+        min-width: 65.75px;
+        max-width: 84px;
         height: 64px;
         padding: 8px 4px;
-        // height: 100%;
         overflow: hidden;
 
         &__active {
