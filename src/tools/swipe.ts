@@ -1,89 +1,89 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react'
 
 export function useSwipe(
-    element: HTMLElement | null,
-    draggable:HTMLElement | null,
-    height: number,
-    speed = 300,
+  element: HTMLElement | null,
+  draggable:HTMLElement | null,
+  height: number,
+  speed = 300,
 ) {
-   
-    const [isExpanded, setIsExpanded] = useState(false);
 
-    let startY: number,
-        startTime: number,
-        deltaY = 0,
-        currentY = 0,
-        canMove = false;
-        
+  const [isExpanded, setIsExpanded] = useState(false)
 
-    useEffect(() => {
-        if (!draggable || !element) return
-        draggable.addEventListener("touchstart", start);
-        document.addEventListener("touchmove", move);
-        document.addEventListener("touchend", end);
+  let startY: number,
+    startTime: number,
+    deltaY = 0,
+    currentY = 0,
+    canMove = false
 
-        return () => {
-            draggable.removeEventListener("touchstart", start);
-            document.removeEventListener("touchmove", move);
-            document.removeEventListener("touchend", end);
-        }
-    }, [draggable, element]);
 
-    
+  useEffect(() => {
+    if (!draggable || !element) return
+    draggable.addEventListener('touchstart', start)
+    document.addEventListener('touchmove', move)
+    document.addEventListener('touchend', end)
 
-    function start(e: TouchEvent) {
-        if (!element) return
-        // console.log(e.target)
-        canMove = true
-        startY = e.touches[0].clientY;
-        startTime = Date.now();
-        element.style.transition = "none";
+    return () => {
+      draggable.removeEventListener('touchstart', start)
+      document.removeEventListener('touchmove', move)
+      document.removeEventListener('touchend', end)
     }
+  }, [draggable, element])
 
-    function move(e: TouchEvent) {
-        if (!element) return
-        if (!canMove) return
-        deltaY = e.touches[0].clientY - startY;
-        if (
-            deltaY < 0 &&
+
+
+  function start(e: TouchEvent) {
+    if (!element) return
+    // console.log(e.target)
+    canMove = true
+    startY = e.touches[0].clientY
+    startTime = Date.now()
+    element.style.transition = 'none'
+  }
+
+  function move(e: TouchEvent) {
+    if (!element) return
+    if (!canMove) return
+    deltaY = e.touches[0].clientY - startY
+    if (
+      deltaY < 0 &&
             element.style.transform === `translateY(${-height}px)`
-        ) {
-            return;
-        }
-        if (deltaY > 0 && element.style.transform === `translateY(${0}px)`) {
-            return;
-        }
-        element.style.transform = `translateY(${currentY + deltaY}px)`;
-        
+    ) {
+      return
     }
-    function end() {
-        if (!element) return
-        const endTime = Date.now();
-        const duration = endTime - startTime;
-        element.style.transition = "transform 0.3s ease";
+    if (deltaY > 0 && element.style.transform === `translateY(${0}px)`) {
+      return
+    }
+    element.style.transform = `translateY(${currentY + deltaY}px)`
 
-        if (
-            duration < speed ||
+  }
+  function end() {
+    if (!element) return
+    const endTime = Date.now()
+    const duration = endTime - startTime
+    element.style.transition = 'transform 0.3s ease'
+
+    if (
+      duration < speed ||
             deltaY > height / 2 ||
             deltaY < -height / 2
-        ) {
-            if (deltaY > 0) {
-                element.style.transform = `translateY(${0}px)`;
-                currentY = 0;
-                setIsExpanded(false);
-            }
-            if (deltaY < 0) {
-                element.style.transform = `translateY(${-height}px)`;
-                currentY = -height;
-                setIsExpanded(true);
-            }
-        } else {
-            element.style.transform = `translateY(${currentY}px)`;
-        }
-        canMove = false
+    ) {
+      if (deltaY > 0) {
+        element.style.transform = `translateY(${0}px)`
+        currentY = 0
+        setIsExpanded(false)
+      }
+      if (deltaY < 0) {
+        element.style.transform = `translateY(${-height}px)`
+        currentY = -height
+        setIsExpanded(true)
+      }
+    } else {
+      element.style.transform = `translateY(${currentY}px)`
     }
+    canMove = false
+  }
 
-    return {isExpanded}
+  return { isExpanded }
 }
 
 

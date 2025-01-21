@@ -33,27 +33,27 @@ const RegisterForm: React.FC<IProps> = ({
   message,
   register,
 }) => {
-    const handleSubmit = (values: any) => {
-        values.st = 1
-        register(values)
-    }
+  const handleSubmit = (values: any) => {
+    values.st = 1
+    register(values)
+  }
 
-    const formStr = (window as any).data?.site_constants?.form_register?.value
-    let form
-    try {
-        form = JSON.parse(formStr)
-    } catch (e) {
-        return <ErrorFrame title='Bad json in data.js' />
-    }
-    return <JSONForm
-        fields={form.fields}
-        onSubmit={handleSubmit}
-        state={{
-          success: status === EStatuses.Success,
-          failed: status === EStatuses.Fail,
-          errorMessage: message,
-        }}
-    />
+  const formStr = (window as any).data?.site_constants?.form_register?.value
+  let form
+  try {
+    form = JSON.parse(formStr)
+  } catch (e) {
+    return <ErrorFrame title='Bad json in data.js' />
+  }
+  return <JSONForm
+    fields={form.fields}
+    onSubmit={handleSubmit}
+    state={{
+      success: status === EStatuses.Success,
+      failed: status === EStatuses.Fail,
+      errorMessage: message,
+    }}
+         />
 }
 
 export default connector(RegisterForm)

@@ -1,7 +1,7 @@
-import React from "react";
-import "./tabs.scss";
-import cn from "classnames";
-import { gradient } from "../../tools/theme";
+import React from 'react'
+import './tabs.scss'
+import cn from 'classnames'
+import { gradient } from '../../tools/theme'
 
 export interface ITab {
   id: string | number;
@@ -12,10 +12,10 @@ export interface ITab {
 
 interface IProps {
   tabs: ITab[];
-  activeTabID: ITab["id"];
+  activeTabID: ITab['id'];
   tabClassName?: string;
   containerClassName?: string;
-  onChange: (id: ITab["id"]) => any;
+  onChange: (id: ITab['id']) => any;
 }
 
 const Tabs: React.FC<IProps> = ({
@@ -31,12 +31,12 @@ const Tabs: React.FC<IProps> = ({
         return (
           <div
             className={cn(tabClassName, {
-              "is-active": item.id === activeTabID,
+              'is-active': item.id === activeTabID,
               small: !item.img,
               disabled: item.disabled,
             })}
             style={{
-              background: item.id === activeTabID ? gradient() : "transparent",
+              background: item.id === activeTabID ? gradient() : 'transparent',
             }}
             onClick={!item.disabled ? (e) => onChange(item.id) : () => {}}
             key={index}
@@ -48,10 +48,10 @@ const Tabs: React.FC<IProps> = ({
             )}
             <span className="tabs__label">{item.label}</span>
           </div>
-        );
+        )
       })}
     </div>
-  );
-};
+  )
+}
 
-export default Tabs;
+export default Tabs

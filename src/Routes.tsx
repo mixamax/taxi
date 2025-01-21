@@ -60,7 +60,7 @@ const HomePageRedirect = () => {
         bottom: 0,
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
       }}
     >
       <a
@@ -73,7 +73,7 @@ const HomePageRedirect = () => {
           color: '#fff',
           textAlign: 'center',
           fontSize: '20px',
-          borderRadius: 10
+          borderRadius: 10,
         }}
       >
         Go to map +1

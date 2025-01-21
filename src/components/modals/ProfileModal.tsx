@@ -26,7 +26,7 @@ const mapStateToProps = (state: IRootState) => ({
 const mapDispatchToProps = {
   setProfileModal: modalsActionCreators.setProfileModal,
   setMessageModal: modalsActionCreators.setMessageModal,
-  updateUser: userActionCreators.initUser
+  updateUser: userActionCreators.initUser,
 }
 
 const connector = connect(mapStateToProps, mapDispatchToProps)
@@ -67,39 +67,39 @@ const CardDetailsModal: React.FC<IProps> = ({
     Promise.all([
       Promise.all(passportImgs.map(getImageFile)),
       Promise.all(driverLicenseImgs.map(getImageFile)),
-      Promise.all(licenseImgs.map(getImageFile))
+      Promise.all(licenseImgs.map(getImageFile)),
     ]).then(res => ({
-        u_name: user?.u_name,
-        u_email: user?.u_email,
-        u_phone: user?.u_phone,
-        u_city: user?.u_city && (window as any).data.cities && (window as any).data.cities[user?.u_city] ? (window as any).data.cities[user?.u_city][language.id] : '',
-        u_details: {
-          state: user?.u_details?.state,
-          zip: user?.u_details?.zip,
-          card: user?.u_details?.card,
-          street: user?.u_details?.street,
-          passport_photo: res[0],
-          driver_license_photo: res[1],
-          license_photo: res[2],
-          subscribe: user?.u_details?.subscribe
-        },
-        ref_code: user?.ref_code,
-        u_car: {}
+      u_name: user?.u_name,
+      u_email: user?.u_email,
+      u_phone: user?.u_phone,
+      u_city: user?.u_city && (window as any).data.cities && (window as any).data.cities[user?.u_city] ? (window as any).data.cities[user?.u_city][language.id] : '',
+      u_details: {
+        state: user?.u_details?.state,
+        zip: user?.u_details?.zip,
+        card: user?.u_details?.card,
+        street: user?.u_details?.street,
+        passport_photo: res[0],
+        driver_license_photo: res[1],
+        license_photo: res[2],
+        subscribe: user?.u_details?.subscribe,
+      },
+      ref_code: user?.ref_code,
+      u_car: {},
     }))
-    .then(values => {
-      getUserCars().then((res = []) => {
-        const u_car = res[0] || {}
-        values.u_car = u_car
-        setDefaultValues(values)
-        setIsValuesLoaded(true)
+      .then(values => {
+        getUserCars().then((res = []) => {
+          const u_car = res[0] || {}
+          values.u_car = u_car
+          setDefaultValues(values)
+          setIsValuesLoaded(true)
+        })
       })
-    })
   }, [isOpen])
 
   const handleChange = useCallback((name: string, value: any) => {
     setErrors({
       ...errors,
-      [name]: false
+      [name]: false,
     })
   }, [errors])
 
@@ -112,7 +112,7 @@ const CardDetailsModal: React.FC<IProps> = ({
         .then(res => {
           if (!res) {
             setErrors({
-              ref_code: true
+              ref_code: true,
             })
             return false
           }
@@ -145,7 +145,7 @@ const CardDetailsModal: React.FC<IProps> = ({
           if (isError) {
             setErrors({
               ...errors,
-              ['u_car.registration_plate']: true
+              'u_car.registration_plate': true,
             })
             setIsSubmittingForm(false)
             return
@@ -169,17 +169,17 @@ const CardDetailsModal: React.FC<IProps> = ({
                     file: image[1],
                     u_id: user?.u_id,
                     token: tokens?.token,
-                    u_hash: tokens?.u_hash
+                    u_hash: tokens?.u_hash,
                   }).then(res => {
                     if (res?.dl_id) imagesMap[key].push(res.dl_id)
-                  })
-                )
+                  }),
+                ),
             )
           })).then(() => {
             const { u_car, ...payload } = values
             payload.u_details = {
               ...u_details,
-              ...imagesMap
+              ...imagesMap,
             }
             API.editUser(payload)
               .then(res => {
@@ -189,23 +189,23 @@ const CardDetailsModal: React.FC<IProps> = ({
                 setMessageModal({ isOpen: true, status: EStatuses.Fail, message: 'An error occured' }),
               )
           })
-          .finally(() => {
-            setIsSubmittingForm(false)
-          })
+            .finally(() => {
+              setIsSubmittingForm(false)
+            })
         })
     })
   }, [])
 
   const formState = useMemo(() => ({
-    pending: isSubmittingForm
+    pending: isSubmittingForm,
   }), [isSubmittingForm])
 
   const formStr = (window as any).data?.site_constants?.form_profile?.value
   let form
   try {
-      form = JSON.parse(formStr)
+    form = JSON.parse(formStr)
   } catch (e) {
-      return <ErrorFrame title='Bad json in data.js' />
+    return <ErrorFrame title='Bad json in data.js' />
   }
 
   if (user?.u_role === EUserRoles.Client) {
@@ -230,7 +230,7 @@ const CardDetailsModal: React.FC<IProps> = ({
                   <div
                     className="avatar_image_bg"
                     style={{
-                      backgroundImage: `url(${user?.u_photo || images.driverAvatar})`
+                      backgroundImage: `url(${user?.u_photo || images.driverAvatar})`,
                     }}
                     title={user?.u_name || ''}
                   />
@@ -243,18 +243,19 @@ const CardDetailsModal: React.FC<IProps> = ({
               </label> :
               <svg width="100" height="100" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" stroke="#000">
                 <g fill="none" fill-rule="evenodd">
-                    <g transform="translate(1 1)" stroke-width="2">
-                        <circle stroke-opacity=".5" cx="18" cy="18" r="18"/>
-                        <path d="M36 18c0-9.94-8.06-18-18-18">
-                            <animateTransform
-                                attributeName="transform"
-                                type="rotate"
-                                from="0 18 18"
-                                to="360 18 18"
-                                dur="1s"
-                                repeatCount="indefinite"/>
-                        </path>
-                    </g>
+                  <g transform="translate(1 1)" stroke-width="2">
+                    <circle stroke-opacity=".5" cx="18" cy="18" r="18"/>
+                    <path d="M36 18c0-9.94-8.06-18-18-18">
+                      <animateTransform
+                        attributeName="transform"
+                        type="rotate"
+                        from="0 18 18"
+                        to="360 18 18"
+                        dur="1s"
+                        repeatCount="indefinite"
+                      />
+                    </path>
+                  </g>
                 </g>
               </svg>
             }

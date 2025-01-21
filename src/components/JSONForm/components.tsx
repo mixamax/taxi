@@ -5,19 +5,21 @@ import { getCalculation, parseVariable } from './utils'
 import { TCalculate } from './types'
 
 const CustomAlert = (props: any) => {
-    const [ isVisible, setIsVisible ] = useState(true)
+  const [ isVisible, setIsVisible ] = useState(true)
 
-    return !isVisible ? null : (
-        <Alert
-            {...props}
-            message={props.message && (t(props.message) === 'Error' ? props.message : t(props.message))}
-            onClose={() => setIsVisible(false)}
-        />
+  return !isVisible ?
+    null :
+    (
+      <Alert
+        {...props}
+        message={props.message && (t(props.message) === 'Error' ? props.message : t(props.message))}
+        onClose={() => setIsVisible(false)}
+      />
     )
 }
 
 const customComponents: Record<string, any> = {
-    alert: CustomAlert
+  alert: CustomAlert,
 }
 
 interface IPropsCustomComponent {
@@ -29,24 +31,24 @@ interface IPropsCustomComponent {
 }
 
 const CustomComponent: React.FC<IPropsCustomComponent> = ({
-    component,
-    props = {},
-    values,
-    visible,
-    variables = {}
+  component,
+  props = {},
+  values,
+  visible,
+  variables = {},
 }) => {
-    if (
-        !component ||
+  if (
+    !component ||
         !customComponents[component] ||
         !parseVariable(getCalculation(visible, values), variables)
-    ) return null
-    const Component = customComponents[component]
-    const computedProps = Object.keys(props).reduce((res, key) => ({
-        ...res,
-        [key]: parseVariable(getCalculation(props[key], values), variables)
-    }), {})
+  ) return null
+  const Component = customComponents[component]
+  const computedProps = Object.keys(props).reduce((res, key) => ({
+    ...res,
+    [key]: parseVariable(getCalculation(props[key], values), variables),
+  }), {})
 
-    return <Component {...computedProps} />
+  return <Component {...computedProps} />
 }
 
 export default CustomComponent

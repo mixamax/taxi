@@ -86,7 +86,7 @@ const getYupImageSchema = (isRequired: boolean = false) => {
   return isRequired ? schema : schema.required(TRANSLATION.REQUIRED_FILE)
 }
 
-const getYupSchema = (schema: any, isRequired: boolean = false) => 
+const getYupSchema = (schema: any, isRequired: boolean = false) =>
   isRequired ? schema.required(t(TRANSLATION.REQUIRED_FIELD)) : schema
 
 const RegisterForm: React.FC<IProps> = ({
@@ -104,11 +104,11 @@ const RegisterForm: React.FC<IProps> = ({
         const [ key, value ] = item.split(',')
         return {
           ...res,
-          [key]: !!Number(value)
+          [key]: !!Number(value),
         }
       }, {})
   }, [])
-  
+
   const location = useLocation()
 
   const [showRefCode, setShowRefCode] = useState(false)
@@ -156,7 +156,7 @@ const RegisterForm: React.FC<IProps> = ({
     handleSubmit,
     formState: { errors, isValid },
     control,
-    setValue
+    setValue,
   } = useForm<IFormValues>({
     criteriaMode: 'all',
     mode: 'all',
@@ -254,7 +254,7 @@ const RegisterForm: React.FC<IProps> = ({
         upload.push({ name: 'license_photo', file })
       })
     }
-    
+
     register({
       u_name: data.u_name,
       u_phone: data.u_phone,
@@ -277,7 +277,7 @@ const RegisterForm: React.FC<IProps> = ({
         details: {},
         cc_id: data.car_classes,
       },
-      uploads: upload
+      uploads: upload,
     })
   }
 
@@ -337,7 +337,7 @@ const RegisterForm: React.FC<IProps> = ({
           ...formRegister('u_name', {
             required: t(TRANSLATION.REQUIRED_FIELD),
           }),
-          required: true
+          required: true,
         }}
         label={t(
           workType === EWorkTypes.Company ?
@@ -351,7 +351,7 @@ const RegisterForm: React.FC<IProps> = ({
           ...formRegister('u_phone', {
             required: t(TRANSLATION.REQUIRED_FIELD),
           }),
-          required: true
+          required: true,
         }}
         label={t(TRANSLATION.PHONE)}
         inputType={EInputTypes.Default}
@@ -377,7 +377,7 @@ const RegisterForm: React.FC<IProps> = ({
           ...formRegister('u_email', {
             required: t(TRANSLATION.REQUIRED_FIELD),
           }),
-          required: true
+          required: true,
         }}
         label={t(TRANSLATION.EMAIL)}
         error={errors.u_email?.message}
@@ -404,7 +404,7 @@ const RegisterForm: React.FC<IProps> = ({
             ...formRegister('street', {
               required: requireFeildsMap.street && t(TRANSLATION.REQUIRED_FIELD),
             }),
-            required: requireFeildsMap.street
+            required: requireFeildsMap.street,
           }}
           label={t(TRANSLATION.STREET_ADDRESS)}
           error={errors.street?.message}
@@ -418,7 +418,7 @@ const RegisterForm: React.FC<IProps> = ({
             ...formRegister('city', {
               required: requireFeildsMap.city && t(TRANSLATION.REQUIRED_FIELD),
             }),
-            required: requireFeildsMap.city
+            required: requireFeildsMap.city,
           }}
           label={t(TRANSLATION.CITY)}
           error={errors.city?.message}
@@ -431,7 +431,7 @@ const RegisterForm: React.FC<IProps> = ({
             ...formRegister('state', {
               required: requireFeildsMap.state && t(TRANSLATION.REQUIRED_FIELD),
             }),
-            required: requireFeildsMap.state
+            required: requireFeildsMap.state,
           }}
           label={t(TRANSLATION.STATE)}
           error={errors.state?.message}
@@ -444,7 +444,7 @@ const RegisterForm: React.FC<IProps> = ({
             ...formRegister('zip', {
               required: requireFeildsMap.zip && t(TRANSLATION.REQUIRED_FIELD),
             }),
-            required: requireFeildsMap.zip
+            required: requireFeildsMap.zip,
           }}
           label={t(TRANSLATION.ZIP_CODE)}
           error={errors.zip?.message}

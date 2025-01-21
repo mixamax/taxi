@@ -13,10 +13,10 @@ export function uploadFiles(data: any) {
       const promises = files.map((file: File) => API.uploadFile({ file, ...params }))
       return Promise.all(promises).then(
         (res: any[]) => res.reduce((acc, item) => ({
-          [key]: [...acc[key], item.data?.data?.dl_id]
-        }), { [key]: [] })
+          [key]: [...acc[key], item.data?.data?.dl_id],
+        }), { [key]: [] }),
       ).then((res: any) => ({ [key]: JSON.stringify(res[key]) }))
-  })
+    })
 
   return Promise.all(uploads).then(res => {
     const u_details = res.reduce((acc, item) => ({ ...acc, ...item }), additionalDetails)
@@ -24,7 +24,7 @@ export function uploadFiles(data: any) {
       u_details,
       u_id: `${params?.u_id}`,
       token: params?.token,
-      u_hash: params?.u_hash
+      u_hash: params?.u_hash,
     })
   })
 }
@@ -56,12 +56,12 @@ export function uploadRegisterFiles(params: any) {
     }
     return userData
   })
-  .then(u_details => {
-    return API.editUserAfterRegister({
-      u_details,
-      u_id: `${response?.u_id}`,
-      token: response?.token,
-      u_hash: response?.u_hash
+    .then(u_details => {
+      return API.editUserAfterRegister({
+        u_details,
+        u_id: `${response?.u_id}`,
+        token: response?.token,
+        u_hash: response?.u_hash,
+      })
     })
-  })
 }

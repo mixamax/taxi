@@ -74,7 +74,7 @@ const Map: React.FC<IProps> = ({
   setMapModal,
   setMessageModal,
   onClose,
-  containerClassName
+  containerClassName,
 }) => {
   const [staticMarkers, setStaticMarkers] = useState<IStaticMarker[]>([])
   const [userCoordinates, setUserCoordinates] = useState<IAddressPoint | null>(null)
@@ -130,7 +130,7 @@ const Map: React.FC<IProps> = ({
           // @ts-ignore
           item.t_start_datetime?.format && item.t_complete_datetime?.format &&
           // @ts-ignore
-          item.t_complete_datetime.isAfter(Date.now())
+          item.t_complete_datetime.isAfter(Date.now()),
         ))
         .then(items => {
           // @ts-ignore
@@ -142,7 +142,7 @@ const Map: React.FC<IProps> = ({
             // @ts-ignore
             popup: `from ${item.t_start_datetime.format('HH:mm MM-DD')} to ${item.t_complete_datetime.format('HH:mm MM-DD')}`,
             // @ts-ignore
-            tooltip: `until ${item.t_complete_datetime.format('HH:mm MM-DD')}`
+            tooltip: `until ${item.t_complete_datetime.format('HH:mm MM-DD')}`,
           }))
           setStaticMarkers(markers)
         })
@@ -200,7 +200,7 @@ const Map: React.FC<IProps> = ({
   }, [isOpen])
 
   const handleFromClick = (isButtonPopup?: boolean) => {
-        if (!setFrom || !map) return
+    if (!setFrom || !map) return
 
     if (!isButtonPopup) {
       const center = map.getCenter()
@@ -242,7 +242,7 @@ const Map: React.FC<IProps> = ({
 
   const duration = [
     !!routeInfo?.time.hours && `${routeInfo?.time.hours} h`,
-    !!routeInfo?.time.minutes && `${routeInfo?.time.minutes} min`
+    !!routeInfo?.time.minutes && `${routeInfo?.time.minutes} min`,
   ].filter(part => part).join(' ')
 
   return (

@@ -72,13 +72,13 @@ const LocationInput: React.FC<IProps> = ({ type, isIntercity, from, to, setFrom,
     },
     {
       src: images.pointOnMap,
-      onClick: () => 
-        { if (onOpenMap) return onOpenMap()
-          setMapModal({
-        isOpen: true,
-        type: EMapModalTypes.Client,
-        defaultCenter: point?.latitude && point.longitude ? [point.latitude, point.longitude] : undefined,
-      })},
+      onClick: () =>
+      { if (onOpenMap) return onOpenMap()
+        setMapModal({
+          isOpen: true,
+          type: EMapModalTypes.Client,
+          defaultCenter: point?.latitude && point.longitude ? [point.latitude, point.longitude] : undefined,
+        })},
     },
   ]
 
@@ -90,7 +90,7 @@ const LocationInput: React.FC<IProps> = ({ type, isIntercity, from, to, setFrom,
         onChange: (e: React.ChangeEvent<HTMLInputElement>) => setPoint({ address: e.target.value }),
         disabled: isAddressCurrent,
       }}
-    //   label={t(type === EPointType.From ? TRANSLATION.FROM : TRANSLATION.TO)}
+      //   label={t(type === EPointType.From ? TRANSLATION.FROM : TRANSLATION.TO)}
       error={getPointError(point)}
       buttons={
         point?.shortAddress ?

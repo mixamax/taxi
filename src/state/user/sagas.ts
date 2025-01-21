@@ -64,7 +64,7 @@ function* googleLoginSaga(data: TAction) {
     const result = yield* call<PromiseReturn<ReturnType<typeof API.googleLogin>>>(API.googleLogin, data.payload)
 
     if (!result) throw new Error('Wrong login response')
-    console.log("GFP-POINT-01: Saving tokens from goole auth to localStorage", result)
+    console.log('GFP-POINT-01: Saving tokens from goole auth to localStorage', result)
     localStorage.setItem('tokens', JSON.stringify(result.tokens))
 
     if(result.user.u_role === EUserRoles.Client || result.user.u_role === EUserRoles.Agent) {
@@ -92,7 +92,7 @@ function* registerSaga(data: TAction) {
     let response = yield* call<any>(API.register, { ...payload, st: 1 })
     const tokens = {
       token: response.token,
-      u_hash: response.u_hash
+      u_hash: response.u_hash,
     }
     localStorage.setItem('tokens', JSON.stringify(tokens))
 
@@ -116,7 +116,7 @@ function* registerSaga(data: TAction) {
     yield put(setMessageModal({
       isOpen: true,
       status: messageStatus,
-      message: t(messageText)
+      message: t(messageText),
     }))
   } catch (error) {
     console.error(error)

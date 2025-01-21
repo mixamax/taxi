@@ -438,7 +438,7 @@ export const convertCar = (car: any): ICar => {
 
 export const convertUser = (user: any): IUser => {
   return convertTypes<any, IUser>(
-    user, 
+    user,
     {
       customKeys: {
         u_ban: () => convertTypes<any, IUser['u_ban']>(user.u_ban, {

@@ -174,15 +174,15 @@ const Input: React.FC<IProps> = (
           <div className="input-file">
             {defaultFiles.map((file: any, index: number) => {
               return (
-              <div
-                className="input-file-uploaded"
-                key={index}
-                onClick={(e) => {
-                  removeDefaultImage && removeDefaultImage(file[0])
-                }}
-              >
-                <img src={file[1]}></img>
-              </div>)
+                <div
+                  className="input-file-uploaded"
+                  key={index}
+                  onClick={(e) => {
+                    removeDefaultImage && removeDefaultImage(file[0])
+                  }}
+                >
+                  <img src={file[1]}></img>
+                </div>)
             })}
             {files.map((file: File, index: number) =>
               (<div

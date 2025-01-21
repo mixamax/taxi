@@ -72,13 +72,13 @@ const LocationInput: React.FC<IProps> = ({ type, isIntercity, from, to, setFrom,
     },
     {
       src: images.activeMarker,
-      onClick: () => 
-        { if (onOpenMap) return onOpenMap()
-          setMapModal({
-        isOpen: true,
-        type: EMapModalTypes.Client,
-        defaultCenter: point?.latitude && point.longitude ? [point.latitude, point.longitude] : undefined,
-      })},
+      onClick: () =>
+      { if (onOpenMap) return onOpenMap()
+        setMapModal({
+          isOpen: true,
+          type: EMapModalTypes.Client,
+          defaultCenter: point?.latitude && point.longitude ? [point.latitude, point.longitude] : undefined,
+        })},
     },
   ]
 

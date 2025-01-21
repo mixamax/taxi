@@ -25,7 +25,7 @@ const mapStateToProps = (state: IRootState) => ({
 
 const mapDispatchToProps = {
   ...ordersActionCreators,
-  setLoginModal: modalsActionCreators.setLoginModal
+  setLoginModal: modalsActionCreators.setLoginModal,
 }
 
 const connector = connect(mapStateToProps, mapDispatchToProps)
@@ -48,7 +48,7 @@ const Driver: React.FC<IProps> = ({
   getActiveOrders,
   getHistoryOrders,
   getReadyOrders,
-  setLoginModal
+  setLoginModal,
 }) => {
   const { tab = EDriverTabs.Lite } = useQuery()
 

@@ -62,12 +62,12 @@ type TForm = TFormElement[]
 type TFormValues = Record<string, any>
 
 export type {
-    TCondition,
-    TExpression,
-    TOperation,
-    TOption,
-    TCalculate,
-    TFormElement,
-    TForm,
-    TFormValues
+  TCondition,
+  TExpression,
+  TOperation,
+  TOption,
+  TCalculate,
+  TFormElement,
+  TForm,
+  TFormValues,
 }

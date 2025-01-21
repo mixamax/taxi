@@ -22,8 +22,9 @@ const Checkbox = React.forwardRef<HTMLInputElement, IProps>(
   ) => {
     return (
       <div className={wrapperClassName || classNames('checkbox', wrapperAdditionalClassName, {
-        disabled: inputProps.disabled
-      })}>
+        disabled: inputProps.disabled,
+      })}
+      >
         <MetaTags>
           <style>
             {`

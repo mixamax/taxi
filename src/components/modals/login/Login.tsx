@@ -39,7 +39,7 @@ const mapDispatchToProps = {
   setMessage: userActionCreators.setMessage,
   register: userActionCreators.register,
   setWAOpen: modalsActionCreators.setWACodeModal,
-  setRefOpen: modalsActionCreators.setRefCodeModal
+  setRefOpen: modalsActionCreators.setRefCodeModal,
 }
 
 const connector = connect(mapStateToProps, mapDispatchToProps)
@@ -143,7 +143,7 @@ const LoginForm: React.FC<IProps> = ({
             ref_code: '',
             u_details: {},
             st: '1',
-          }
+          },
         })
       }
     }
@@ -183,10 +183,12 @@ const LoginForm: React.FC<IProps> = ({
     if (user) {
       logout()
     } else if (data) {
-      const loginData: IFormValues = data.type === 'whatsapp' ? {
-        type: data.type,
-        login: data.login
-      } : data
+      const loginData: IFormValues = data.type === 'whatsapp' ?
+        {
+          type: data.type,
+          login: data.login,
+        } :
+        data
       login(loginData)
     }
   }

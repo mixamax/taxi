@@ -16,7 +16,7 @@ import {
   ISuggestion,
   ITokens,
   ITrip,
-  IUser
+  IUser,
 } from './types/types'
 import { Stringify, ValueOf } from './types/index'
 import { addToFormData, apiMethod, IApiMethodArguments, IResponseFields } from './tools/api'
@@ -40,7 +40,7 @@ import store from './state'
 import { configSelectors } from './state/config'
 import SITE_CONSTANTS from './siteConstants'
 import getCountryISO3 from './tools/countryISO2To3'
-import {to} from "./state/clientOrder/selectors";
+import { to } from './state/clientOrder/selectors'
 
 export enum EBookingActions {
     SetConfirmState = 'set_confirm_state',
@@ -60,7 +60,7 @@ export const getCacheVersion = (url: string) => axios.get(`${url}/?cv=`)
 
 const _uploadFile = (
   { formData }: IApiMethodArguments,
-  data: any
+  data: any,
 ): Promise<{
   dl_id: string
 } | null> => {
@@ -70,7 +70,7 @@ const _uploadFile = (
         token: data.token,
         u_hash: data.u_hash,
         file: JSON.stringify({ base64, u_id: data.u_id }),
-        private: 0
+        private: 0,
       })
       return formData
     })
@@ -104,7 +104,7 @@ const _register = (
       return axios.post(`${Config.API_URL}/user/${res.data.u_id}/car`, carFormData).then(carRes => {
         return {
           ...res.data,
-          car: carRes.data
+          car: carRes.data,
         }
       })
     })
@@ -137,7 +137,7 @@ const _login = (
 ): Promise<{ user: IUser | null, tokens: ITokens | null, data: string | null } | null> => {
   addToFormData(formData, {
     ...data,
-    au: 'f'
+    au: 'f',
   })
 
   return axios.post(`${Config.API_URL}/auth`, formData)
@@ -187,7 +187,7 @@ const _googleLogin = (
       auth_hash: string | null
   },
 ): Promise<{ user: IUser, tokens: ITokens } | null> => {
-    console.log(auth)
+  console.log(auth)
   if(auth.auth_hash === null) {
     addToFormData(formData, {
       ...auth.data,
@@ -217,7 +217,7 @@ const _googleLogin = (
       })
   }
   else {
-    const tokenFormData = "auth_hash="+encodeURIComponent(auth.auth_hash)
+    const tokenFormData = 'auth_hash='+encodeURIComponent(auth.auth_hash)
     return axios.post(`${Config.API_URL}/token`, tokenFormData, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
       .then(tokenRes => tokenRes.data)
       .then(tokenRes => {
@@ -296,7 +296,7 @@ export const cancelDrive = apiMethod<typeof _cancelDrive>(_cancelDrive)
 
 const _editCar = (
   { formData }: IApiMethodArguments,
-  data: any
+  data: any,
 ): Promise<any> => {
   const { c_id, ...payload } = data
   addToFormData(formData, { data: JSON.stringify(payload) })
@@ -306,7 +306,7 @@ const _editCar = (
 export const editCar = apiMethod<typeof _editCar>(_editCar)
 
 const _getUserCars = (
-  { formData }: IApiMethodArguments
+  { formData }: IApiMethodArguments,
 ): Promise<any> => {
   return axios.post(`${Config.API_URL}/user/authorized/car`, formData)
     .then(res => Object.values(res?.data?.data?.car || {}))
@@ -610,7 +610,7 @@ const _editUser = (
   const { token, u_hash, u_id, u_city, ...userData } = data
   if (token && u_hash && u_id) addToFormData(formData, { token, u_hash, u_id })
   addToFormData(formData, {
-    data: JSON.stringify(reverseConvertUser(userData))
+    data: JSON.stringify(reverseConvertUser(userData)),
   })
 
   return axios.post(`${Config.API_URL}/user`, formData)
@@ -624,7 +624,7 @@ const _getImageBlob = (
   id: number,
 ) => {
   return axios.post(`${Config.API_URL}/dropbox/file/${id}`, formData, {
-    responseType: 'blob'
+    responseType: 'blob',
   }).then(res => {
     return [id, URL.createObjectURL(res.data)]
   })
@@ -636,7 +636,7 @@ const _getImageFile = (
   id: number,
 ) => {
   return axios.post(`${Config.API_URL}/dropbox/file/${id}`, formData, {
-    responseType: 'blob'
+    responseType: 'blob',
   }).then(res => {
     return [id, new File([res.data], String(id))]
   })

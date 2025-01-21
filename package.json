@@ -106,7 +106,8 @@
         "start": "set NODE_OPTIONS=--openssl-legacy-provider && node scripts/start.js",
         "build": "node scripts/build.js",
         "test": "node scripts/test.js",
-        "prepare-build": "npm version patch && node pre-build.js"
+        "prepare-build": "npm version patch && node pre-build.js",
+        "lint-fix": "eslint src/**/*.{ts,tsx} --fix"
     },
     "browserslist": {
         "production": [
