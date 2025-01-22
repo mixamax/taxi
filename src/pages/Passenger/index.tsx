@@ -149,27 +149,27 @@ const mapDispatchToProps = {
 const connector = connect(mapStateToProps, mapDispatchToProps)
 
 interface IFormValues {
-    from_porch: string;
-    from_floor: string;
-    from_room: string;
-    from_way: string;
-    from_mission: string;
-    to_porch: string;
-    to_floor: string;
-    to_room: string;
-    to_way: string;
-    to_mission: string;
-    customer_price: number;
-    object: string;
-    is_big_size: boolean;
-    cost: number;
-    loading: boolean;
-    steps?: string;
-    size?: number;
-    bigTruckCargoWeight?: number;
-    carsCount?: number;
-    bigTruckCarTypes?: string[] | string;
-    bigTruckCarLogic: ELogic;
+  from_porch: string;
+  from_floor: string;
+  from_room: string;
+  from_way: string;
+  from_mission: string;
+  to_porch: string;
+  to_floor: string;
+  to_room: string;
+  to_way: string;
+  to_mission: string;
+  customer_price: number;
+  object: string;
+  is_big_size: boolean;
+  cost: number;
+  loading: boolean;
+  steps?: string;
+  size?: number;
+  bigTruckCargoWeight?: number;
+  carsCount?: number;
+  bigTruckCarTypes?: string[] | string;
+  bigTruckCarLogic: ELogic;
 }
 
 interface IProps extends ConnectedProps<typeof connector> { }
@@ -225,9 +225,9 @@ const PassengerOrder: React.FC<IProps> = ({
   const [carClass, setCarClass] = useCachedState(
     `${cachedOrderDataStateKey}.carClass`,
     ECarClasses.Economy,
-        Object.values(ECarClasses).filter(
-          (item) => typeof item === 'number',
-        ) as number[],
+    Object.values(ECarClasses).filter(
+      (item) => typeof item === 'number',
+    ) as number[],
   )
   const [tab, setTab] = useCachedState(
     `${cachedOrderDataStateKey}.tab`,
@@ -244,9 +244,9 @@ const PassengerOrder: React.FC<IProps> = ({
   const [moveType, setMoveType] = useCachedState(
     `${cachedOrderDataStateKey}.moveType`,
     EMoveTypes.Apartament,
-        Object.values(EMoveTypes).filter(
-          (item) => typeof item === 'number',
-        ) as unknown as EMoveTypes[],
+    Object.values(EMoveTypes).filter(
+      (item) => typeof item === 'number',
+    ) as unknown as EMoveTypes[],
   )
 
   // Switchers
@@ -267,14 +267,14 @@ const PassengerOrder: React.FC<IProps> = ({
     getDayOptions().map((item) => item.value),
   )
   const [fromTimeFrom, setFromTimeFrom, { dirty: fromTimeFromDirty }] =
-        useCachedState(
-          `${cachedOrderDataStateKey}.fromTimeFrom`,
-          undefined,
-          getTimeOptions().map((item) => item.value),
-          {
-            dirty: true,
-          },
-        )
+    useCachedState(
+      `${cachedOrderDataStateKey}.fromTimeFrom`,
+      undefined,
+      getTimeOptions().map((item) => item.value),
+      {
+        dirty: true,
+      },
+    )
   const [fromTimeTill, setFromTimeTill] = useCachedState(
     `${cachedOrderDataStateKey}.fromTimeTill`,
     undefined,
@@ -311,8 +311,8 @@ const PassengerOrder: React.FC<IProps> = ({
     null,
   )
   const [cargoDescription, setCargoDescription] = useCachedState<
-        string | undefined
-    >(`${cachedOrderDataStateKey}.cargoDescription`)
+    string | undefined
+  >(`${cachedOrderDataStateKey}.cargoDescription`)
   const [fromPhone, setFromPhone] = useCachedState<string | null>(
     `${cachedOrderDataStateKey}.fromPhone`,
     null,
@@ -342,8 +342,8 @@ const PassengerOrder: React.FC<IProps> = ({
     defaultDateTimeIntervalValue,
   )
   const [bigTruckServices, setBigTruckServices] = useState<
-        IBigTruckService['id'][]
-    >([])
+    IBigTruckService['id'][]
+  >([])
 
   const [distance, setDistance] = useState(0)
   const [moveFiles, setMoveFiles] = useState<TMoveFiles>({})
@@ -387,11 +387,11 @@ const PassengerOrder: React.FC<IProps> = ({
   // *********************/swipe*********************
 
   const roomFurniture =
-        tab === TABS.MOVE.id && moveType === EMoveTypes.Apartament ?
-          room !== null ?
-            furniture.house[room] :
-            null :
-          furniture.room
+    tab === TABS.MOVE.id && moveType === EMoveTypes.Apartament ?
+      room !== null ?
+        furniture.house[room] :
+        null :
+      furniture.room
 
   const {
     register,
@@ -429,20 +429,20 @@ const PassengerOrder: React.FC<IProps> = ({
     (item) => item.b_id === selectedOrderID,
   )
   const selectedOrderDriver =
-        selectedOrder?.drivers &&
-        selectedOrder?.drivers.find(
-          (item) => item.c_state > EBookingDriverState.Canceled,
-        )
+    selectedOrder?.drivers &&
+    selectedOrder?.drivers.find(
+      (item) => item.c_state > EBookingDriverState.Canceled,
+    )
   // *****************************************************getActiveOrders() и  setRefresh => marker-from.svg  каждые 5сек перерендер всей страницы
   useInterval(() => {
     user && getActiveOrders()
     for (const order of activeOrders || []) {
       if (
         order.b_voting &&
-                order.b_start_datetime &&
-                (order.b_max_waiting || SITE_CONSTANTS.WAITING_INTERVAL) -
-                moment().diff(order.b_start_datetime, 'seconds') <=
-                0
+        order.b_start_datetime &&
+        (order.b_max_waiting || SITE_CONSTANTS.WAITING_INTERVAL) -
+        moment().diff(order.b_start_datetime, 'seconds') <=
+        0
       ) {
         API.cancelDrive(order.b_id)
         return API.postDrive({
@@ -488,10 +488,10 @@ const PassengerOrder: React.FC<IProps> = ({
     if (selectedOrder.b_voting && !selectedOrderDriver) {
       if (
         selectedOrder.b_start_datetime &&
-                (selectedOrder.b_max_waiting ||
-                    SITE_CONSTANTS.WAITING_INTERVAL) -
-                moment().diff(selectedOrder.b_start_datetime, 'seconds') <=
-                0
+        (selectedOrder.b_max_waiting ||
+          SITE_CONSTANTS.WAITING_INTERVAL) -
+        moment().diff(selectedOrder.b_start_datetime, 'seconds') <=
+        0
       ) {
         API.cancelDrive(selectedOrder.b_id)
         return API.postDrive({
@@ -520,7 +520,7 @@ const PassengerOrder: React.FC<IProps> = ({
       ['96', '95'].some((item) =>
         selectedOrder?.b_comments?.includes(item),
       ) &&
-            !selectedOrderDriver
+      !selectedOrderDriver
     ) {
       setCandidatesModal(true)
       return
@@ -528,7 +528,7 @@ const PassengerOrder: React.FC<IProps> = ({
 
     if (
       !selectedOrderDriver ||
-            selectedOrderDriver.c_state === EBookingDriverState.Finished
+      selectedOrderDriver.c_state === EBookingDriverState.Finished
     ) {
       setVoteModal(false)
       setDriverModal(false)
@@ -560,7 +560,7 @@ const PassengerOrder: React.FC<IProps> = ({
     if (!prevSelectedOrderDriver) return
     if (
       prevSelectedOrderDriver.c_state <= EBookingDriverState.Started &&
-            !activeOrders?.find((item) => item.b_id === prevSelectedOrder?.b_id)
+      !activeOrders?.find((item) => item.b_id === prevSelectedOrder?.b_id)
     ) {
       const id = prevSelectedOrder?.b_id
       API.getOrder(id as string)
@@ -612,18 +612,18 @@ const PassengerOrder: React.FC<IProps> = ({
   }
 
   const handleLogicChange =
-        (type: ELogic) => (e: React.ChangeEvent<HTMLInputElement>) => {
-          if (type === ELogic.And) {
-            if (values.bigTruckCarLogic === ELogic.And)
-              setValue('bigTruckCarLogic', ELogic.Nothing)
-            else setValue('bigTruckCarLogic', ELogic.And)
-          }
-          if (type === ELogic.Or) {
-            if (values.bigTruckCarLogic === ELogic.Or)
-              setValue('bigTruckCarLogic', ELogic.Nothing)
-            else setValue('bigTruckCarLogic', ELogic.Or)
-          }
-        }
+    (type: ELogic) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (type === ELogic.And) {
+        if (values.bigTruckCarLogic === ELogic.And)
+          setValue('bigTruckCarLogic', ELogic.Nothing)
+        else setValue('bigTruckCarLogic', ELogic.And)
+      }
+      if (type === ELogic.Or) {
+        if (values.bigTruckCarLogic === ELogic.Or)
+          setValue('bigTruckCarLogic', ELogic.Nothing)
+        else setValue('bigTruckCarLogic', ELogic.Or)
+      }
+    }
 
   const handleSubmit = async() => {
     try {
@@ -633,7 +633,7 @@ const PassengerOrder: React.FC<IProps> = ({
 
       if (
         (tab === TABS.DELIVERY.id || tab === TABS.MOTORCYCLE.id) &&
-                (getPhoneError(fromPhone) || getPhoneError(toPhone))
+        (getPhoneError(fromPhone) || getPhoneError(toPhone))
       ) {
         throw t(TRANSLATION.PHONE_PATTERN_ERROR)
       }
@@ -643,7 +643,7 @@ const PassengerOrder: React.FC<IProps> = ({
       }
       if (
         !(tab === TABS.MOVE.id && moveType === EMoveTypes.Handy) &&
-                (!to || !((to.latitude && to.longitude) || to.address))
+        (!to || !((to.latitude && to.longitude) || to.address))
       ) {
         throw t(TRANSLATION.MAP_TO_NOT_SPECIFIED_ERROR)
       }
@@ -651,9 +651,9 @@ const PassengerOrder: React.FC<IProps> = ({
       const commentObj: any = {}
       commentObj['b_comments'] = comments.ids || []
       comments.custom &&
-                (commentObj['b_custom_comment'] = comments.custom)
+        (commentObj['b_custom_comment'] = comments.custom)
       comments.flightNumber &&
-                (commentObj['b_flight_number'] = comments.flightNumber)
+        (commentObj['b_flight_number'] = comments.flightNumber)
       comments.placard && (commentObj['b_placard'] = comments.placard)
       tab === TABS.DELIVERY.id && commentObj['b_comments'].push(98)
       tab === TABS.MOTORCYCLE.id && commentObj['b_comments'].push(97)
@@ -671,8 +671,8 @@ const PassengerOrder: React.FC<IProps> = ({
         )
       } else if (
         tab === TABS.VOTING.id ||
-                (tab === TABS.WAITING.id && time === 'now') ||
-                time === 'now'
+        (tab === TABS.WAITING.id && time === 'now') ||
+        time === 'now'
       ) {
         startTime = moment()
       } else {
@@ -691,9 +691,9 @@ const PassengerOrder: React.FC<IProps> = ({
         options = {
           ...options,
           courier_auto:
-                        tab === TABS.DELIVERY.id ?
-                          courierAuto :
-                          TABS.MOTORCYCLE.id,
+            tab === TABS.DELIVERY.id ?
+              courierAuto :
+              TABS.MOTORCYCLE.id,
           from_porch: values.from_porch,
           from_floor: values.from_floor,
           from_room: values.from_room,
@@ -722,9 +722,9 @@ const PassengerOrder: React.FC<IProps> = ({
           steps: values.steps,
           elevator: elevator,
           furniture:
-                        moveType === EMoveTypes.Apartament ?
-                          furniture.house :
-                          furniture.room,
+            moveType === EMoveTypes.Apartament ?
+              furniture.house :
+              furniture.room,
           time_is_not_important: fromTimeFrom === '',
         }
 
@@ -739,9 +739,9 @@ const PassengerOrder: React.FC<IProps> = ({
           carsCount: values.carsCount,
           bigTruckCarLogic: values.bigTruckCarLogic,
           bigTruckCarTypes:
-                        typeof values.bigTruckCarTypes === 'string' ?
-                          [values.bigTruckCarTypes] :
-                          values.bigTruckCarTypes,
+            typeof values.bigTruckCarTypes === 'string' ?
+              [values.bigTruckCarTypes] :
+              values.bigTruckCarTypes,
           bigTruckServices: bigTruckServices,
         }
 
@@ -778,13 +778,13 @@ const PassengerOrder: React.FC<IProps> = ({
         // b_tips         чаевые
         // b_cars_count   число машин
         b_max_waiting:
-                    tab === TABS.VOTING.id ?
-                      SITE_CONSTANTS.WAITING_INTERVAL :
-                      tab === TABS.WAITING.id ?
-                        7200 :
-                        3600,
+          tab === TABS.VOTING.id ?
+            SITE_CONSTANTS.WAITING_INTERVAL :
+            tab === TABS.WAITING.id ?
+              7200 :
+              3600,
         b_services:
-                    tab === TABS.VOTING.id ? [EServices.Voting.toString()] : [],
+          tab === TABS.VOTING.id ? [EServices.Voting.toString()] : [],
         b_options: options,
       })
 
@@ -840,9 +840,9 @@ const PassengerOrder: React.FC<IProps> = ({
 
   let cardPaymentEnabled = false
   const mode =
-        SITE_CONSTANTS.MONEY_MODES[
-          (Object.values(TABS).find((i) => i.id === tab) as any).sid
-        ]
+    SITE_CONSTANTS.MONEY_MODES[
+      (Object.values(TABS).find((i) => i.id === tab) as any).sid
+    ]
   if (typeof mode === 'object') {
     if (tab === TABS.DELIVERY.id) cardPaymentEnabled = mode[courierAuto]
     if (tab === TABS.MOVE.id) cardPaymentEnabled = mode[moveType]
@@ -855,73 +855,62 @@ const PassengerOrder: React.FC<IProps> = ({
           <PassengerMiniOrders handleOrderClick={handleOrderClick} />
           <Map
             containerClassName="form-map-container"
-            // onClose={() => setIsMapVisible(!isMapVisible)}
+          // onClose={() => setIsMapVisible(!isMapVisible)}
           />
-          <div
-            ref={formContainerRef}
-            // className={cn("form-container", {
-            //     "map-visible": isMapVisible,
-            // })}
-            className="form-container"
-          >
-            <BoundaryButtons onIsIntercityChanged={(value) => setIsIntercity(value)} isIntercity={isIntercity} />
-            <form
-              onSubmit={formHandleSubmit(handleSubmit)}
-              className="input-group"
-              ref={draggableRef}
+          <div className='form-placeholder'>
+            <div
+              ref={formContainerRef}
+              // className={cn("form-container", {
+              //     "map-visible": isMapVisible,
+              // })}
+              className="form-container"
             >
-              <div className="swipe-line"></div>
-              {/* <TabsSwitcher
+              <BoundaryButtons onIsIntercityChanged={(value) => setIsIntercity(value)} isIntercity={isIntercity} />
+              <form
+                onSubmit={formHandleSubmit(handleSubmit)}
+                className="input-group"
+                ref={draggableRef}
+              >
+                <div className="swipe-line"></div>
+                {/* <TabsSwitcher
                             tab={tab}
                             onChange={(id: typeof tab) => setTab(id)}
                         /> */}
-              {/* <div className="form-with-map" ref={formWithMapRef}> */}
+                {/* <div className="form-with-map" ref={formWithMapRef}> */}
 
-              {/* ******************form-container******************** */}
-
-              {/* <div
-                                    onClick={() =>
-                                        setIsMapVisible(!isMapVisible)
-                                    }
-                                    className="map-button"
-                                >
-                                    click
-                                </div> */}
-
-              {/* *********************ФОРМЫ**************** */}
-              {(TABS.VOTING.id === tab || TABS.WAITING.id === tab) && (
-                <VotingForm
-                  tab={tab}
-                  isIntercity={isIntercity}
-                  setIsIntercity={setIsIntercity}
-                  moveType={moveType}
-                  setIsMapVisible={setIsMapVisible}
-                  register={register}
-                  time={time}
-                  distance={distance}
-                  errors={errors}
-                  setPaymentWay={setPaymentWay}
-                  paymentWay={paymentWay}
-                  t={t}
-                  cardPaymentEnabled={cardPaymentEnabled}
-                  setPickTimeModal={setPickTimeModal}
-                  // setSeatsModal={setSeatsModal}
-                  setCommentsModal={setCommentsModal}
-                  carClass={carClass}
-                  setCarClass={setCarClass}
-                  phone={phone}
-                  user={user}
-                  seats={seats}
-                  setPhone={setPhone}
-                  status={status}
-                  message={message}
-                  setSeats={setSeats}
-                  isExpanded={isExpanded}
-                  draggableElement={draggableRef.current}
-                  ref={formSlidersRef}
-                />
-              )}
-              {/* {TABS.WAITING.id === tab && (
+                {(TABS.VOTING.id === tab || TABS.WAITING.id === tab) && (
+                  <VotingForm
+                    tab={tab}
+                    isIntercity={isIntercity}
+                    setIsIntercity={setIsIntercity}
+                    moveType={moveType}
+                    setIsMapVisible={setIsMapVisible}
+                    register={register}
+                    time={time}
+                    distance={distance}
+                    errors={errors}
+                    setPaymentWay={setPaymentWay}
+                    paymentWay={paymentWay}
+                    t={t}
+                    cardPaymentEnabled={cardPaymentEnabled}
+                    setPickTimeModal={setPickTimeModal}
+                    // setSeatsModal={setSeatsModal}
+                    setCommentsModal={setCommentsModal}
+                    carClass={carClass}
+                    setCarClass={setCarClass}
+                    phone={phone}
+                    user={user}
+                    seats={seats}
+                    setPhone={setPhone}
+                    status={status}
+                    message={message}
+                    setSeats={setSeats}
+                    isExpanded={isExpanded}
+                    draggableElement={draggableRef.current}
+                    ref={formSlidersRef}
+                  />
+                )}
+                {/* {TABS.WAITING.id === tab && (
                                     <WaitingForm
                                         tab={tab}
                                         isIntercity={isIntercity}
@@ -949,1504 +938,214 @@ const PassengerOrder: React.FC<IProps> = ({
                                         message={message}
                                     />
                                 )} */}
-              {TABS.DELIVERY.id === tab && (
-                <DeliveryForm
-                  tab={tab}
-                  courierAuto={courierAuto}
-                  setCourierAuto={setCourierAuto} //если оставить ECourierAutoTypes не соберется
-                  isIntercity={isIntercity}
-                  setIsIntercity={setIsIntercity}
-                  moveType={moveType}
-                  setIsMapVisible={setIsMapVisible}
-                  register={register}
-                  distance={distance}
-                  errors={errors}
-                  setPaymentWay={setPaymentWay}
-                  paymentWay={paymentWay}
-                  t={t}
-                  cardPaymentEnabled={cardPaymentEnabled}
-                  carClass={carClass}
-                  phone={phone}
-                  user={user}
-                  setPhone={setPhone}
-                  status={status}
-                  message={message}
-                  fromPhone={fromPhone}
-                  fromDay={fromDay}
-                  handleFromDayChange={
-                    handleFromDayChange
-                  }
-                  fromTimeFrom={fromTimeFrom}
-                  setFromPhone={setFromPhone}
-                  setFromTimeFrom={setFromTimeFrom}
-                  fromTimeFromOptions={
-                    fromTimeFromOptions
-                  }
-                  fromTimeTill={fromTimeTill}
-                  setFromTimeTill={setFromTimeTill}
-                  toPhone={toPhone}
-                  setToPhone={setToPhone}
-                  setToDay={setToDay}
-                  toDay={toDay}
-                  setToTimeFrom={setToTimeFrom}
-                  toTimeFrom={toTimeFrom}
-                  toTimeTill={toTimeTill}
-                  setToTimeTill={setToTimeTill}
-                  setValue={setValue}
-                  weight={weight}
-                  setWeight={setWeight}
-                  cost={cost}
-                  setCost={setCost}
-                />
-              )}
-              {TABS.MOTORCYCLE.id === tab && (
-                <MotorcycleForm
-                  tab={tab}
-                  isIntercity={isIntercity}
-                  setIsIntercity={setIsIntercity}
-                  moveType={moveType}
-                  setIsMapVisible={setIsMapVisible}
-                  register={register}
-                  distance={distance}
-                  errors={errors}
-                  setPaymentWay={setPaymentWay}
-                  paymentWay={paymentWay}
-                  t={t}
-                  cardPaymentEnabled={cardPaymentEnabled}
-                  carClass={carClass}
-                  phone={phone}
-                  user={user}
-                  setPhone={setPhone}
-                  status={status}
-                  message={message}
-                  fromPhone={fromPhone}
-                  fromTimeFrom={fromTimeFrom}
-                  setFromPhone={setFromPhone}
-                  toPhone={toPhone}
-                  setToPhone={setToPhone}
-                  setValue={setValue}
-                  cost={cost}
-                  setCost={setCost}
-                />
-              )}
-              {TABS.MOVE.id === tab && (
-                <MoveForm
-                  tab={tab}
-                  setMoveType={setMoveType}
-                  room={room}
-                  setRoom={setRoom}
-                  elevator={elevator}
-                  setElevator={setElevator}
-                  handleDeleteMoveFile={
-                    handleDeleteMoveFile
-                  }
-                  handleDeleteMoveFiles={
-                    handleDeleteMoveFiles
-                  }
-                  moveFiles={moveFiles}
-                  furniture={furniture}
-                  isIntercity={isIntercity}
-                  setIsIntercity={setIsIntercity}
-                  moveType={moveType}
-                  setIsMapVisible={setIsMapVisible}
-                  register={register}
-                  errors={errors}
-                  setPaymentWay={setPaymentWay}
-                  paymentWay={paymentWay}
-                  t={t}
-                  cardPaymentEnabled={cardPaymentEnabled}
-                  phone={phone}
-                  user={user}
-                  setPhone={setPhone}
-                  status={status}
-                  message={message}
-                  handleFurnitureChange={
-                    handleFurnitureChange
-                  }
-                  roomFurniture={roomFurniture}
-                  fromDay={fromDay}
-                  handleFromDayChange={
-                    handleFromDayChange
-                  }
-                  fromTimeFrom={fromTimeFrom}
-                  setFromTimeFrom={setFromTimeFrom}
-                  fromTimeFromOptions={
-                    fromTimeFromOptions
-                  }
-                />
-              )}
-              {TABS.WAGON.id === tab && (
-                <WagonForm
-                  tab={tab}
-                  moveType={moveType}
-                  isIntercity={isIntercity}
-                  // setIsIntercity={setIsIntercity}
-                  setIsMapVisible={setIsMapVisible}
-                  register={register}
-                  // errors={errors}
-                  setPaymentWay={setPaymentWay}
-                  paymentWay={paymentWay}
-                  t={t}
-                  cardPaymentEnabled={cardPaymentEnabled}
-                  phone={phone}
-                  user={user}
-                  setPhone={setPhone}
-                  status={status}
-                  message={message}
-                  insertCargoTypeIntoCargoDescription={
-                    insertCargoTypeIntoCargoDescription
-                  }
-                  tillTimeInterval={tillTimeInterval}
-                  setTillTimeInterval={
-                    setTillTimeInterval
-                  }
-                  setCargoDescription={
-                    setCargoDescription
-                  }
-                  cargoDescription={cargoDescription}
-                  fromTimeInterval={fromTimeInterval}
-                  setFromTimeInterval={
-                    setFromTimeInterval
-                  }
-                  handleLogicChange={handleLogicChange}
-                  values={values}
-                  email={email}
-                  setEmail={setEmail}
-                  setBigTruckServices={
-                    setBigTruckServices
-                  }
-                  bigTruckServices={bigTruckServices}
-                />
-              )}
-              {TABS.TRIP.id === tab && (
-                <TripForm
-                  tab={tab}
-                  moveType={moveType}
-                  isIntercity={isIntercity}
-                  setIsIntercity={setIsIntercity}
-                  setIsMapVisible={setIsMapVisible}
-                  // register={register}
-                  // errors={errors}
-                  setPaymentWay={setPaymentWay}
-                  paymentWay={paymentWay}
-                  t={t}
-                  cardPaymentEnabled={cardPaymentEnabled}
-                  status={status}
-                  message={message}
-                  tillTimeInterval={tillTimeInterval}
-                  setTillTimeInterval={
-                    setTillTimeInterval
-                  }
-                  fromTimeInterval={fromTimeInterval}
-                  setFromTimeInterval={
-                    setFromTimeInterval
-                  }
-                />
-              )}
-              {TABS.WASH.id === tab && (
-                <WashForm
-                  tab={tab}
-                  moveType={moveType}
-                  isIntercity={isIntercity}
-                  // setIsIntercity={setIsIntercity}
-                  setIsMapVisible={setIsMapVisible}
+                {TABS.DELIVERY.id === tab && (
+                  <DeliveryForm
+                    tab={tab}
+                    courierAuto={courierAuto}
+                    setCourierAuto={setCourierAuto} //если оставить ECourierAutoTypes не соберется
+                    isIntercity={isIntercity}
+                    setIsIntercity={setIsIntercity}
+                    moveType={moveType}
+                    setIsMapVisible={setIsMapVisible}
+                    register={register}
+                    distance={distance}
+                    errors={errors}
+                    setPaymentWay={setPaymentWay}
+                    paymentWay={paymentWay}
+                    t={t}
+                    cardPaymentEnabled={cardPaymentEnabled}
+                    carClass={carClass}
+                    phone={phone}
+                    user={user}
+                    setPhone={setPhone}
+                    status={status}
+                    message={message}
+                    fromPhone={fromPhone}
+                    fromDay={fromDay}
+                    handleFromDayChange={
+                      handleFromDayChange
+                    }
+                    fromTimeFrom={fromTimeFrom}
+                    setFromPhone={setFromPhone}
+                    setFromTimeFrom={setFromTimeFrom}
+                    fromTimeFromOptions={
+                      fromTimeFromOptions
+                    }
+                    fromTimeTill={fromTimeTill}
+                    setFromTimeTill={setFromTimeTill}
+                    toPhone={toPhone}
+                    setToPhone={setToPhone}
+                    setToDay={setToDay}
+                    toDay={toDay}
+                    setToTimeFrom={setToTimeFrom}
+                    toTimeFrom={toTimeFrom}
+                    toTimeTill={toTimeTill}
+                    setToTimeTill={setToTimeTill}
+                    setValue={setValue}
+                    weight={weight}
+                    setWeight={setWeight}
+                    cost={cost}
+                    setCost={setCost}
+                  />
+                )}
+                {TABS.MOTORCYCLE.id === tab && (
+                  <MotorcycleForm
+                    tab={tab}
+                    isIntercity={isIntercity}
+                    setIsIntercity={setIsIntercity}
+                    moveType={moveType}
+                    setIsMapVisible={setIsMapVisible}
+                    register={register}
+                    distance={distance}
+                    errors={errors}
+                    setPaymentWay={setPaymentWay}
+                    paymentWay={paymentWay}
+                    t={t}
+                    cardPaymentEnabled={cardPaymentEnabled}
+                    carClass={carClass}
+                    phone={phone}
+                    user={user}
+                    setPhone={setPhone}
+                    status={status}
+                    message={message}
+                    fromPhone={fromPhone}
+                    fromTimeFrom={fromTimeFrom}
+                    setFromPhone={setFromPhone}
+                    toPhone={toPhone}
+                    setToPhone={setToPhone}
+                    setValue={setValue}
+                    cost={cost}
+                    setCost={setCost}
+                  />
+                )}
+                {TABS.MOVE.id === tab && (
+                  <MoveForm
+                    tab={tab}
+                    setMoveType={setMoveType}
+                    room={room}
+                    setRoom={setRoom}
+                    elevator={elevator}
+                    setElevator={setElevator}
+                    handleDeleteMoveFile={
+                      handleDeleteMoveFile
+                    }
+                    handleDeleteMoveFiles={
+                      handleDeleteMoveFiles
+                    }
+                    moveFiles={moveFiles}
+                    furniture={furniture}
+                    isIntercity={isIntercity}
+                    setIsIntercity={setIsIntercity}
+                    moveType={moveType}
+                    setIsMapVisible={setIsMapVisible}
+                    register={register}
+                    errors={errors}
+                    setPaymentWay={setPaymentWay}
+                    paymentWay={paymentWay}
+                    t={t}
+                    cardPaymentEnabled={cardPaymentEnabled}
+                    phone={phone}
+                    user={user}
+                    setPhone={setPhone}
+                    status={status}
+                    message={message}
+                    handleFurnitureChange={
+                      handleFurnitureChange
+                    }
+                    roomFurniture={roomFurniture}
+                    fromDay={fromDay}
+                    handleFromDayChange={
+                      handleFromDayChange
+                    }
+                    fromTimeFrom={fromTimeFrom}
+                    setFromTimeFrom={setFromTimeFrom}
+                    fromTimeFromOptions={
+                      fromTimeFromOptions
+                    }
+                  />
+                )}
+                {TABS.WAGON.id === tab && (
+                  <WagonForm
+                    tab={tab}
+                    moveType={moveType}
+                    isIntercity={isIntercity}
+                    // setIsIntercity={setIsIntercity}
+                    setIsMapVisible={setIsMapVisible}
+                    register={register}
+                    // errors={errors}
+                    setPaymentWay={setPaymentWay}
+                    paymentWay={paymentWay}
+                    t={t}
+                    cardPaymentEnabled={cardPaymentEnabled}
+                    phone={phone}
+                    user={user}
+                    setPhone={setPhone}
+                    status={status}
+                    message={message}
+                    insertCargoTypeIntoCargoDescription={
+                      insertCargoTypeIntoCargoDescription
+                    }
+                    tillTimeInterval={tillTimeInterval}
+                    setTillTimeInterval={
+                      setTillTimeInterval
+                    }
+                    setCargoDescription={
+                      setCargoDescription
+                    }
+                    cargoDescription={cargoDescription}
+                    fromTimeInterval={fromTimeInterval}
+                    setFromTimeInterval={
+                      setFromTimeInterval
+                    }
+                    handleLogicChange={handleLogicChange}
+                    values={values}
+                    email={email}
+                    setEmail={setEmail}
+                    setBigTruckServices={
+                      setBigTruckServices
+                    }
+                    bigTruckServices={bigTruckServices}
+                  />
+                )}
+                {TABS.TRIP.id === tab && (
+                  <TripForm
+                    tab={tab}
+                    moveType={moveType}
+                    isIntercity={isIntercity}
+                    setIsIntercity={setIsIntercity}
+                    setIsMapVisible={setIsMapVisible}
+                    // register={register}
+                    // errors={errors}
+                    setPaymentWay={setPaymentWay}
+                    paymentWay={paymentWay}
+                    t={t}
+                    cardPaymentEnabled={cardPaymentEnabled}
+                    status={status}
+                    message={message}
+                    tillTimeInterval={tillTimeInterval}
+                    setTillTimeInterval={
+                      setTillTimeInterval
+                    }
+                    fromTimeInterval={fromTimeInterval}
+                    setFromTimeInterval={
+                      setFromTimeInterval
+                    }
+                  />
+                )}
+                {TABS.WASH.id === tab && (
+                  <WashForm
+                    tab={tab}
+                    moveType={moveType}
+                    isIntercity={isIntercity}
+                    // setIsIntercity={setIsIntercity}
+                    setIsMapVisible={setIsMapVisible}
                   // register={register}
                   // errors={errors}
                   // t={t}
-                />
-              )}
-              {/* ******************************формы****************************** */}
-              <>
-                {/* DELIVERY */}
-                {/* <CouriersTransportTabs
-                                        tab={courierAuto as ECourierAutoTypes}
-                                        onChange={(id: typeof courierAuto) =>
-                                            setCourierAuto(id)
-                                        }
-                                        visible={tab === TABS.DELIVERY.id}
-                                    /> */}
-
-                {/* MOVE */}
-                {/* <MoveTypeTabs
-                                        tab={moveType as EMoveTypes}
-                                        onChange={(id: typeof moveType) =>
-                                            setMoveType(id)
-                                        }
-                                        visible={tab === TABS.MOVE.id}
-                                    /> */}
-
-                {/* MOVE */}
-                {/* {tab === TABS.MOVE.id &&
-                                        moveType === EMoveTypes.Apartament && (
-                                            <>
-                                                <Rooms
-                                                    furnitureState={
-                                                        furniture.house
-                                                    }
-                                                    value={room}
-                                                    onChange={setRoom}
-                                                />
-                                                <div className="move__elevator">
-                                                    {!elevator.elevator && (
-                                                        <Input
-                                                            inputProps={{
-                                                                type: "number",
-                                                                min: 0,
-                                                                disabled:
-                                                                    room ===
-                                                                    null,
-                                                                value:
-                                                                    room !==
-                                                                        null &&
-                                                                    elevator
-                                                                        .steps[
-                                                                        room
-                                                                    ] !==
-                                                                        undefined
-                                                                        ? elevator
-                                                                              .steps[
-                                                                              room
-                                                                          ]
-                                                                        : "",
-                                                                onChange: (
-                                                                    e: React.ChangeEvent<HTMLInputElement>
-                                                                ) =>
-                                                                    room !==
-                                                                        null &&
-                                                                    setElevator(
-                                                                        (
-                                                                            prev
-                                                                        ) => ({
-                                                                            ...prev,
-                                                                            steps: {
-                                                                                ...prev.steps,
-                                                                                [room]: parseInt(
-                                                                                    e
-                                                                                        .target
-                                                                                        .value
-                                                                                ),
-                                                                            },
-                                                                        })
-                                                                    ),
-                                                            }}
-                                                            label={t(
-                                                                TRANSLATION.NUMBER_OF_STEPS
-                                                            )}
-                                                            error={
-                                                                errors.steps
-                                                                    ?.message
-                                                            }
-                                                            fieldWrapperClassName={cn(
-                                                                "move__steps",
-                                                                {
-                                                                    "move__steps--oneline":
-                                                                        _.sum(
-                                                                            Object.values(
-                                                                                elevator.steps
-                                                                            )
-                                                                        ),
-                                                                    "move__steps--disabled":
-                                                                        room ===
-                                                                        null,
-                                                                }
-                                                            )}
-                                                        />
-                                                    )}
-                                                    {!_.sum(
-                                                        Object.values(
-                                                            elevator.steps
-                                                        )
-                                                    ) && (
-                                                        <div
-                                                            className={cn(
-                                                                "move__elevator-switcher-wrapper",
-                                                                {
-                                                                    "move__elevator-switcher-wrapper--oneline":
-                                                                        elevator.elevator,
-                                                                }
-                                                            )}
-                                                        >
-                                                            <label className="input__label">
-                                                                {t(
-                                                                    TRANSLATION.ELEVATOR
-                                                                )}
-                                                            </label>
-                                                            <SwitchSlider
-                                                                isVertical={
-                                                                    window.innerWidth <
-                                                                        768 &&
-                                                                    !elevator.elevator
-                                                                }
-                                                                checked={
-                                                                    !!elevator.elevator
-                                                                }
-                                                                onValueChanged={(
-                                                                    value
-                                                                ) =>
-                                                                    setElevator(
-                                                                        (
-                                                                            prev
-                                                                        ) => ({
-                                                                            ...prev,
-                                                                            elevator:
-                                                                                value,
-                                                                        })
-                                                                    )
-                                                                }
-                                                                startButton={{
-                                                                    label: t(
-                                                                        TRANSLATION.NO
-                                                                    ),
-                                                                }}
-                                                                endButton={{
-                                                                    label: t(
-                                                                        TRANSLATION.YES
-                                                                    ),
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    )}
-                                                    <hr
-                                                        className="move__elevator-hr"
-                                                        style={{
-                                                            backgroundColor:
-                                                                SITE_CONSTANTS
-                                                                    .PALETTE
-                                                                    .primary
-                                                                    .dark,
-                                                        }}
-                                                    />
-                                                </div>
-                                                {room !== null &&
-                                                    !!moveFiles[room]
-                                                        ?.length && (
-                                                        <Slider
-                                                            files={
-                                                                moveFiles[room]
-                                                            }
-                                                            controls
-                                                            handleDelete={
-                                                                handleDeleteMoveFile
-                                                            }
-                                                            handleDeleteAll={
-                                                                handleDeleteMoveFiles
-                                                            }
-                                                            mobileFriendly
-                                                            headerLabel={t(
-                                                                (
-                                                                    rooms.find(
-                                                                        (i) =>
-                                                                            i.id ===
-                                                                            room
-                                                                    ) as IRoom
-                                                                ).label
-                                                            )}
-                                                        />
-                                                    )}
-                                            </>
-                                        )} */}
-
-                {/* MOVE */}
-                {/* {tab === TABS.MOVE.id && (
-                                        <>
-                                            <Furniture
-                                                value={roomFurniture}
-                                                room={room}
-                                                listAll={
-                                                    moveType !==
-                                                    EMoveTypes.Apartament
-                                                }
-                                                key={`${room}_${moveType}`}
-                                                handleChange={
-                                                    handleFurnitureChange
-                                                }
-                                                total={
-                                                    moveType ===
-                                                    EMoveTypes.Apartament
-                                                        ? Object.values(
-                                                              furniture.house
-                                                          ).reduce(
-                                                              (sum, i) =>
-                                                                  sum +
-                                                                  _.sum(
-                                                                      Object.values(
-                                                                          i
-                                                                      )
-                                                                  ),
-                                                              0
-                                                          )
-                                                        : _.sum(
-                                                              Object.values(
-                                                                  furniture.room
-                                                              )
-                                                          )
-                                                }
-                                                // roomsChoosen={Object.values(roomFurniture)
-                                                // .reduce((sum, i) => sum + (_.sum(Object.values(i)) > 0 ? 1 : 0), 0)}
-                                            />
-                                            <hr
-                                                className="move__separator"
-                                                style={{
-                                                    backgroundColor:
-                                                        SITE_CONSTANTS.PALETTE
-                                                            .primary.dark,
-                                                }}
-                                            />
-                                        </>
-                                    )} */}
-
-                {/*VOTING, WAITING, DELIVERY, MOVE, TRIP  */}
-                {/* {![
-                                        TABS.WAGON.id,
-                                        TABS.MOTORCYCLE.id,
-                                        TABS.WASH.id,
-                                    ].includes(tab) && (
-                                        <SwitchSlider
-                                            checked={isIntercity}
-                                            onValueChanged={(value) =>
-                                                setIsIntercity(value)
-                                            }
-                                            startButton={{
-                                                label: t(
-                                                    tab === TABS.MOVE.id
-                                                        ? TRANSLATION.SAME_STATE
-                                                        : TRANSLATION.CITY
-                                                ),
-                                            }}
-                                            endButton={{
-                                                label: t(
-                                                    tab === TABS.MOVE.id
-                                                        ? TRANSLATION.INTERSTATE
-                                                        : TRANSLATION.INTERCITY
-                                                ),
-                                            }}
-                                            wrapperClassName="is-intercity"
-                                        />
-                                    )} */}
-
-                {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP */}
-                {/* {tab !== TABS.WASH.id && (
-                                        <LocationInput
-                                            onOpenMap={() => {
-                                                setIsMapVisible(true);
-                                            }}
-                                            type={EPointType.From}
-                                            isIntercity={isIntercity}
-                                        />
-                                    )} */}
-                {/* WAGON, TRIP */}
-                {/* {[TABS.WAGON.id, TABS.TRIP.id].includes(
-                                        tab
-                                    ) && (
-                                        <DateTimeIntervalInput
-                                            value={fromTimeInterval}
-                                            onChange={setFromTimeInterval}
-                                            isSimple={tab === TABS.TRIP.id}
-                                        />
-                                    )} */}
-                {/*DELIVERY */}
-                {/* {[TABS.DELIVERY.id].includes(tab) && (
-                                        <GroupedInputs>
-                                            <Input
-                                                inputProps={{
-                                                    type: "number",
-                                                    ...register("from_porch"),
-                                                }}
-                                                label={t(TRANSLATION.PORCH)}
-                                                error={
-                                                    errors.from_porch?.message
-                                                }
-                                            />
-                                            <Input
-                                                inputProps={{
-                                                    type: "number",
-                                                    ...register("from_floor"),
-                                                }}
-                                                label={t(TRANSLATION.FLOOR)}
-                                                error={
-                                                    errors.from_floor?.message
-                                                }
-                                            />
-                                            <Input
-                                                inputProps={{
-                                                    type: "number",
-                                                    ...register("from_room"),
-                                                }}
-                                                label={t(TRANSLATION.ROOM)}
-                                                error={
-                                                    errors.from_room?.message
-                                                }
-                                            />
-                                        </GroupedInputs>
-                                    )} */}
-                {/*DELIVERY,  MOVE */}
-                {/* {[TABS.DELIVERY.id, TABS.MOVE.id].includes(
-                                        tab
-                                    ) &&
-                                        SITE_CONSTANTS.PASSENGER_ORDER_CONFIG
-                                            .visibility.fromWay && (
-                                            <Input
-                                                inputProps={{
-                                                    ...register("from_way"),
-                                                }}
-                                                label={t(
-                                                    tab === TABS.MOVE.id
-                                                        ? TRANSLATION.COMMENT
-                                                        : TRANSLATION.WAY
-                                                )}
-                                                error={errors.from_way?.message}
-                                            />
-                                        )} */}
-                {/*DELIVERY */}
-                {/* {[TABS.DELIVERY.id].includes(tab) &&
-                                        SITE_CONSTANTS.PASSENGER_ORDER_CONFIG
-                                            .visibility.fromMission && (
-                                            <details>
-                                                <summary>
-                                                    {t(
-                                                        TRANSLATION.COURIER_MISSION
-                                                    )}
-                                                </summary>
-                                                <Input
-                                                    inputProps={{
-                                                        placeholder: t(
-                                                            TRANSLATION.WRITE_COURIER_MISSION
-                                                        ),
-                                                        ...register(
-                                                            "from_mission"
-                                                        ),
-                                                    }}
-                                                    inputType={
-                                                        EInputTypes.Textarea
-                                                    }
-                                                    error={
-                                                        errors.from_mission
-                                                            ?.message
-                                                    }
-                                                />
-                                            </details>
-                                        )} */}
-                {/*DELIVERY, MOTORCYCLE */}
-                {/* {(tab === TABS.DELIVERY.id ||
-                                        tab === TABS.MOTORCYCLE.id) && (
-                                        <Input
-                                            inputProps={{
-                                                value: fromPhone || "",
-                                                onChange: (
-                                                    e: React.ChangeEvent<HTMLInputElement>
-                                                ) =>
-                                                    setFromPhone(
-                                                        e.target.value
-                                                    ),
-                                            }}
-                                            inputType={EInputTypes.MaskedPhone}
-                                            error={getPhoneError(fromPhone)}
-                                        />
-                                    )} */}
-
-                {/*DELIVERY */}
-                {/* {tab === TABS.DELIVERY.id && (
-                                        <>
-                                            <Input
-                                                inputProps={{
-                                                    value: fromDay,
-                                                    onChange:
-                                                        handleFromDayChange,
-                                                }}
-                                                inputType={EInputTypes.Select}
-                                                options={getDayOptions()}
-                                            />
-                                            <GroupedInputs>
-                                                <Input
-                                                    inputProps={{
-                                                        value:
-                                                            fromTimeFrom || "",
-                                                        onChange: (
-                                                            e: React.ChangeEvent<HTMLSelectElement>
-                                                        ) =>
-                                                            setFromTimeFrom(
-                                                                e.target.value
-                                                            ),
-                                                    }}
-                                                    inputType={
-                                                        EInputTypes.Select
-                                                    }
-                                                    label={t(
-                                                        TRANSLATION.TIME_FROM
-                                                    )}
-                                                    options={
-                                                        fromTimeFromOptions
-                                                    }
-                                                />
-                                                <Input
-                                                    inputProps={{
-                                                        value:
-                                                            fromTimeTill || "",
-                                                        onChange: (
-                                                            e: React.ChangeEvent<HTMLSelectElement>
-                                                        ) =>
-                                                            setFromTimeTill(
-                                                                e.target.value
-                                                            ),
-                                                    }}
-                                                    inputType={
-                                                        EInputTypes.Select
-                                                    }
-                                                    label={t(
-                                                        TRANSLATION.TIME_TILL
-                                                    )}
-                                                    options={getTimeOptions(
-                                                        fromTimeFrom
-                                                            ? moment(
-                                                                  fromTimeFrom,
-                                                                  dateFormatTime
-                                                              )
-                                                            : null
-                                                    )}
-                                                />
-                                            </GroupedInputs>
-                                        </>
-                                    )} */}
-
-                {/* MOVE */}
-                {/* {[TABS.MOVE.id].includes(tab) && (
-                                        <GroupedInputs>
-                                            <Input
-                                                inputProps={{
-                                                    value: fromDay,
-                                                    onChange:
-                                                        handleFromDayChange,
-                                                    type: "date",
-                                                }}
-                                                label={t(
-                                                    TRANSLATION.PICKUP_DATE
-                                                )}
-                                            />
-                                            <Input
-                                                inputProps={{
-                                                    value: fromTimeFrom || "",
-                                                    onChange: (
-                                                        e: React.ChangeEvent<HTMLSelectElement>
-                                                    ) =>
-                                                        setFromTimeFrom(
-                                                            e.target.value
-                                                        ),
-                                                }}
-                                                inputType={EInputTypes.Select}
-                                                label={t(
-                                                    TRANSLATION.PICKUP_TIME
-                                                )}
-                                                options={fromTimeFromOptions}
-                                            />
-                                        </GroupedInputs>
-                                    )} */}
-
-                {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP, WASH  разобраться */}
-                {/* {!(
-                                        tab === TABS.MOVE.id &&
-                                        moveType === EMoveTypes.Handy
-                                    ) &&
-                                        tab !== TABS.WASH.id && (
-                                            <LocationInput
-                                                type={EPointType.To}
-                                                onOpenMap={() => {
-                                                    setIsMapVisible(true);
-                                                }}
-                                                isIntercity={isIntercity}
-                                            />
-                                        )} */}
-                {/* WAGON, TRIP  */}
-                {/* {[TABS.WAGON.id, TABS.TRIP.id].includes(
-                                        tab
-                                    ) && (
-                                        <DateTimeIntervalInput
-                                            value={tillTimeInterval}
-                                            onChange={setTillTimeInterval}
-                                            isSimple={tab === TABS.TRIP.id}
-                                        />
-                                    )} */}
-                {/*WAGON  */}
-                {/* {tab === TABS.WAGON.id && (
-                                        <>
-                                            <Input
-                                                inputType={EInputTypes.Select}
-                                                inputProps={{
-                                                    value: "-1",
-                                                    onChange: (e: any) => {
-                                                        if (
-                                                            e.target.value ===
-                                                            "-1"
-                                                        )
-                                                            return;
-                                                        insertCargoTypeIntoCargoDescription(
-                                                            t(e.target.value)
-                                                        );
-                                                    },
-                                                }}
-                                                label={t(TRANSLATION.CARGO_P)}
-                                                options={[
-                                                    {
-                                                        label: t(
-                                                            TRANSLATION.CHOSE
-                                                        ),
-                                                        value: "-1",
-                                                    },
-                                                ].concat(
-                                                    SITE_CONSTANTS.BIG_TRUCK_CARGO_TYPES.map(
-                                                        (item) => ({
-                                                            label: t(
-                                                                item.value
-                                                            ),
-                                                            value: item.value,
-                                                        })
-                                                    )
-                                                )}
-                                                fieldWrapperClassName="big-truck__cargo-types"
-                                                oneline
-                                            />
-                                            <Input
-                                                inputType={EInputTypes.Textarea}
-                                                inputProps={{
-                                                    value:
-                                                        cargoDescription ?? "",
-                                                    onChange: (
-                                                        e: React.ChangeEvent<HTMLInputElement>
-                                                    ) =>
-                                                        setCargoDescription(
-                                                            e.target.value
-                                                        ),
-                                                    placeholder: t(
-                                                        TRANSLATION.CARGO_DESCRIPTION_PLACEHOLDER
-                                                    ),
-                                                    rows: 4,
-                                                }}
-                                            />
-                                            <GroupedInputs
-                                                label={`${t(
-                                                    TRANSLATION.CARGO_VOLUME_P
-                                                )} ${t(TRANSLATION.AND, {
-                                                    toLower: true,
-                                                })} ${t(
-                                                    TRANSLATION.CARGO_WEIGHT_P,
-                                                    { toLower: true }
-                                                )}`}
-                                            >
-                                                <Input
-                                                    inputType={
-                                                        EInputTypes.Default
-                                                    }
-                                                    inputProps={{
-                                                        type: "number",
-                                                        min: 0,
-                                                        ...register("size"),
-                                                    }}
-                                                />
-                                                <Input
-                                                    inputType={
-                                                        EInputTypes.Default
-                                                    }
-                                                    inputProps={{
-                                                        type: "number",
-                                                        min: 0,
-                                                        ...register(
-                                                            "bigTruckCargoWeight"
-                                                        ),
-                                                    }}
-                                                />
-                                            </GroupedInputs>
-                                            <GroupedInputs
-                                                label={t(
-                                                    TRANSLATION.CAR_QUANTITY_AND_CAR_TYPE
-                                                )}
-                                            >
-                                                <Input
-                                                    fieldWrapperClassName="big-truck__car-count"
-                                                    inputProps={{
-                                                        type: "number",
-                                                        min: 1,
-                                                        max: 99,
-                                                        ...register(
-                                                            "carsCount"
-                                                        ),
-                                                    }}
-                                                />
-                                                <div className="big-truck__car-types">
-                                                    <Input
-                                                        inputType={
-                                                            EInputTypes.Select
-                                                        }
-                                                        inputProps={{
-                                                            ...register(
-                                                                "bigTruckCarTypes"
-                                                            ),
-                                                            multiple:
-                                                                values.bigTruckCarLogic !==
-                                                                ELogic.Nothing,
-                                                            size: 1,
-                                                        }}
-                                                        options={SITE_CONSTANTS.BIG_TRUCK_TRANSPORT_TYPES.map(
-                                                            (item) => ({
-                                                                label: t(
-                                                                    item.value
-                                                                ),
-                                                                value: item.key,
-                                                            })
-                                                        )}
-                                                    />
-                                                    <GroupedInputs className="big-truck__logic">
-                                                        <RadioCheckbox
-                                                            textLabel={t(
-                                                                TRANSLATION.AND
-                                                            )}
-                                                            checked={
-                                                                values.bigTruckCarLogic ===
-                                                                ELogic.And
-                                                            }
-                                                            onChange={handleLogicChange(
-                                                                ELogic.And
-                                                            )}
-                                                        />
-                                                        <RadioCheckbox
-                                                            textLabel={t(
-                                                                TRANSLATION.OR
-                                                            )}
-                                                            checked={
-                                                                values.bigTruckCarLogic ===
-                                                                ELogic.Or
-                                                            }
-                                                            onChange={handleLogicChange(
-                                                                ELogic.Or
-                                                            )}
-                                                        />
-                                                    </GroupedInputs>
-                                                </div>
-                                            </GroupedInputs>
-                                            <BigTruckServices
-                                                value={bigTruckServices}
-                                                onChange={setBigTruckServices}
-                                            />
-                                        </>
-                                    )} */}
-                {/*VOTING, WAITING, DELIVERY, MOTORCYCLE  */}
-                {/* {SITE_CONSTANTS.ENABLE_CUSTOMER_PRICE &&
-                                        ![
-                                            TABS.MOVE.id,
-                                            TABS.WAGON.id,
-                                            TABS.TRIP.id,
-                                            TABS.WASH.id,
-                                        ].includes(tab) && (
-                                            <Input
-                                                inputProps={{
-                                                    type: "number",
-                                                    min: 0,
-                                                    ...register(
-                                                        "customer_price"
-                                                    ),
-                                                }}
-                                                label={`${t(
-                                                    TRANSLATION.CUSTOMER_PRICE
-                                                )}, ${CURRENCY.SIGN}`}
-                                                error={
-                                                    errors.customer_price
-                                                        ?.message
-                                                }
-                                            />
-                                        )} */}
-                {/*DELIVERY  */}
-                {/* {[TABS.DELIVERY.id].includes(tab) && (
-                                        <GroupedInputs>
-                                            <Input
-                                                inputProps={{
-                                                    type: "number",
-                                                    ...register("to_porch"),
-                                                }}
-                                                label={t(TRANSLATION.PORCH)}
-                                                error={errors.to_porch?.message}
-                                            />
-                                            <Input
-                                                inputProps={{
-                                                    type: "number",
-                                                    ...register("to_floor"),
-                                                }}
-                                                label={t(TRANSLATION.FLOOR)}
-                                                error={errors.to_floor?.message}
-                                            />
-                                            <Input
-                                                inputProps={{
-                                                    type: "number",
-                                                    ...register("to_room"),
-                                                }}
-                                                label={t(TRANSLATION.ROOM)}
-                                                error={errors.to_room?.message}
-                                            />
-                                        </GroupedInputs>
-                                    )} */}
-                {/*DELIVERY, MOVE  */}
-                {/* {([TABS.DELIVERY.id].includes(tab) ||
-                                        (tab === TABS.MOVE.id &&
-                                            moveType !== EMoveTypes.Handy)) &&
-                                        SITE_CONSTANTS.PASSENGER_ORDER_CONFIG
-                                            .visibility.toWay && (
-                                            <Input
-                                                inputProps={{
-                                                    ...register("to_way"),
-                                                }}
-                                                label={t(
-                                                    tab === TABS.MOVE.id
-                                                        ? TRANSLATION.COMMENT
-                                                        : TRANSLATION.WAY
-                                                )}
-                                                error={errors.to_way?.message}
-                                            />
-                                        )} */}
-                {/*DELIVERY */}
-                {/* {[TABS.DELIVERY.id].includes(tab) &&
-                                        SITE_CONSTANTS.PASSENGER_ORDER_CONFIG
-                                            .visibility.toMission && (
-                                            <details>
-                                                <summary>
-                                                    <span>
-                                                        {t(
-                                                            TRANSLATION.COURIER_MISSION
-                                                        )}
-                                                    </span>
-                                                </summary>
-                                                <Input
-                                                    inputProps={{
-                                                        placeholder: t(
-                                                            TRANSLATION.WRITE_COURIER_MISSION
-                                                        ),
-                                                        ...register(
-                                                            "to_mission"
-                                                        ),
-                                                    }}
-                                                    inputType={
-                                                        EInputTypes.Textarea
-                                                    }
-                                                    error={
-                                                        errors.to_mission
-                                                            ?.message
-                                                    }
-                                                />
-                                            </details>
-                                        )} */}
-                {/* DELIVERY, MOTORCYCLE */}
-                {/* {(tab === TABS.DELIVERY.id ||
-                                        tab === TABS.MOTORCYCLE.id) && (
-                                        <Input
-                                            inputProps={{
-                                                value: toPhone || "",
-                                                onChange: (
-                                                    e: React.ChangeEvent<HTMLInputElement>
-                                                ) => setToPhone(e.target.value),
-                                            }}
-                                            inputType={EInputTypes.MaskedPhone}
-                                            error={getPhoneError(toPhone)}
-                                        />
-                                    )} */}
-                {/* DELIVERY  */}
-                {/* {tab === TABS.DELIVERY.id && (
-                                        <>
-                                            <Input
-                                                inputProps={{
-                                                    value: toDay,
-                                                    onChange: (
-                                                        e: React.ChangeEvent<HTMLSelectElement>
-                                                    ) =>
-                                                        setToDay(
-                                                            e.target.value
-                                                        ),
-                                                }}
-                                                inputType={EInputTypes.Select}
-                                                options={getDayOptions(
-                                                    moment(
-                                                        fromDay,
-                                                        dateFormatDate
-                                                    )
-                                                )}
-                                            />
-                                            <GroupedInputs>
-                                                <Input
-                                                    inputProps={{
-                                                        value: toTimeFrom || "",
-                                                        onChange: (
-                                                            e: React.ChangeEvent<HTMLSelectElement>
-                                                        ) =>
-                                                            setToTimeFrom(
-                                                                e.target.value
-                                                            ),
-                                                    }}
-                                                    inputType={
-                                                        EInputTypes.Select
-                                                    }
-                                                    label={t(
-                                                        TRANSLATION.TIME_FROM
-                                                    )}
-                                                    options={getTimeOptions(
-                                                        moment(
-                                                            toDay,
-                                                            dateFormatDate
-                                                        ).days() ===
-                                                            moment().days()
-                                                            ? moment()
-                                                            : null
-                                                    )}
-                                                />
-                                                <Input
-                                                    inputProps={{
-                                                        value: toTimeTill || "",
-                                                        onChange: (
-                                                            e: React.ChangeEvent<HTMLSelectElement>
-                                                        ) =>
-                                                            setToTimeTill(
-                                                                e.target.value
-                                                            ),
-                                                    }}
-                                                    inputType={
-                                                        EInputTypes.Select
-                                                    }
-                                                    label={t(
-                                                        TRANSLATION.TIME_TILL
-                                                    )}
-                                                    options={getTimeOptions(
-                                                        toTimeFrom
-                                                            ? moment(
-                                                                  toTimeFrom,
-                                                                  dateFormatTime
-                                                              )
-                                                            : null
-                                                    )}
-                                                />
-                                            </GroupedInputs>
-                                        </>
-                                    )} */}
-                {/*DELIVERY, MOTORCYCLE  */}
-                {/* {(tab === TABS.DELIVERY.id ||
-                                        tab === TABS.MOTORCYCLE.id) && (
-                                        <>
-                                            <Input
-                                                inputProps={{
-                                                    ...register("object"),
-                                                }}
-                                                label={t(
-                                                    TRANSLATION.WHAT_WE_DELIVERING
-                                                )}
-                                                error={errors.object?.message}
-                                            />
-                                            <Hints
-                                                hints={[
-                                                    t(TRANSLATION.DOCUMENTS),
-                                                    t(TRANSLATION.GROCERIES),
-                                                    t(TRANSLATION.GIFT),
-                                                    t(TRANSLATION.FLOWERS),
-                                                ]}
-                                                onClick={(item) =>
-                                                    setValue("object", item)
-                                                }
-                                            />
-                                        </>
-                                    )} */}
-                {/*DELIVERY  */}
-                {/* {tab === TABS.DELIVERY.id && (
-                                        <div className="weight">
-                                            <Tabs
-                                                tabs={SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.values.weight.map(
-                                                    (item) => ({
-                                                        ...item,
-                                                        label: `${t(
-                                                            TRANSLATION.NUMBER_TILL
-                                                        )} ${item.id}${t(
-                                                            TRANSLATION.KG
-                                                        )}`,
-                                                    })
-                                                )}
-                                                activeTabID={weight}
-                                                onChange={(id) =>
-                                                    setWeight(
-                                                        id as typeof weight
-                                                    )
-                                                }
-                                            />
-                                        </div>
-                                    )} */}
-                {/* DELIVERY, MOTORCYCLE  */}
-                {/* {(tab === TABS.DELIVERY.id ||
-                                        tab === TABS.MOTORCYCLE.id) && (
-                                        <>
-                                            <Checkbox
-                                                label={t(
-                                                    TRANSLATION.LARGE_PACKAGE
-                                                )}
-                                                {...register("is_big_size")}
-                                            />
-                                            <GroupedInputs className="groupped-inputs--cost">
-                                                {tab === TABS.DELIVERY.id ? (
-                                                    <Input
-                                                        inputProps={{
-                                                            type: "number",
-                                                            ...register("cost"),
-                                                        }}
-                                                        label={t(
-                                                            TRANSLATION.COST
-                                                        )}
-                                                        error={
-                                                            errors.cost?.message
-                                                        }
-                                                    />
-                                                ) : (
-                                                    <CostTabs
-                                                        defaultValue={cost}
-                                                        onChange={(id) =>
-                                                            setCost(id)
-                                                        }
-                                                    />
-                                                )}
-                                                {distance ? (
-                                                    <span className="order-payment colored">
-                                                        {tab !==
-                                                            TABS.DELIVERY.id &&
-                                                            getPayment(
-                                                                null,
-                                                                null,
-                                                                distance,
-                                                                moment(
-                                                                    fromTimeFrom,
-                                                                    dateFormatTime
-                                                                ),
-                                                                carClass
-                                                            ).text}
-                                                    </span>
-                                                ) : null}
-                                            </GroupedInputs>
-                                        </>
-                                    )} */}
-                {/*DELIVERY  */}
-                {/* {tab === TABS.DELIVERY.id && (
-                                        <>
-                                            <div
-                                                className="info"
-                                                style={{
-                                                    color: SITE_CONSTANTS
-                                                        .PALETTE.primary.light,
-                                                }}
-                                            >
-                                                {t(TRANSLATION.DELIVERY_INFO)}
-                                            </div>
-
-                                            <Checkbox
-                                                {...register("loading")}
-                                                label={t(
-                                                    TRANSLATION.BOXING_REQUIRED
-                                                )}
-                                            />
-                                        </>
-                                    )} */}
-                {/*VOTING, WAITING */}
-                {/* {![
-                                        TABS.DELIVERY.id,
-                                        TABS.MOTORCYCLE.id,
-                                        TABS.MOVE.id,
-                                        TABS.WAGON.id,
-                                        TABS.TRIP.id,
-                                        TABS.WASH.id,
-                                    ].includes(tab) && (
-                                        <>
-                                            <Separator
-                                                text={t(TRANSLATION.AUTO_CLASS)}
-                                            />
-                                            <div className="taxi-cards">
-                                                {class_auto.map((auto) => {
-                                                    const _time =
-                                                        typeof time === "string"
-                                                            ? moment()
-                                                            : time;
-                                                    const value = getPayment(
-                                                        null,
-                                                        null,
-                                                        distance,
-                                                        _time,
-                                                        auto.id
-                                                    ).value;
-                                                    const payment = `~${value.toFixed(
-                                                        2
-                                                    )}${CURRENCY.NAME}`;
-
-                                                    return (
-                                                        <Card
-                                                            key={auto.id}
-                                                            active={
-                                                                auto.id ===
-                                                                carClass
-                                                            }
-                                                            src={auto.src}
-                                                            text={t(
-                                                                TRANSLATION
-                                                                    .CAR_CLASSES[
-                                                                    auto.id
-                                                                ]
-                                                            )}
-                                                            onClick={() =>
-                                                                setCarClass(
-                                                                    auto.id
-                                                                )
-                                                            }
-                                                            payment={payment}
-                                                        />
-                                                    );
-                                                })}
-                                            </div>
-                                            <div className="waiting-block">
-                                                <span>
-                                                    <img
-                                                        src={images.carAlt}
-                                                        alt={t(TRANSLATION.CAR)}
-                                                    />
-                                                    <label className="colored">
-                                                        {t(TRANSLATION.FREE)}:{" "}
-                                                        <span>7</span>
-                                                    </label>
-                                                </span>
-                                                <div className="vertical-line" />
-                                                <span>
-                                                    <img
-                                                        src={images.clock}
-                                                        alt={t(
-                                                            TRANSLATION.CLOCK
-                                                        )}
-                                                    />
-                                                    <label className="colored">
-                                                        {t(TRANSLATION.WAITING)}
-                                                        :{" "}
-                                                        <span>
-                                                            5{" "}
-                                                            {t(
-                                                                TRANSLATION.MINUTES
-                                                            )}
-                                                        </span>
-                                                    </label>
-                                                </span>
-                                            </div>
-                                        </>
-                                    )} */}
-                {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP  */}
-                {/* {tab !== TABS.WASH.id && (
-                                        <>
-                                            <Separator
-                                                text={t(
-                                                    TRANSLATION.PAYMENT_WAY
-                                                )}
-                                            />
-                                            <div className="credit-cards">
-                                                <Card
-                                                    src={images.cash}
-                                                    onClick={() =>
-                                                        setPaymentWay(
-                                                            EPaymentWays.Cash
-                                                        )
-                                                    }
-                                                    text={t(
-                                                        TRANSLATION
-                                                            .PAYMENT_WAYS[1]
-                                                    )}
-                                                    active={
-                                                        paymentWay ===
-                                                            EPaymentWays.Cash ||
-                                                        !cardPaymentEnabled
-                                                    }
-                                                />
-                                                <Card
-                                                    src={images.card}
-                                                    onClick={() =>
-                                                        setPaymentWay(
-                                                            EPaymentWays.Credit
-                                                        )
-                                                    }
-                                                    text={t(
-                                                        TRANSLATION
-                                                            .PAYMENT_WAYS[2]
-                                                    )}
-                                                    disabled={true}
-                                                    // onClick={(e) => {
-                                                    //   e.preventDefault()
-                                                    //   setCardActiveClass(2)
-                                                    //   setTieCardModal(true)
-                                                    // }}
-                                                />
-                                            </div>
-                                        </>
-                                    )} */}
-                {/*VOTING, WAITING  */}
-                {/* {![
-                                        TABS.DELIVERY.id,
-                                        TABS.MOTORCYCLE.id,
-                                        TABS.MOVE.id,
-                                        TABS.WAGON.id,
-                                        TABS.TRIP.id,
-                                        TABS.WASH.id,
-                                    ].includes(tab) && (
-                                        <>
-                                            <Separator
-                                                text={t(
-                                                    TRANSLATION.ORDER_DETAILS
-                                                )}
-                                            />
-                                            <div className="info-block">
-                                                <div
-                                                    onClick={() =>
-                                                        setPickTimeModal(true)
-                                                    }
-                                                >
-                                                    <img
-                                                        src={images.timer}
-                                                        alt={t(
-                                                            TRANSLATION.CLOCK
-                                                        )}
-                                                    />
-                                                    <label
-                                                        style={{
-                                                            color: SITE_CONSTANTS
-                                                                .PALETTE.primary
-                                                                .dark,
-                                                        }}
-                                                    >
-                                                        {typeof time ===
-                                                        "string"
-                                                            ? t(TRANSLATION.NOW)
-                                                            : time.isSame(
-                                                                  new Date(),
-                                                                  "day"
-                                                              )
-                                                            ? `${t(
-                                                                  TRANSLATION.TODAY
-                                                              )} ${time.format(
-                                                                  dateFormatTime
-                                                              )}`
-                                                            : `${t(
-                                                                  TRANSLATION.TOMORROW
-                                                              )} ${time.format(
-                                                                  dateFormatTime
-                                                              )}`}
-                                                    </label>
-                                                </div>
-                                                <div
-                                                    onClick={() =>
-                                                        setSeatsModal(true)
-                                                    }
-                                                >
-                                                    <img
-                                                        src={
-                                                            images.multipleUsers
-                                                        }
-                                                        alt={t(
-                                                            TRANSLATION.SEATS
-                                                        )}
-                                                    />
-                                                    <label
-                                                        style={{
-                                                            color: SITE_CONSTANTS
-                                                                .PALETTE.primary
-                                                                .dark,
-                                                        }}
-                                                    >
-                                                        {t(TRANSLATION.SEATS)}:{" "}
-                                                        <span>{seats}</span>
-                                                    </label>
-                                                </div>
-                                                <div
-                                                    onClick={() =>
-                                                        setCommentsModal(true)
-                                                    }
-                                                >
-                                                    <span
-                                                        className="comment-controls"
-                                                        style={{
-                                                            height: "55px",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={
-                                                                images.messageIcon
-                                                            }
-                                                            alt={t(
-                                                                TRANSLATION.MESSAGE
-                                                            )}
-                                                        />
-                                                    </span>
-                                                    <label
-                                                        style={{
-                                                            color: SITE_CONSTANTS
-                                                                .PALETTE.primary
-                                                                .dark,
-                                                        }}
-                                                    >
-                                                        {t(TRANSLATION.COMMENT)}
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </>
-                                    )} */}
-                {/*WAGON */}
-                {/* {tab === TABS.WAGON.id && (
-                                        <Input
-                                            inputProps={{
-                                                placeholder: t(
-                                                    TRANSLATION.EMAIL
-                                                ),
-                                                type: "email",
-                                                value: email || "",
-                                            }}
-                                            defaultValue={user?.u_email}
-                                            onChange={(e) => {
-                                                if (typeof e === "string") {
-                                                    setEmail(e);
-                                                }
-                                            }}
-                                        />
-                                    )} */}
-
-                {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON  */}
-                {/* {![TABS.TRIP.id, TABS.WASH.id].includes(
-                                        tab
-                                    ) && (
-                                        <Input
-                                            inputProps={{
-                                                value: phone || "",
-                                            }}
-                                            fieldWrapperClassName="phone-input"
-                                            inputType={EInputTypes.MaskedPhone}
-                                            error={getPhoneError(phone)}
-                                            buttons={[
-                                                { src: images.checkMark },
-                                            ]}
-                                            defaultValue={user?.u_phone}
-                                            onChange={(e) => {
-                                                if (typeof e === "string") {
-                                                    setPhone(e);
-                                                }
-                                            }}
-                                        />
-                                    )} */}
-
-                {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP  */}
-                {/* {tab !== TABS.WASH.id && (
-                                        <div className="order-vote">
-                                            <Button
-                                                type="submit"
-                                                text={t(
-                                                    tab === TABS.VOTING.id
-                                                        ? TRANSLATION.VOTE
-                                                        : TRANSLATION.TO_ORDER,
-                                                    { toUpper: true }
-                                                )}
-                                                status={status}
-                                                label={message}
-                                            />
-                                        </div>
-                                    )} */}
-              </>
-
-              {/* </div> */}
-            </form>
+                  />
+                )}
+              </form>
+            </div>
           </div>
         </section>
       </Layout>
@@ -2463,245 +1162,245 @@ export default connector(PassengerOrder)
 
 {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP, WASH */ }
 type TVotingFormProps = {
-    tab: (typeof TABS)[keyof typeof TABS]['id'];
-    isIntercity: boolean;
-    setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
-    moveType: EMoveTypes;
-    setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
-    register: UseFormRegister<IFormValues>;
-    time: string | moment.Moment;
-    distance: number;
-    errors: FieldErrors<IFormValues>;
-    setPaymentWay: React.Dispatch<React.SetStateAction<string | EPaymentWays>>;
-    paymentWay: string | EPaymentWays;
-    t: any;
-    cardPaymentEnabled: boolean; //проверить
-    carClass: number;
-    setCarClass: React.Dispatch<React.SetStateAction<number>>;
-    phone: string | null;
-    setPhone: React.Dispatch<React.SetStateAction<string | null>>;
-    user: IProps['user'];
-    seats: IProps['seats'];
-    status: IProps['status'];
-    message: IProps['message'];
-    setPickTimeModal: IProps['setPickTimeModal'];
-    // setSeatsModal: IProps["setSeatsModal"];
-    setSeats: IProps['setSeats'];
-    setCommentsModal: IProps['setCommentsModal'];
-    isExpanded: boolean;
-    draggableElement: HTMLFormElement | null
-    // ref: any;
+  tab: (typeof TABS)[keyof typeof TABS]['id'];
+  isIntercity: boolean;
+  setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
+  moveType: EMoveTypes;
+  setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  register: UseFormRegister<IFormValues>;
+  time: string | moment.Moment;
+  distance: number;
+  errors: FieldErrors<IFormValues>;
+  setPaymentWay: React.Dispatch<React.SetStateAction<string | EPaymentWays>>;
+  paymentWay: string | EPaymentWays;
+  t: any;
+  cardPaymentEnabled: boolean; //проверить
+  carClass: number;
+  setCarClass: React.Dispatch<React.SetStateAction<number>>;
+  phone: string | null;
+  setPhone: React.Dispatch<React.SetStateAction<string | null>>;
+  user: IProps['user'];
+  seats: IProps['seats'];
+  status: IProps['status'];
+  message: IProps['message'];
+  setPickTimeModal: IProps['setPickTimeModal'];
+  // setSeatsModal: IProps["setSeatsModal"];
+  setSeats: IProps['setSeats'];
+  setCommentsModal: IProps['setCommentsModal'];
+  isExpanded: boolean;
+  draggableElement: HTMLFormElement | null
+  // ref: any;
 };
 
 type TWaitingFormProps = {
-    tab: (typeof TABS)[keyof typeof TABS]['id'];
-    isIntercity: boolean;
-    setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
-    moveType: EMoveTypes;
-    setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
-    register: UseFormRegister<IFormValues>;
-    time: string | moment.Moment;
-    errors: FieldErrors<IFormValues>;
-    distance: number;
-    setPaymentWay: React.Dispatch<React.SetStateAction<string | EPaymentWays>>;
-    paymentWay: string | EPaymentWays;
-    t: any;
-    cardPaymentEnabled: boolean; //проверить
-    carClass: number;
-    setCarClass: React.Dispatch<React.SetStateAction<number>>;
-    phone: string | null;
-    setPhone: React.Dispatch<React.SetStateAction<string | null>>;
-    user: IProps['user'];
-    seats: IProps['seats'];
-    status: IProps['status'];
-    message: IProps['message'];
-    setPickTimeModal: IProps['setPickTimeModal'];
-    // setSeatsModal: IProps["setSeatsModal"];
-    setCommentsModal: IProps['setCommentsModal'];
+  tab: (typeof TABS)[keyof typeof TABS]['id'];
+  isIntercity: boolean;
+  setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
+  moveType: EMoveTypes;
+  setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  register: UseFormRegister<IFormValues>;
+  time: string | moment.Moment;
+  errors: FieldErrors<IFormValues>;
+  distance: number;
+  setPaymentWay: React.Dispatch<React.SetStateAction<string | EPaymentWays>>;
+  paymentWay: string | EPaymentWays;
+  t: any;
+  cardPaymentEnabled: boolean; //проверить
+  carClass: number;
+  setCarClass: React.Dispatch<React.SetStateAction<number>>;
+  phone: string | null;
+  setPhone: React.Dispatch<React.SetStateAction<string | null>>;
+  user: IProps['user'];
+  seats: IProps['seats'];
+  status: IProps['status'];
+  message: IProps['message'];
+  setPickTimeModal: IProps['setPickTimeModal'];
+  // setSeatsModal: IProps["setSeatsModal"];
+  setCommentsModal: IProps['setCommentsModal'];
 };
 
 type TDeliveryFormProps = {
-    tab: (typeof TABS)[keyof typeof TABS]['id'];
-    courierAuto: ECourierAutoTypes | string;
-    setCourierAuto: React.Dispatch<
-        React.SetStateAction<ECourierAutoTypes | string>
-    >;
-    isIntercity: boolean;
-    setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
-    moveType: EMoveTypes;
-    setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
-    register: UseFormRegister<IFormValues>;
-    errors: FieldErrors<IFormValues>;
-    distance: number;
-    setPaymentWay: React.Dispatch<React.SetStateAction<string | EPaymentWays>>;
-    paymentWay: string | EPaymentWays;
-    t: any;
-    cardPaymentEnabled: boolean; //проверить
-    carClass: number;
-    phone: string | null;
-    setPhone: React.Dispatch<React.SetStateAction<string | null>>;
-    user: IProps['user'];
-    status: IProps['status'];
-    message: IProps['message'];
-    fromPhone: string | null;
-    setFromPhone: React.Dispatch<React.SetStateAction<string | null>>;
-    fromDay: string;
-    handleFromDayChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-    fromTimeFrom: string | null;
-    setFromTimeFrom: React.Dispatch<React.SetStateAction<string | null>>;
-    fromTimeFromOptions: {
-        label: string;
-        value: string | null;
-    }[];
-    fromTimeTill: string | null;
-    setFromTimeTill: React.Dispatch<React.SetStateAction<string | null>>;
-    toPhone: string | null;
-    setToPhone: React.Dispatch<React.SetStateAction<string | null>>;
-    toDay: string;
-    setToDay: React.Dispatch<React.SetStateAction<string>>;
-    toTimeFrom: string | null;
-    setToTimeFrom: React.Dispatch<React.SetStateAction<string | null>>;
-    toTimeTill: string | null;
-    setToTimeTill: React.Dispatch<React.SetStateAction<string | null>>;
-    setValue: UseFormSetValue<IFormValues>;
-    weight: string;
-    setWeight: React.Dispatch<React.SetStateAction<string>>;
-    cost: number;
-    setCost: React.Dispatch<React.SetStateAction<number>>;
+  tab: (typeof TABS)[keyof typeof TABS]['id'];
+  courierAuto: ECourierAutoTypes | string;
+  setCourierAuto: React.Dispatch<
+    React.SetStateAction<ECourierAutoTypes | string>
+  >;
+  isIntercity: boolean;
+  setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
+  moveType: EMoveTypes;
+  setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  register: UseFormRegister<IFormValues>;
+  errors: FieldErrors<IFormValues>;
+  distance: number;
+  setPaymentWay: React.Dispatch<React.SetStateAction<string | EPaymentWays>>;
+  paymentWay: string | EPaymentWays;
+  t: any;
+  cardPaymentEnabled: boolean; //проверить
+  carClass: number;
+  phone: string | null;
+  setPhone: React.Dispatch<React.SetStateAction<string | null>>;
+  user: IProps['user'];
+  status: IProps['status'];
+  message: IProps['message'];
+  fromPhone: string | null;
+  setFromPhone: React.Dispatch<React.SetStateAction<string | null>>;
+  fromDay: string;
+  handleFromDayChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  fromTimeFrom: string | null;
+  setFromTimeFrom: React.Dispatch<React.SetStateAction<string | null>>;
+  fromTimeFromOptions: {
+    label: string;
+    value: string | null;
+  }[];
+  fromTimeTill: string | null;
+  setFromTimeTill: React.Dispatch<React.SetStateAction<string | null>>;
+  toPhone: string | null;
+  setToPhone: React.Dispatch<React.SetStateAction<string | null>>;
+  toDay: string;
+  setToDay: React.Dispatch<React.SetStateAction<string>>;
+  toTimeFrom: string | null;
+  setToTimeFrom: React.Dispatch<React.SetStateAction<string | null>>;
+  toTimeTill: string | null;
+  setToTimeTill: React.Dispatch<React.SetStateAction<string | null>>;
+  setValue: UseFormSetValue<IFormValues>;
+  weight: string;
+  setWeight: React.Dispatch<React.SetStateAction<string>>;
+  cost: number;
+  setCost: React.Dispatch<React.SetStateAction<number>>;
 };
 
 type TMotorcycleFormProps = {
-    tab: (typeof TABS)[keyof typeof TABS]['id'];
-    isIntercity: boolean;
-    setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
-    moveType: EMoveTypes;
-    setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
-    register: UseFormRegister<IFormValues>;
-    errors: FieldErrors<IFormValues>;
-    distance: number;
-    paymentWay: string | EPaymentWays;
-    setPaymentWay: React.Dispatch<React.SetStateAction<string | EPaymentWays>>;
-    t: any;
-    cardPaymentEnabled: boolean; //проверить
-    carClass: number;
-    phone: string | null;
-    setPhone: React.Dispatch<React.SetStateAction<string | null>>;
-    user: IProps['user'];
-    status: IProps['status'];
-    message: IProps['message'];
-    fromPhone: string | null;
-    setFromPhone: React.Dispatch<React.SetStateAction<string | null>>;
-    fromTimeFrom: string | null;
-    toPhone: string | null;
-    setToPhone: React.Dispatch<React.SetStateAction<string | null>>;
-    setValue: UseFormSetValue<IFormValues>;
-    cost: number;
-    setCost: React.Dispatch<React.SetStateAction<number>>;
+  tab: (typeof TABS)[keyof typeof TABS]['id'];
+  isIntercity: boolean;
+  setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
+  moveType: EMoveTypes;
+  setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  register: UseFormRegister<IFormValues>;
+  errors: FieldErrors<IFormValues>;
+  distance: number;
+  paymentWay: string | EPaymentWays;
+  setPaymentWay: React.Dispatch<React.SetStateAction<string | EPaymentWays>>;
+  t: any;
+  cardPaymentEnabled: boolean; //проверить
+  carClass: number;
+  phone: string | null;
+  setPhone: React.Dispatch<React.SetStateAction<string | null>>;
+  user: IProps['user'];
+  status: IProps['status'];
+  message: IProps['message'];
+  fromPhone: string | null;
+  setFromPhone: React.Dispatch<React.SetStateAction<string | null>>;
+  fromTimeFrom: string | null;
+  toPhone: string | null;
+  setToPhone: React.Dispatch<React.SetStateAction<string | null>>;
+  setValue: UseFormSetValue<IFormValues>;
+  cost: number;
+  setCost: React.Dispatch<React.SetStateAction<number>>;
 };
 
 type TMoveFormProps = {
-    tab: (typeof TABS)[keyof typeof TABS]['id'];
-    setMoveType: React.Dispatch<React.SetStateAction<EMoveTypes>>;
-    room: number | null;
-    setRoom: React.Dispatch<React.SetStateAction<number | null>>;
-    elevator: IElevatorState;
-    setElevator: React.Dispatch<React.SetStateAction<IElevatorState>>;
-    handleDeleteMoveFile: (src: IFile['src']) => void;
-    handleDeleteMoveFiles: () => void;
-    moveFiles: TMoveFiles;
-    furniture: IFurniture;
-    isIntercity: boolean;
-    setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
-    moveType: EMoveTypes;
-    setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
-    register: UseFormRegister<IFormValues>;
-    errors: FieldErrors<IFormValues>;
-    setPaymentWay: React.Dispatch<React.SetStateAction<string | EPaymentWays>>;
-    paymentWay: string | EPaymentWays;
-    t: any;
-    cardPaymentEnabled: boolean; //проверить
-    phone: string | null;
-    setPhone: React.Dispatch<React.SetStateAction<string | null>>;
-    user: IProps['user'];
-    status: IProps['status'];
-    message: IProps['message'];
-    handleFurnitureChange: (id: number, value: TRoomFurniture) => void;
-    roomFurniture: TRoomFurniture | null;
-    fromDay: string;
-    handleFromDayChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-    fromTimeFrom: string | null;
-    setFromTimeFrom: React.Dispatch<React.SetStateAction<string | null>>;
-    fromTimeFromOptions: {
-        label: string;
-        value: string | null;
-    }[];
+  tab: (typeof TABS)[keyof typeof TABS]['id'];
+  setMoveType: React.Dispatch<React.SetStateAction<EMoveTypes>>;
+  room: number | null;
+  setRoom: React.Dispatch<React.SetStateAction<number | null>>;
+  elevator: IElevatorState;
+  setElevator: React.Dispatch<React.SetStateAction<IElevatorState>>;
+  handleDeleteMoveFile: (src: IFile['src']) => void;
+  handleDeleteMoveFiles: () => void;
+  moveFiles: TMoveFiles;
+  furniture: IFurniture;
+  isIntercity: boolean;
+  setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
+  moveType: EMoveTypes;
+  setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  register: UseFormRegister<IFormValues>;
+  errors: FieldErrors<IFormValues>;
+  setPaymentWay: React.Dispatch<React.SetStateAction<string | EPaymentWays>>;
+  paymentWay: string | EPaymentWays;
+  t: any;
+  cardPaymentEnabled: boolean; //проверить
+  phone: string | null;
+  setPhone: React.Dispatch<React.SetStateAction<string | null>>;
+  user: IProps['user'];
+  status: IProps['status'];
+  message: IProps['message'];
+  handleFurnitureChange: (id: number, value: TRoomFurniture) => void;
+  roomFurniture: TRoomFurniture | null;
+  fromDay: string;
+  handleFromDayChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  fromTimeFrom: string | null;
+  setFromTimeFrom: React.Dispatch<React.SetStateAction<string | null>>;
+  fromTimeFromOptions: {
+    label: string;
+    value: string | null;
+  }[];
 };
 
 type TWagonFormProps = {
-    tab: (typeof TABS)[keyof typeof TABS]['id'];
-    moveType: EMoveTypes;
-    isIntercity: boolean;
-    // setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
-    setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
-    register: UseFormRegister<IFormValues>;
-    // errors: FieldErrors<IFormValues>;
-    setPaymentWay: React.Dispatch<React.SetStateAction<string | EPaymentWays>>;
-    paymentWay: string | EPaymentWays;
-    t: any;
-    cardPaymentEnabled: boolean; //проверить
-    phone: string | null;
-    setPhone: React.Dispatch<React.SetStateAction<string | null>>;
-    user: IProps['user'];
-    status: IProps['status'];
-    message: IProps['message'];
-    insertCargoTypeIntoCargoDescription: (cargoType: string) => void;
-    tillTimeInterval: IDateTime;
-    setTillTimeInterval: React.Dispatch<React.SetStateAction<IDateTime>>;
-    cargoDescription: string | undefined;
-    setCargoDescription: React.Dispatch<
-        React.SetStateAction<string | undefined>
-    >;
-    fromTimeInterval: IDateTime;
-    setFromTimeInterval: React.Dispatch<React.SetStateAction<IDateTime>>;
-    handleLogicChange: (
-        type: ELogic
-    ) => (e: React.ChangeEvent<HTMLInputElement>) => void;
-    values: IFormValues;
-    email: string | null;
-    setEmail: React.Dispatch<React.SetStateAction<string | null>>;
-    bigTruckServices: number[];
-    setBigTruckServices: React.Dispatch<React.SetStateAction<number[]>>;
+  tab: (typeof TABS)[keyof typeof TABS]['id'];
+  moveType: EMoveTypes;
+  isIntercity: boolean;
+  // setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  register: UseFormRegister<IFormValues>;
+  // errors: FieldErrors<IFormValues>;
+  setPaymentWay: React.Dispatch<React.SetStateAction<string | EPaymentWays>>;
+  paymentWay: string | EPaymentWays;
+  t: any;
+  cardPaymentEnabled: boolean; //проверить
+  phone: string | null;
+  setPhone: React.Dispatch<React.SetStateAction<string | null>>;
+  user: IProps['user'];
+  status: IProps['status'];
+  message: IProps['message'];
+  insertCargoTypeIntoCargoDescription: (cargoType: string) => void;
+  tillTimeInterval: IDateTime;
+  setTillTimeInterval: React.Dispatch<React.SetStateAction<IDateTime>>;
+  cargoDescription: string | undefined;
+  setCargoDescription: React.Dispatch<
+    React.SetStateAction<string | undefined>
+  >;
+  fromTimeInterval: IDateTime;
+  setFromTimeInterval: React.Dispatch<React.SetStateAction<IDateTime>>;
+  handleLogicChange: (
+    type: ELogic
+  ) => (e: React.ChangeEvent<HTMLInputElement>) => void;
+  values: IFormValues;
+  email: string | null;
+  setEmail: React.Dispatch<React.SetStateAction<string | null>>;
+  bigTruckServices: number[];
+  setBigTruckServices: React.Dispatch<React.SetStateAction<number[]>>;
 };
 
 type TTripFormProps = {
-    tab: (typeof TABS)[keyof typeof TABS]['id'];
-    moveType: EMoveTypes;
-    isIntercity: boolean;
-    setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
-    setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
-    // register: UseFormRegister<IFormValues>;
-    // errors: FieldErrors<IFormValues>;
-    setPaymentWay: React.Dispatch<React.SetStateAction<string | EPaymentWays>>;
-    paymentWay: string | EPaymentWays;
-    t: any;
-    cardPaymentEnabled: boolean; //проверить
-    status: IProps['status'];
-    message: IProps['message'];
-    tillTimeInterval: IDateTime;
-    setTillTimeInterval: React.Dispatch<React.SetStateAction<IDateTime>>;
-    fromTimeInterval: IDateTime;
-    setFromTimeInterval: React.Dispatch<React.SetStateAction<IDateTime>>;
+  tab: (typeof TABS)[keyof typeof TABS]['id'];
+  moveType: EMoveTypes;
+  isIntercity: boolean;
+  setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  // register: UseFormRegister<IFormValues>;
+  // errors: FieldErrors<IFormValues>;
+  setPaymentWay: React.Dispatch<React.SetStateAction<string | EPaymentWays>>;
+  paymentWay: string | EPaymentWays;
+  t: any;
+  cardPaymentEnabled: boolean; //проверить
+  status: IProps['status'];
+  message: IProps['message'];
+  tillTimeInterval: IDateTime;
+  setTillTimeInterval: React.Dispatch<React.SetStateAction<IDateTime>>;
+  fromTimeInterval: IDateTime;
+  setFromTimeInterval: React.Dispatch<React.SetStateAction<IDateTime>>;
 };
 
 type TWashFormProps = {
-    tab: (typeof TABS)[keyof typeof TABS]['id'];
-    moveType: EMoveTypes;
-    isIntercity: boolean;
-    // setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
-    setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
-    // register: UseFormRegister<IFormValues>;
-    // errors: FieldErrors<IFormValues>;
-    // t: any;
+  tab: (typeof TABS)[keyof typeof TABS]['id'];
+  moveType: EMoveTypes;
+  isIntercity: boolean;
+  // setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  // register: UseFormRegister<IFormValues>;
+  // errors: FieldErrors<IFormValues>;
+  // t: any;
 };
 
 const VotingForm = forwardRef(function VotingForm(
@@ -2769,30 +1468,30 @@ const VotingForm = forwardRef(function VotingForm(
                 /> */}
       </div>
       {!isExpanded &&
-      <>
-        <ShortInfo />
-        <div key="order-button-wrapper" className="form-container__order-button-wrapper">
-          <Button
-            type="submit"
-            text={t(
-              tab === TABS.VOTING.id ?
-                TRANSLATION.VOTE :
-                TRANSLATION.TO_ORDER,
-              { toUpper: false },
-            )}
-            status={status}
-            label={message}
-          />
-          <Button
-            type="submit"
-            text={t(TRANSLATION.TO_ORDER,
-              { toUpper: false },
-            )}
-            status={status}
-            label={message}
-          />
-        </div>
-      </>
+        <>
+          <ShortInfo />
+          <div key="order-button-wrapper" className="form-container__order-button-wrapper">
+            <Button
+              type="submit"
+              text={t(
+                tab === TABS.VOTING.id ?
+                  TRANSLATION.VOTE :
+                  TRANSLATION.TO_ORDER,
+                { toUpper: false },
+              )}
+              status={status}
+              label={message}
+            />
+            <Button
+              type="submit"
+              text={t(TRANSLATION.TO_ORDER,
+                { toUpper: false },
+              )}
+              status={status}
+              label={message}
+            />
+          </div>
+        </>
       }
       <div className="form-container__seats-and-time">
         <div className="form-container__seats">
@@ -3093,7 +1792,7 @@ function WaitingForm({
       )}
       {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP, WASH  разобраться */}
       {!(tab === TABS.MOVE.id && moveType === EMoveTypes.Handy) &&
-                tab !== TABS.WASH.id && (
+        tab !== TABS.WASH.id && (
         <LocationInput
           type={EPointType.To}
           onOpenMap={() => {
@@ -3103,12 +1802,12 @@ function WaitingForm({
         />
       )}
       {SITE_CONSTANTS.ENABLE_CUSTOMER_PRICE &&
-                ![
-                  TABS.MOVE.id,
-                  TABS.WAGON.id,
-                  TABS.TRIP.id,
-                  TABS.WASH.id,
-                ].includes(tab) && (
+        ![
+          TABS.MOVE.id,
+          TABS.WAGON.id,
+          TABS.TRIP.id,
+          TABS.WASH.id,
+        ].includes(tab) && (
         <Input
           inputProps={{
             type: 'number',
@@ -3133,7 +1832,7 @@ function WaitingForm({
           <div className="taxi-cards">
             {class_auto.map((auto) => {
               const _time =
-                                    typeof time === 'string' ? moment() : time
+                  typeof time === 'string' ? moment() : time
               const value = getPayment(
                 null,
                 null,
@@ -3187,7 +1886,7 @@ function WaitingForm({
               text={t(TRANSLATION.PAYMENT_WAYS[1])}
               active={
                 paymentWay === EPaymentWays.Cash ||
-                                !cardPaymentEnabled
+                !cardPaymentEnabled
               }
             />
             <Card
@@ -3195,11 +1894,11 @@ function WaitingForm({
               onClick={() => setPaymentWay(EPaymentWays.Credit)}
               text={t(TRANSLATION.PAYMENT_WAYS[2])}
               disabled={true}
-              // onClick={(e) => {
-              //   e.preventDefault()
-              //   setCardActiveClass(2)
-              //   setTieCardModal(true)
-              // }}
+            // onClick={(e) => {
+            //   e.preventDefault()
+            //   setCardActiveClass(2)
+            //   setTieCardModal(true)
+            // }}
             />
           </div>
         </>
@@ -3389,7 +2088,7 @@ function DeliveryForm({
 
       {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP, WASH  разобраться */}
       {!(tab === TABS.MOVE.id && moveType === EMoveTypes.Handy) &&
-                tab !== TABS.WASH.id && (
+        tab !== TABS.WASH.id && (
         <LocationInput
           type={EPointType.To}
           onOpenMap={() => {
@@ -3602,7 +2301,7 @@ function DeliveryForm({
             label={t(TRANSLATION.TIME_FROM)}
             options={getTimeOptions(
               moment(toDay, dateFormatDate).days() ===
-                                moment().days() ?
+                moment().days() ?
                 moment() :
                 null,
             )}
@@ -3686,13 +2385,13 @@ function DeliveryForm({
             (
               <span className="order-payment colored">
                 {tab !== TABS.DELIVERY.id &&
-                                getPayment(
-                                  null,
-                                  null,
-                                  distance,
-                                  moment(fromTimeFrom, dateFormatTime),
-                                  carClass,
-                                ).text}
+                  getPayment(
+                    null,
+                    null,
+                    distance,
+                    moment(fromTimeFrom, dateFormatTime),
+                    carClass,
+                  ).text}
               </span>
             ) :
             null}
@@ -3724,7 +2423,7 @@ function DeliveryForm({
             text={t(TRANSLATION.PAYMENT_WAYS[1])}
             active={
               paymentWay === EPaymentWays.Cash ||
-                            !cardPaymentEnabled
+              !cardPaymentEnabled
             }
           />
           <Card
@@ -3732,11 +2431,11 @@ function DeliveryForm({
             onClick={() => setPaymentWay(EPaymentWays.Credit)}
             text={t(TRANSLATION.PAYMENT_WAYS[2])}
             disabled={true}
-            // onClick={(e) => {
-            //   e.preventDefault()
-            //   setCardActiveClass(2)
-            //   setTieCardModal(true)
-            // }}
+          // onClick={(e) => {
+          //   e.preventDefault()
+          //   setCardActiveClass(2)
+          //   setTieCardModal(true)
+          // }}
           />
         </div>
       </>
@@ -3825,7 +2524,7 @@ function MotorcycleForm({
       )}
       {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP, WASH  разобраться */}
       {!(tab === TABS.MOVE.id && moveType === EMoveTypes.Handy) &&
-                tab !== TABS.WASH.id && (
+        tab !== TABS.WASH.id && (
         <LocationInput
           type={EPointType.To}
           onOpenMap={() => {
@@ -3835,12 +2534,12 @@ function MotorcycleForm({
         />
       )}
       {SITE_CONSTANTS.ENABLE_CUSTOMER_PRICE &&
-                ![
-                  TABS.MOVE.id,
-                  TABS.WAGON.id,
-                  TABS.TRIP.id,
-                  TABS.WASH.id,
-                ].includes(tab) && (
+        ![
+          TABS.MOVE.id,
+          TABS.WAGON.id,
+          TABS.TRIP.id,
+          TABS.WASH.id,
+        ].includes(tab) && (
         <Input
           inputProps={{
             type: 'number',
@@ -3911,13 +2610,13 @@ function MotorcycleForm({
               (
                 <span className="order-payment colored">
                   {tab !== TABS.DELIVERY.id &&
-                                    getPayment(
-                                      null,
-                                      null,
-                                      distance,
-                                      moment(fromTimeFrom, dateFormatTime),
-                                      carClass,
-                                    ).text}
+                    getPayment(
+                      null,
+                      null,
+                      distance,
+                      moment(fromTimeFrom, dateFormatTime),
+                      carClass,
+                    ).text}
                 </span>
               ) :
               null}
@@ -3934,7 +2633,7 @@ function MotorcycleForm({
               text={t(TRANSLATION.PAYMENT_WAYS[1])}
               active={
                 paymentWay === EPaymentWays.Cash ||
-                                !cardPaymentEnabled
+                !cardPaymentEnabled
               }
             />
             <Card
@@ -3942,11 +2641,11 @@ function MotorcycleForm({
               onClick={() => setPaymentWay(EPaymentWays.Credit)}
               text={t(TRANSLATION.PAYMENT_WAYS[2])}
               disabled={true}
-              // onClick={(e) => {
-              //   e.preventDefault()
-              //   setCardActiveClass(2)
-              //   setTieCardModal(true)
-              // }}
+            // onClick={(e) => {
+            //   e.preventDefault()
+            //   setCardActiveClass(2)
+            //   setTieCardModal(true)
+            // }}
             />
           </div>
         </>
@@ -4042,23 +2741,23 @@ function MoveForm({
                   min: 0,
                   disabled: room === null,
                   value:
-                                        room !== null &&
-                                            elevator.steps[room] !== undefined ?
-                                          elevator.steps[room] :
-                                          '',
+                    room !== null &&
+                      elevator.steps[room] !== undefined ?
+                      elevator.steps[room] :
+                      '',
                   onChange: (
                     e: React.ChangeEvent<HTMLInputElement>,
                   ) =>
                     room !== null &&
-                                        setElevator((prev) => ({
-                                          ...prev,
-                                          steps: {
-                                            ...prev.steps,
-                                            [room]: parseInt(
-                                              e.target.value,
-                                            ),
-                                          },
-                                        })),
+                    setElevator((prev) => ({
+                      ...prev,
+                      steps: {
+                        ...prev.steps,
+                        [room]: parseInt(
+                          e.target.value,
+                        ),
+                      },
+                    })),
                 }}
                 label={t(TRANSLATION.NUMBER_OF_STEPS)}
                 error={errors.steps?.message}
@@ -4076,7 +2775,7 @@ function MoveForm({
                   'move__elevator-switcher-wrapper',
                   {
                     'move__elevator-switcher-wrapper--oneline':
-                                            elevator.elevator,
+                      elevator.elevator,
                   },
                 )}
               >
@@ -4086,7 +2785,7 @@ function MoveForm({
                 <SwitchSlider
                   isVertical={
                     window.innerWidth < 768 &&
-                                        !elevator.elevator
+                    !elevator.elevator
                   }
                   checked={!!elevator.elevator}
                   onValueChanged={(value) =>
@@ -4108,7 +2807,7 @@ function MoveForm({
               className="move__elevator-hr"
               style={{
                 backgroundColor:
-                                    SITE_CONSTANTS.PALETTE.primary.dark,
+                  SITE_CONSTANTS.PALETTE.primary.dark,
               }}
             />
           </div>
@@ -4143,14 +2842,14 @@ function MoveForm({
                 ) :
                 _.sum(Object.values(furniture.room))
             }
-            // roomsChoosen={Object.values(roomFurniture)
-            // .reduce((sum, i) => sum + (_.sum(Object.values(i)) > 0 ? 1 : 0), 0)}
+          // roomsChoosen={Object.values(roomFurniture)
+          // .reduce((sum, i) => sum + (_.sum(Object.values(i)) > 0 ? 1 : 0), 0)}
           />
           <hr
             className="move__separator"
             style={{
               backgroundColor:
-                                SITE_CONSTANTS.PALETTE.primary.dark,
+                SITE_CONSTANTS.PALETTE.primary.dark,
             }}
           />
         </>
@@ -4188,7 +2887,7 @@ function MoveForm({
         />
       )}
       {[TABS.DELIVERY.id, TABS.MOVE.id].includes(tab) &&
-                SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.fromWay && (
+        SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.fromWay && (
         <Input
           inputProps={{
             ...register('from_way'),
@@ -4226,7 +2925,7 @@ function MoveForm({
       )}
       {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP, WASH  разобраться */}
       {!(tab === TABS.MOVE.id && moveType === EMoveTypes.Handy) &&
-                tab !== TABS.WASH.id && (
+        tab !== TABS.WASH.id && (
         <LocationInput
           type={EPointType.To}
           onOpenMap={() => {
@@ -4236,8 +2935,8 @@ function MoveForm({
         />
       )}
       {([TABS.DELIVERY.id].includes(tab) ||
-                (tab === TABS.MOVE.id && moveType !== EMoveTypes.Handy)) &&
-                SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.toWay && (
+        (tab === TABS.MOVE.id && moveType !== EMoveTypes.Handy)) &&
+        SITE_CONSTANTS.PASSENGER_ORDER_CONFIG.visibility.toWay && (
         <Input
           inputProps={{
             ...register('to_way'),
@@ -4260,7 +2959,7 @@ function MoveForm({
               text={t(TRANSLATION.PAYMENT_WAYS[1])}
               active={
                 paymentWay === EPaymentWays.Cash ||
-                                !cardPaymentEnabled
+                !cardPaymentEnabled
               }
             />
             <Card
@@ -4268,11 +2967,11 @@ function MoveForm({
               onClick={() => setPaymentWay(EPaymentWays.Credit)}
               text={t(TRANSLATION.PAYMENT_WAYS[2])}
               disabled={true}
-              // onClick={(e) => {
-              //   e.preventDefault()
-              //   setCardActiveClass(2)
-              //   setTieCardModal(true)
-              // }}
+            // onClick={(e) => {
+            //   e.preventDefault()
+            //   setCardActiveClass(2)
+            //   setTieCardModal(true)
+            // }}
             />
           </div>
         </>
@@ -4364,7 +3063,7 @@ function WagonForm({
       )}
       {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP, WASH  разобраться */}
       {!(tab === TABS.MOVE.id && moveType === EMoveTypes.Handy) &&
-                tab !== TABS.WASH.id && (
+        tab !== TABS.WASH.id && (
         <LocationInput
           type={EPointType.To}
           onOpenMap={() => {
@@ -4466,8 +3165,8 @@ function WagonForm({
                 inputProps={{
                   ...register('bigTruckCarTypes'),
                   multiple:
-                                        values.bigTruckCarLogic !==
-                                        ELogic.Nothing,
+                    values.bigTruckCarLogic !==
+                    ELogic.Nothing,
                   size: 1,
                 }}
                 options={SITE_CONSTANTS.BIG_TRUCK_TRANSPORT_TYPES.map(
@@ -4511,7 +3210,7 @@ function WagonForm({
               text={t(TRANSLATION.PAYMENT_WAYS[1])}
               active={
                 paymentWay === EPaymentWays.Cash ||
-                                !cardPaymentEnabled
+                !cardPaymentEnabled
               }
             />
             <Card
@@ -4519,11 +3218,11 @@ function WagonForm({
               onClick={() => setPaymentWay(EPaymentWays.Credit)}
               text={t(TRANSLATION.PAYMENT_WAYS[2])}
               disabled={true}
-              // onClick={(e) => {
-              //   e.preventDefault()
-              //   setCardActiveClass(2)
-              //   setTieCardModal(true)
-              // }}
+            // onClick={(e) => {
+            //   e.preventDefault()
+            //   setCardActiveClass(2)
+            //   setTieCardModal(true)
+            // }}
             />
           </div>
         </>
@@ -4641,7 +3340,7 @@ function TripForm({
       )}
       {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP, WASH  разобраться */}
       {!(tab === TABS.MOVE.id && moveType === EMoveTypes.Handy) &&
-                tab !== TABS.WASH.id && (
+        tab !== TABS.WASH.id && (
         <LocationInput
           type={EPointType.To}
           onOpenMap={() => {
@@ -4667,7 +3366,7 @@ function TripForm({
               text={t(TRANSLATION.PAYMENT_WAYS[1])}
               active={
                 paymentWay === EPaymentWays.Cash ||
-                                !cardPaymentEnabled
+                !cardPaymentEnabled
               }
             />
             <Card
@@ -4675,11 +3374,11 @@ function TripForm({
               onClick={() => setPaymentWay(EPaymentWays.Credit)}
               text={t(TRANSLATION.PAYMENT_WAYS[2])}
               disabled={true}
-              // onClick={(e) => {
-              //   e.preventDefault()
-              //   setCardActiveClass(2)
-              //   setTieCardModal(true)
-              // }}
+            // onClick={(e) => {
+            //   e.preventDefault()
+            //   setCardActiveClass(2)
+            //   setTieCardModal(true)
+            // }}
             />
           </div>
         </>
@@ -4709,14 +3408,14 @@ function WashForm({
   // setIsIntercity,
   setIsMapVisible,
 }: // register,
-    // errors,
-    // t,
-    TWashFormProps) {
+  // errors,
+  // t,
+  TWashFormProps) {
   return (
     <>
       {/*VOTING, WAITING, DELIVERY, MOTORCYCLE, MOVE, WAGON, TRIP, WASH  разобраться */}
       {!(tab === TABS.MOVE.id && moveType === EMoveTypes.Handy) &&
-                tab !== TABS.WASH.id && (
+        tab !== TABS.WASH.id && (
         <LocationInput
           type={EPointType.To}
           onOpenMap={() => {
