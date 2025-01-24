@@ -115,6 +115,11 @@
   }
 
   .leaflet-control{
+    display: none;
     margin-top:32px;
+
+    @media screen and (min-width: 1025px) {
+      display: block;
+    }
   }
 }
