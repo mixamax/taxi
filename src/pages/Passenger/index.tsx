@@ -350,41 +350,13 @@ const PassengerOrder: React.FC<IProps> = ({
 
   const [refresh, setRefresh] = useState(false)
 
-  const [isMapVisible, setIsMapVisible] = useState(true)
+  // const [isMapVisible, setIsMapVisible] = useState(true)
 
   const formContainerRef = useRef<HTMLDivElement>(null)
   const draggableRef = useRef<HTMLFormElement>(null)
-  //   const formSlidersRef = useRef({
-  //     carSliderRef: HTMLDivElement,
-  //     seatSliderRef: HTMLDivElement,
-  // })
   const formSlidersRef = useRef({ carSliderRef: null, seatSliderRef: null })
   const { isExpanded } = useSwipe(formContainerRef.current, draggableRef.current, menuLiftingHeight, formSlidersRef)
 
-  // const formWithMapRef = useRef<HTMLDivElement>(null);
-  // const votingFormRef = useRef<HTMLDivElement>(null);
-
-
-  // *********************swipe*********************
-  // useEffect(() => {
-  //     const element = formContainerRef.current;
-  //     const draggable = draggableRef.current
-  //     let removeLsts: (() => void)[] = [];
-
-  //     if (element && draggable) {
-  //         removeLsts = swipe(element, draggable);
-  //     }
-  //     return () => {
-  //         if (removeLsts) {
-  //             removeLsts.forEach((lst) => lst());
-  //         }
-  //     };
-  // }, [
-  //     formContainerRef.current,
-  //     draggableRef.current
-  // ]);
-  //передать ресайз в зависимости
-  // *********************/swipe*********************
 
   const roomFurniture =
     tab === TABS.MOVE.id && moveType === EMoveTypes.Apartament ?
@@ -884,7 +856,7 @@ const PassengerOrder: React.FC<IProps> = ({
                     isIntercity={isIntercity}
                     setIsIntercity={setIsIntercity}
                     moveType={moveType}
-                    setIsMapVisible={setIsMapVisible}
+                    // setIsMapVisible={setIsMapVisible}
                     register={register}
                     time={time}
                     distance={distance}
@@ -946,7 +918,7 @@ const PassengerOrder: React.FC<IProps> = ({
                     isIntercity={isIntercity}
                     setIsIntercity={setIsIntercity}
                     moveType={moveType}
-                    setIsMapVisible={setIsMapVisible}
+                    // setIsMapVisible={setIsMapVisible}
                     register={register}
                     distance={distance}
                     errors={errors}
@@ -994,7 +966,7 @@ const PassengerOrder: React.FC<IProps> = ({
                     isIntercity={isIntercity}
                     setIsIntercity={setIsIntercity}
                     moveType={moveType}
-                    setIsMapVisible={setIsMapVisible}
+                    // setIsMapVisible={setIsMapVisible}
                     register={register}
                     distance={distance}
                     errors={errors}
@@ -1037,7 +1009,7 @@ const PassengerOrder: React.FC<IProps> = ({
                     isIntercity={isIntercity}
                     setIsIntercity={setIsIntercity}
                     moveType={moveType}
-                    setIsMapVisible={setIsMapVisible}
+                    // setIsMapVisible={setIsMapVisible}
                     register={register}
                     errors={errors}
                     setPaymentWay={setPaymentWay}
@@ -1070,7 +1042,7 @@ const PassengerOrder: React.FC<IProps> = ({
                     moveType={moveType}
                     isIntercity={isIntercity}
                     // setIsIntercity={setIsIntercity}
-                    setIsMapVisible={setIsMapVisible}
+                    // setIsMapVisible={setIsMapVisible}
                     register={register}
                     // errors={errors}
                     setPaymentWay={setPaymentWay}
@@ -1113,7 +1085,7 @@ const PassengerOrder: React.FC<IProps> = ({
                     moveType={moveType}
                     isIntercity={isIntercity}
                     setIsIntercity={setIsIntercity}
-                    setIsMapVisible={setIsMapVisible}
+                    // setIsMapVisible={setIsMapVisible}
                     // register={register}
                     // errors={errors}
                     setPaymentWay={setPaymentWay}
@@ -1138,7 +1110,7 @@ const PassengerOrder: React.FC<IProps> = ({
                     moveType={moveType}
                     isIntercity={isIntercity}
                     // setIsIntercity={setIsIntercity}
-                    setIsMapVisible={setIsMapVisible}
+                    // setIsMapVisible={setIsMapVisible}
                   // register={register}
                   // errors={errors}
                   // t={t}
@@ -1166,7 +1138,7 @@ type TVotingFormProps = {
   isIntercity: boolean;
   setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
   moveType: EMoveTypes;
-  setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  // setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
   register: UseFormRegister<IFormValues>;
   time: string | moment.Moment;
   distance: number;
@@ -1197,7 +1169,7 @@ type TWaitingFormProps = {
   isIntercity: boolean;
   setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
   moveType: EMoveTypes;
-  setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  // setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
   register: UseFormRegister<IFormValues>;
   time: string | moment.Moment;
   errors: FieldErrors<IFormValues>;
@@ -1228,7 +1200,7 @@ type TDeliveryFormProps = {
   isIntercity: boolean;
   setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
   moveType: EMoveTypes;
-  setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  // setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
   register: UseFormRegister<IFormValues>;
   errors: FieldErrors<IFormValues>;
   distance: number;
@@ -1274,7 +1246,7 @@ type TMotorcycleFormProps = {
   isIntercity: boolean;
   setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
   moveType: EMoveTypes;
-  setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  // setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
   register: UseFormRegister<IFormValues>;
   errors: FieldErrors<IFormValues>;
   distance: number;
@@ -1312,7 +1284,7 @@ type TMoveFormProps = {
   isIntercity: boolean;
   setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
   moveType: EMoveTypes;
-  setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  // setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
   register: UseFormRegister<IFormValues>;
   errors: FieldErrors<IFormValues>;
   setPaymentWay: React.Dispatch<React.SetStateAction<string | EPaymentWays>>;
@@ -1341,7 +1313,7 @@ type TWagonFormProps = {
   moveType: EMoveTypes;
   isIntercity: boolean;
   // setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  // setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
   register: UseFormRegister<IFormValues>;
   // errors: FieldErrors<IFormValues>;
   setPaymentWay: React.Dispatch<React.SetStateAction<string | EPaymentWays>>;
@@ -1377,7 +1349,7 @@ type TTripFormProps = {
   moveType: EMoveTypes;
   isIntercity: boolean;
   setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  // setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
   // register: UseFormRegister<IFormValues>;
   // errors: FieldErrors<IFormValues>;
   setPaymentWay: React.Dispatch<React.SetStateAction<string | EPaymentWays>>;
@@ -1397,7 +1369,7 @@ type TWashFormProps = {
   moveType: EMoveTypes;
   isIntercity: boolean;
   // setIsIntercity: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  // setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
   // register: UseFormRegister<IFormValues>;
   // errors: FieldErrors<IFormValues>;
   // t: any;
@@ -1409,7 +1381,7 @@ const VotingForm = forwardRef(function VotingForm(
     isIntercity,
     setIsIntercity,
     moveType,
-    setIsMapVisible,
+    // setIsMapVisible,
     register,
     time,
     distance,
@@ -1735,7 +1707,7 @@ function WaitingForm({
   isIntercity,
   setIsIntercity,
   moveType,
-  setIsMapVisible,
+  // setIsMapVisible,
   register,
   time,
   distance,
@@ -1784,7 +1756,7 @@ function WaitingForm({
       {tab !== TABS.WASH.id && (
         <LocationInput
           onOpenMap={() => {
-            setIsMapVisible(true)
+            // setIsMapVisible(true)
           }}
           type={EPointType.From}
           isIntercity={isIntercity}
@@ -1796,7 +1768,7 @@ function WaitingForm({
         <LocationInput
           type={EPointType.To}
           onOpenMap={() => {
-            setIsMapVisible(true)
+            // setIsMapVisible(true)
           }}
           isIntercity={isIntercity}
         />
@@ -2013,7 +1985,7 @@ function DeliveryForm({
   isIntercity,
   setIsIntercity,
   moveType,
-  setIsMapVisible,
+  // setIsMapVisible,
   register,
   distance,
   errors,
@@ -2080,7 +2052,7 @@ function DeliveryForm({
 
       <LocationInput
         onOpenMap={() => {
-          setIsMapVisible(true)
+          // setIsMapVisible(true)
         }}
         type={EPointType.From}
         isIntercity={isIntercity}
@@ -2092,7 +2064,7 @@ function DeliveryForm({
         <LocationInput
           type={EPointType.To}
           onOpenMap={() => {
-            setIsMapVisible(true)
+            // setIsMapVisible(true)
           }}
           isIntercity={isIntercity}
         />
@@ -2477,7 +2449,7 @@ function MotorcycleForm({
   tab,
   isIntercity,
   moveType,
-  setIsMapVisible,
+  // setIsMapVisible,
   register,
   distance,
   errors,
@@ -2505,7 +2477,7 @@ function MotorcycleForm({
       {tab !== TABS.WASH.id && (
         <LocationInput
           onOpenMap={() => {
-            setIsMapVisible(true)
+            // setIsMapVisible(true)
           }}
           type={EPointType.From}
           isIntercity={isIntercity}
@@ -2528,7 +2500,7 @@ function MotorcycleForm({
         <LocationInput
           type={EPointType.To}
           onOpenMap={() => {
-            setIsMapVisible(true)
+            // setIsMapVisible(true)
           }}
           isIntercity={isIntercity}
         />
@@ -2699,7 +2671,7 @@ function MoveForm({
   isIntercity,
   setIsIntercity,
   moveType,
-  setIsMapVisible,
+  // setIsMapVisible,
   register,
   errors,
   setPaymentWay,
@@ -2880,7 +2852,7 @@ function MoveForm({
       {tab !== TABS.WASH.id && (
         <LocationInput
           onOpenMap={() => {
-            setIsMapVisible(true)
+            // setIsMapVisible(true)
           }}
           type={EPointType.From}
           isIntercity={isIntercity}
@@ -2929,7 +2901,7 @@ function MoveForm({
         <LocationInput
           type={EPointType.To}
           onOpenMap={() => {
-            setIsMapVisible(true)
+            // setIsMapVisible(true)
           }}
           isIntercity={isIntercity}
         />
@@ -3017,7 +2989,7 @@ function WagonForm({
   moveType,
   isIntercity,
   // setIsIntercity,
-  setIsMapVisible,
+  // setIsMapVisible,
   register,
   // errors,
   setPaymentWay,
@@ -3048,7 +3020,7 @@ function WagonForm({
       {tab !== TABS.WASH.id && (
         <LocationInput
           onOpenMap={() => {
-            setIsMapVisible(true)
+            // setIsMapVisible(true)
           }}
           type={EPointType.From}
           isIntercity={isIntercity}
@@ -3067,7 +3039,7 @@ function WagonForm({
         <LocationInput
           type={EPointType.To}
           onOpenMap={() => {
-            setIsMapVisible(true)
+            // setIsMapVisible(true)
           }}
           isIntercity={isIntercity}
         />
@@ -3282,7 +3254,7 @@ function TripForm({
   moveType,
   isIntercity,
   setIsIntercity,
-  setIsMapVisible,
+  // setIsMapVisible,
   // register,
   // errors,
   setPaymentWay,
@@ -3325,7 +3297,7 @@ function TripForm({
       {tab !== TABS.WASH.id && (
         <LocationInput
           onOpenMap={() => {
-            setIsMapVisible(true)
+            // setIsMapVisible(true)
           }}
           type={EPointType.From}
           isIntercity={isIntercity}
@@ -3344,7 +3316,7 @@ function TripForm({
         <LocationInput
           type={EPointType.To}
           onOpenMap={() => {
-            setIsMapVisible(true)
+            // setIsMapVisible(true)
           }}
           isIntercity={isIntercity}
         />
@@ -3406,7 +3378,7 @@ function WashForm({
   moveType,
   isIntercity,
   // setIsIntercity,
-  setIsMapVisible,
+  // setIsMapVisible,
 }: // register,
   // errors,
   // t,
@@ -3419,7 +3391,7 @@ function WashForm({
         <LocationInput
           type={EPointType.To}
           onOpenMap={() => {
-            setIsMapVisible(true)
+            // setIsMapVisible(true)
           }}
           isIntercity={isIntercity}
         />

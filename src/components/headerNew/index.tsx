@@ -165,9 +165,9 @@ const Header: React.FC<IProps> = ({
               )
           }
         </div>
-        <button className={'vote-button'}>
+        {(user?.u_role === EUserRoles.Client) && <button className={'vote-button'}>
           <img height={24} src={images.handUp} alt='' />
-        </button>
+        </button>}
       </div>
       {/* <h2>{heading}</h2> */}
       <div className='header-logo'>Logo</div>
