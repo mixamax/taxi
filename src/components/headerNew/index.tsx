@@ -21,9 +21,9 @@ import { gradient } from '../../tools/theme'
 import { Burger } from '../Burger/Burger'
 
 interface IMenuItem {
-    label: string
-    action?: (index: number) => any
-    href?: string
+  label: string
+  action?: (index: number) => any
+  href?: string
 }
 
 const mapStateToProps = (state: IRootState) => ({
@@ -84,7 +84,9 @@ const Header: React.FC<IProps> = ({
   }, 1000)
 
   const onReturn = () => {
-    history.push('/driver-order')
+    // history.push('/driver-order')
+    // console.log(history.goBack);
+    history.goBack();
   }
 
   const toggleLanguagesOpened = () => setLanguagesOpened(prev => !prev)

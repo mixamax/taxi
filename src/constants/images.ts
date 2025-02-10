@@ -52,6 +52,9 @@ const names = {
   mapIcon: 'map-icon.svg',
   mapArrow: 'map-arrow.svg',
   mapArrowVoting: 'map-arrow-voting.svg',
+  mapOrderVoting: 'map-voting.svg',
+  mapOrderWating: 'map-waiting.svg',
+  mapMarkerProfit: 'map-marker-profit.svg',
   mapArrowHome: 'map-arrow-home.svg',
   returnIcon: 'return-icon.svg',
   passengerAvatar: 'passenger-avatar.svg',
@@ -124,8 +127,7 @@ const names = {
 
 export default new Proxy({}, {
   get(target, key: keyof typeof names) {
-    return `/assets/images/${
-      SITE_CONSTANTS.ICONS_PALLETE_FOLDER && `${SITE_CONSTANTS.ICONS_PALLETE_FOLDER}/`
-    }${names[key]}`
+    return `/assets/images/${SITE_CONSTANTS.ICONS_PALLETE_FOLDER && `${SITE_CONSTANTS.ICONS_PALLETE_FOLDER}/`
+      }${names[key]}`
   },
 }) as typeof names

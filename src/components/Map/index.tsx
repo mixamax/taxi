@@ -248,7 +248,7 @@ const Map: React.FC<IProps> = ({
   return (
     <>
       <div
-        className={cn('map-container',containerClassName, { 'map-container--active': isOpen, 'map-container--modal': isModal })}
+        className={cn('map-container', containerClassName, { 'map-container--active': isOpen, 'map-container--modal': isModal })}
         key={SITE_CONSTANTS.MAP_MODE}
       >
         <MapContainer
@@ -265,7 +265,7 @@ const Map: React.FC<IProps> = ({
                 className="map-container__route"
               >
 
-                <b>{t(TRANSLATION.DISTANCE)}</b> {routeInfo?.distance}km<br/>
+                <b>{t(TRANSLATION.DISTANCE)}</b> {routeInfo?.distance}km<br />
                 <b>{t(TRANSLATION.EXPECTED_DURATION)}</b>&nbsp;
                 {duration}
               </div>
@@ -273,13 +273,13 @@ const Map: React.FC<IProps> = ({
           }
           {
             routeInfo && (
-              <Polyline positions={routeInfo.points}/>
+              <Polyline positions={routeInfo.points} />
             )
           }
           {
             !!userCoordinates?.latitude &&
             !!userCoordinates?.longitude &&
-              <CircleMarker center={[userCoordinates.latitude, userCoordinates.longitude]}/>
+            <CircleMarker center={[userCoordinates.latitude, userCoordinates.longitude]} />
           }
           {staticMarkers.map(marker => (
             <Marker
@@ -298,30 +298,30 @@ const Map: React.FC<IProps> = ({
             </Marker>
           ))}
           {!!from?.latitude && !!from?.longitude &&
-          <Marker
-            position={[from.latitude, from.longitude]}
-            icon={new L.Icon({
-              iconUrl: images.markerFrom,
-              iconSize: [35, 41],
-              iconAnchor: [18, 41],
-              popupAnchor: [0, -35],
-            })}
-          >
-            <Popup>{t(TRANSLATION.FROM)}{!!from.address && `: ${from.shortAddress || from.address}`}</Popup>
-          </Marker>
+            <Marker
+              position={[from.latitude, from.longitude]}
+              icon={new L.Icon({
+                iconUrl: images.markerFrom,
+                iconSize: [35, 41],
+                iconAnchor: [18, 41],
+                popupAnchor: [0, -35],
+              })}
+            >
+              <Popup>{t(TRANSLATION.FROM)}{!!from.address && `: ${from.shortAddress || from.address}`}</Popup>
+            </Marker>
           }
           {!!to?.latitude && !!to?.longitude &&
-          <Marker
-            position={[to.latitude, to.longitude]}
-            icon={new L.Icon({
-              iconUrl: images.markerTo,
-              iconSize: [36, 41],
-              iconAnchor: [18, 41],
-              popupAnchor: [0, -35],
-            })}
-          >
-            <Popup>{t(TRANSLATION.TO)}{!!to.address && `: ${to.shortAddress || to.address}`}</Popup>
-          </Marker>
+            <Marker
+              position={[to.latitude, to.longitude]}
+              icon={new L.Icon({
+                iconUrl: images.markerTo,
+                iconSize: [36, 41],
+                iconAnchor: [18, 41],
+                popupAnchor: [0, -35],
+              })}
+            >
+              <Popup>{t(TRANSLATION.TO)}{!!to.address && `: ${to.shortAddress || to.address}`}</Popup>
+            </Marker>
           }
           <img
             src="https://unpkg.com/leaflet@1.6.0/dist/images/marker-icon-2x.png"

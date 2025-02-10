@@ -89,7 +89,7 @@ const Header: React.FC<IProps> = ({
   const toggleLanguagesOpened = () => setLanguagesOpened(prev => !prev)
   const toggleMenuOpened = () => setMenuOpened(prev => !prev)
 
-  const detailedOrderID = matchPath<{id: string}>(location.pathname, { path: '/driver-order/:id' })?.params.id
+  const detailedOrderID = matchPath<{ id: string }>(location.pathname, { path: '/driver-order/:id' })?.params.id
 
   let time = ''
   if (duration.hours() >= 10)
@@ -123,7 +123,7 @@ const Header: React.FC<IProps> = ({
         <span className='api'>1</span>
         {
           detailedOrderID ?
-            <img src={images.returnIcon} className="menu-icon" alt={t(TRANSLATION.RETURN)} onClick={onReturn}/> :
+            <img src={images.returnIcon} className="menu-icon" alt={t(TRANSLATION.RETURN)} onClick={onReturn} /> :
             (
               <div className="menu__wrapper">
                 <HamburgerButton
@@ -142,7 +142,7 @@ const Header: React.FC<IProps> = ({
                         onClick={() =>
                           item.href ?
                             history.push(item.href) :
-                            item.action && (() => {setMenuOpened(false); item.action(index)})()
+                            item.action && (() => { setMenuOpened(false); item.action(index) })()
                         }
                         className="menu__button"
                       >
@@ -162,7 +162,7 @@ const Header: React.FC<IProps> = ({
           className='langs-container'
           style={{ background: SITE_CONSTANTS.PALETTE.primary.dark }}
         >
-          <img src={language.logo} alt={language.native}/>
+          <img src={language.logo} alt={language.native} />
           <img
             src={images.arrowDown}
             style={{ transform: `rotate(${languagesOpened ? 180 : 0}deg)` }}
@@ -175,7 +175,7 @@ const Header: React.FC<IProps> = ({
           >
             {
               SITE_CONSTANTS.LANGUAGES.map(item => (
-                <img src={item.logo} onClick={e => setLanguage(item)} alt={item.native} key={item.id}/>
+                <img src={item.logo} onClick={e => setLanguage(item)} alt={item.native} key={item.id} />
               ))
             }
           </span>

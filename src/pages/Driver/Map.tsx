@@ -65,7 +65,7 @@ const DriverOrderMapMode: React.FC<IProps> = ({
         },
       )
       map.on(
-        'zoomend', (e) =>{
+        'zoomend', (e) => {
           setZoom(e.target._animateToZoom)
         },
       )
@@ -88,9 +88,9 @@ const DriverOrderMapMode: React.FC<IProps> = ({
                 latitude: p1[0],
                 longitude: p1[1],
               }, {
-                latitude: p2[0],
-                longitude: p2[1],
-              },
+              latitude: p2[0],
+              longitude: p2[1],
+            },
             )
             setArrowIcon(new L.DivIcon({
               iconSize: [40, 40],
@@ -137,62 +137,70 @@ const DriverOrderMapMode: React.FC<IProps> = ({
         />
         {
           lastPositions.length &&
-            lastPositions.map((item, index) => index === lastPositions.length - 1 ?
-              <Marker position={item} icon={arrowIcon} key={index}/> :
-              <CircleMarker center={item} key={index}/>,
-            )
+          lastPositions.map((item, index) => index === lastPositions.length - 1 ?
+            <Marker position={item} icon={arrowIcon} key={index} /> :
+            <CircleMarker center={item} key={index} />,
+          )
         }
         {
           !!lastPositions.length &&
-            <Polyline positions={lastPositions}/>
+          <Polyline positions={lastPositions} />
         }
         {
           !!readyOrders?.length &&
-            readyOrders
-              .filter(item => item.b_start_latitude && item.b_start_longitude)
-              .map(item => {
-                const angle = getAngle(
-                  {
-                    latitude: item.b_start_latitude,
-                    longitude: item.b_start_longitude,
-                  }, {
-                    latitude: item.b_destination_latitude,
-                    longitude: item.b_destination_longitude,
-                  },
-                )
+          readyOrders
+            .filter(item => item.b_start_latitude && item.b_start_longitude)
+            .map(item => {
+              const angle = getAngle(
+                {
+                  latitude: item.b_start_latitude,
+                  longitude: item.b_start_longitude,
+                }, {
+                latitude: item.b_destination_latitude,
+                longitude: item.b_destination_longitude,
+              },
+              )
 
-                return (
-                  <Marker
-                    position={[item.b_start_latitude, item.b_start_longitude] as L.LatLngExpression}
-                    icon={new L.DivIcon({
-                      iconAnchor: [20, 40],
-                      popupAnchor: [0, -35],
-                      iconSize: [50, 50],
-                      shadowSize: [29, 40],
-                      shadowAnchor: [7, 40],
-                      html: `<div class='order-marker'>
-                        <div class='popup-list'>
-                          <ul>
-                            <li>${item.b_start_datetime.format(dateFormatTime)}</li>
-                            <li>${item.b_passengers_count}</li>
-                          </ul>
+              return (
+                <Marker
+                  position={[item.b_start_latitude, item.b_start_longitude] as L.LatLngExpression}
+                  icon={new L.DivIcon({
+                    iconAnchor: [20, 40],
+                    popupAnchor: [0, -35],
+                    iconSize: [50, 50],
+                    shadowSize: [29, 40],
+                    shadowAnchor: [7, 40],
+                    html: `<div class='order-marker'>
+                        <div class='order-marker-hint'>
+                          <div class='row-info'>
+                            ${item.b_destination_address}
+                          </div>
+                           <div class='row-info'>
+                            <div>${item.b_start_datetime.format(dateFormatTime)}</div>
+                            <div class='competitors-num'>${item.drivers || 0}</div>
+                          </div>
+                          <div class='row-info'>
+                            <div class='price'>${item.b_price_estimate || 0}</div>
+                            <div class='tips'>${item.b_tips || 0}</div>
+                            <img
+                              src='${images.mapMarkerProfit}'
+                            />
+                            <div class='order-profit'>${item.b_passengers_count || 0}</div>
+                          </div>
                         </div>
-                        <hr class='top'/>
                         <img
-                          style="transform: rotate(${angle}deg)"
-                          src='${item.b_voting ? images.mapArrowVoting : images.mapArrow}'
+                         
+                          src='${item.b_voting ? images.mapOrderVoting : images.mapOrderWating}'
                         >
-                        <hr class='bottom'/>
-                        <div class='bottom-dot'></div>
                       </div>`,
-                    })}
-                    eventHandlers={{
-                      click: () => history.push(`/driver-order/${item.b_id}`),
-                    }}
-                    key={item.b_id}
-                  />
-                )
-              })
+                  })}
+                  eventHandlers={{
+                    click: () => history.push(`/driver-order/${item.b_id}`),
+                  }}
+                  key={item.b_id}
+                />
+              )
+            })
         }
         <Fullscreen
           position="topleft"
