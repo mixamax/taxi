@@ -79,7 +79,7 @@ const App: React.FC<IProps> = ({
 
     _tags.push(
       SITE_CONSTANTS.OG_IMAGE && (
-        <meta property="og:image" content={_domain + SITE_CONSTANTS.OG_IMAGE}/>
+        <meta property="og:image" content={_domain + SITE_CONSTANTS.OG_IMAGE} />
       ),
     )
     _tags.push(
@@ -123,33 +123,37 @@ const App: React.FC<IProps> = ({
     return _tags.length > 0 ? <MetaTags>{_tags}</MetaTags> : null
   }
 
+  console.log(
+    `/assets/images/${SITE_CONSTANTS.ICONS_PALLETE_FOLDER && `${SITE_CONSTANTS.ICONS_PALLETE_FOLDER}/`}`
+  );
+
   return (
     <React.Fragment key={`${language.id}_${configStatus}`}>
       {getMetaTags()}
-      <AppRoutes/>
+      <AppRoutes />
       {<>
         {/* <PositionTracker/> */}
-        <VoteModal/>
-        <TimerModal/>
-        <CommentsModal/>
-        <DriverModal/>
-        <OnTheWayModal/>
-        <CancelOrderModal/>
-        <RatingModal/>
-        <TieCardModal/>
-        <CardDetailsModal/>
+        <VoteModal />
+        <TimerModal />
+        <CommentsModal />
+        <DriverModal />
+        <OnTheWayModal />
+        <CancelOrderModal />
+        <RatingModal />
+        <TieCardModal />
+        <CardDetailsModal />
         <WACodeModal />
         <RefCodeModal />
-        <PlaceModal/>
-        <AlarmModal/>
-        <TakePassengerModal/>
-        <CancelDriverOrderModal/>
-        <MapModal/>
-        <LoginModal/>
-        <CandidatesModal/>
-        {user && <ProfileModal/>}
-        {activeChat && <Chat key={activeChat}/>}
-        <MessageModal/>
+        <PlaceModal />
+        <AlarmModal />
+        <TakePassengerModal />
+        <CancelDriverOrderModal />
+        <MapModal />
+        <LoginModal />
+        <CandidatesModal />
+        {user && <ProfileModal />}
+        {activeChat && <Chat key={activeChat} />}
+        <MessageModal />
       </>}
     </React.Fragment>
   )
