@@ -55,6 +55,7 @@ export const record = Record<IModalsState>({
   isTieCardModalOpen: false,
   isCardDetailsModalOpen: false,
   isVoteModalOpen: false,
+  isShowSwitchersMenu: false,
   WACodeModal: { ...defaultWACodeModal },
   RefCodeModal: { ...defaultRefCodeModal },
   isSeatsModalOpen: false,
@@ -172,6 +173,8 @@ export default function reducer(state = new record(), action: TAction) {
         .set('ratingModal', { ...defaultRatingModal })
         .set('profileModal', { ...defaultProfileModal })
         .set('deleteFilesModal', { ...defaultDeleteFilesModal })
+    case ActionTypes.SET_SHOW_SWITCHERS_MENU:
+      return state.set('isShowSwitchersMenu', payload)
     default:
       return state
   }

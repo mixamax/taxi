@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { connect, ConnectedProps } from 'react-redux'
 import { matchPath, useLocation } from 'react-router-dom'
 import history from '../../tools/history'
@@ -10,7 +10,7 @@ import images from '../../constants/images'
 import { IRootState } from '../../state'
 import { EBookingDriverState, EUserRoles } from '../../types/types'
 import { configSelectors, configActionCreators } from '../../state/config'
-import { modalsActionCreators } from '../../state/modals'
+import { modalsActionCreators, modalsSelectors } from '../../state/modals'
 import { clientOrderSelectors } from '../../state/clientOrder'
 import { ordersSelectors } from '../../state/orders'
 import { userSelectors } from '../../state/user'
@@ -30,12 +30,14 @@ const mapStateToProps = (state: IRootState) => ({
   language: configSelectors.language(state),
   activeOrders: ordersSelectors.activeOrders(state),
   selectedOrder: clientOrderSelectors.selectedOrder(state),
+  isShowSwitchersMenu: modalsSelectors.isShowSwitchersMenu(state)
 })
 
 const mapDispatchToProps = {
   setLanguage: configActionCreators.setLanguage,
   setLoginModal: modalsActionCreators.setLoginModal,
   setProfileModal: modalsActionCreators.setProfileModal,
+  setIsShowSwitchersMenu: modalsActionCreators.setIsShowSwitchersMenu
 }
 
 const connector = connect(mapStateToProps, mapDispatchToProps)
@@ -51,11 +53,12 @@ const Header: React.FC<IProps> = ({
   selectedOrder,
   setLanguage,
   setLoginModal,
-  setProfileModal,
+  setProfileModal,setIsShowSwitchersMenu, isShowSwitchersMenu
 }) => {
   const [languagesOpened, setLanguagesOpened] = useState(false)
   const [seconds, setSeconds] = useState(0)
   const [menuOpened, setMenuOpened] = useState(false)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const location = useLocation()
 
@@ -155,7 +158,16 @@ const Header: React.FC<IProps> = ({
             )
         }
       </div>
-      <h2>{heading}</h2>
+      <h2 onClick={() => {
+        if (!isShowSwitchersMenu) {
+          if (timeoutRef.current) clearTimeout(timeoutRef.current)
+          timeoutRef.current = setTimeout(() => {
+            setIsShowSwitchersMenu(false)
+          }, 7000)
+          
+        }
+        setIsShowSwitchersMenu(!isShowSwitchersMenu)
+      }}>{heading}</h2>
       <div className="column">
         <div
           onClick={() => toggleLanguagesOpened()}

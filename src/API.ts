@@ -150,6 +150,13 @@ const _login = (
           data: res.data,
         }
       }
+      if (res.message === 'wrong phone'){
+        return {
+            user: null,
+            tokens: null,
+            data: res.message,
+          }}
+
       if (!res?.auth_hash) {
         return Promise.reject()
       }
@@ -170,6 +177,31 @@ const _login = (
     })
 }
 export const login = apiMethod<typeof _login>(_login, { authRequired: false })
+
+const _whatsappSignUp = (
+    _: IApiMethodArguments,
+    data: {
+          login: IUser['u_phone'],
+          type: ERegistrationType
+          ref_code?: string | undefined,
+      },
+  ): Promise< {u_id: IUser['u_id'], string:string} | null> => {
+    const waData = new FormData()
+    addToFormData(waData, {
+        u_phone: data.login,
+        type: ERegistrationType.Whatsapp,
+        u_role: EUserRoles.Client
+    })
+    return axios.post(`${Config.API_URL}/register`, waData)
+     .then(res => res.data)
+     .then(res => {
+       if (res.status === 'error') return Promise.reject(res)
+       return res.data
+       }
+     )
+  }
+
+  export const whatsappSignUp = apiMethod<typeof _whatsappSignUp>(_whatsappSignUp, { authRequired: false })
 
 const _googleLogin = (
   { formData }: IApiMethodArguments,

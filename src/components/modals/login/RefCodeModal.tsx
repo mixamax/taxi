@@ -18,7 +18,7 @@ import { EStatuses } from '../../../types/types'
 import { useVisibility } from '../../../tools/hooks'
 import Alert from '../../Alert/Alert'
 import { Intent } from '../../Alert'
-
+import { ERegistrationType } from '../../../state/user/constants'
 interface IFormValues {
   code: string,
 }
@@ -26,11 +26,14 @@ interface IFormValues {
 const mapStateToProps = (state: IRootState) => ({
   payload: modalsSelectors.isRefCodeModalOpen(state),
   user: userSelectors.user(state),
+  whatsappSignUpData: userSelectors.whatsappSignUpData(state),
   status: userSelectors.status(state),
 })
 
 const mapDispatchToProps = {
   googleLogin: userActionCreators.googleLogin,
+  login: userActionCreators.login,
+  whatsappSignUp: userActionCreators.whatsappSignUp,
   setRefCodeModal: modalsActionCreators.setRefCodeModal,
   setCancelModal: modalsActionCreators.setCancelModal,
 }
@@ -45,6 +48,8 @@ const RefCodeModal: React.FC<IProps> = ({
   setRefCodeModal,
   googleLogin,
   status,
+  whatsappSignUp,
+  whatsappSignUpData,
 }) => {
 
   const [isVisible, toggleVisibility] = useVisibility(false)
@@ -77,9 +82,15 @@ const RefCodeModal: React.FC<IProps> = ({
 
   const onSubmit = (formData : IFormValues) => {
     let data = payload.data
-    if (!formData.code) {
-      googleLogin({ data, auth_hash: null })
-      return
+      if (!formData.code) {
+      
+      if(whatsappSignUpData?.u_phone) {
+        whatsappSignUp({ type: ERegistrationType.Whatsapp, login: whatsappSignUpData.u_phone, })
+        return
+      } else {
+        googleLogin({ data, auth_hash: null })
+        return  
+      }
     }
 
     API.checkRefCode(formData.code).then(isFreeCode => {
@@ -88,7 +99,14 @@ const RefCodeModal: React.FC<IProps> = ({
         return
       }
       data.ref_code = formData.code
-      googleLogin({ data, auth_hash: null })
+
+      if(whatsappSignUpData?.u_phone) {
+        whatsappSignUp({ type: ERegistrationType.Whatsapp, login: whatsappSignUpData.u_phone, ref_code:formData.code })
+        return
+      } else {
+        googleLogin({ data, auth_hash: null })
+        return  
+      }
     })
   }
 
