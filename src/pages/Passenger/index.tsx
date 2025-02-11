@@ -78,19 +78,11 @@ import {
 import {
   clientOrderSelectors,
   clientOrderActionCreators,
-<<<<<<< HEAD
 } from '../../state/clientOrder'
 import { ordersSelectors, ordersActionCreators } from '../../state/orders'
 import { modalsActionCreators } from '../../state/modals'
 import { userSelectors } from '../../state/user'
 import _, { set } from 'lodash'
-=======
-} from "../../state/clientOrder";
-import { ordersSelectors, ordersActionCreators } from "../../state/orders";
-import { modalsActionCreators, modalsSelectors } from "../../state/modals";
-import { userSelectors } from "../../state/user";
-import _, { set } from "lodash";
->>>>>>> fix_wa_auth
 import MoveTypeTabs, {
   EMoveTypes,
 } from '../../components/passenger-order/move/MoveTypeTabs'
@@ -132,17 +124,12 @@ const mapStateToProps = (state: IRootState) => ({
   message: clientOrderSelectors.message(state),
   activeOrders: ordersSelectors.activeOrders(state),
   user: userSelectors.user(state),
-<<<<<<< HEAD
 })
 
 // const mapDispatchToProps = {
 //     setSeats: clientOrderActionCreators.setSeats,
 //     setSeatsModal: modalsActionCreators.setSeatsModal,
 //   }
-=======
-  isShowSwitchersMenu: modalsSelectors.isShowSwitchersMenu(state)
-});
->>>>>>> fix_wa_auth
 
 const mapDispatchToProps = {
   ...clientOrderActionCreators,
@@ -227,11 +214,7 @@ const PassengerOrder: React.FC<IProps> = ({
   setOnTheWayModal,
   setRatingModal,
   setCandidatesModal,
-<<<<<<< HEAD
   setSeats,
-=======
-  isShowSwitchersMenu
->>>>>>> fix_wa_auth
 }) => {
   // Cards, tabs
   const [paymentWay, setPaymentWay] = useCachedState(
@@ -842,7 +825,6 @@ const PassengerOrder: React.FC<IProps> = ({
       <Layout>
         <section>
           <PassengerMiniOrders handleOrderClick={handleOrderClick} />
-<<<<<<< HEAD
           <Map
             containerClassName="form-map-container"
           // onClose={() => setIsMapVisible(!isMapVisible)}
@@ -860,22 +842,6 @@ const PassengerOrder: React.FC<IProps> = ({
                 onSubmit={formHandleSubmit(handleSubmit)}
                 className="input-group"
                 ref={draggableRef}
-=======
-          <form
-            onSubmit={formHandleSubmit(handleSubmit)}
-            className="input-groups"
-          >
-            {isShowSwitchersMenu &&<TabsSwitcher tab={tab} onChange={(id: typeof tab) => setTab(id)} />}
-            <div className="form-with-map">
-              <Map
-                containerClassName="form-map-container"
-                onClose={() => setIsMapVisible(!isMapVisible)}
-              />
-              <div
-                className={cn("form-container", {
-                  "map-visible": isMapVisible,
-                })}
->>>>>>> fix_wa_auth
               >
                 <div className="swipe-line"></div>
                 {/* <TabsSwitcher
