@@ -139,7 +139,7 @@ const DriverOrderMapMode: React.FC<IProps> = ({
           lastPositions.length &&
           lastPositions.map((item, index) => index === lastPositions.length - 1 ?
             <Marker position={item} icon={arrowIcon} key={index} /> :
-            <CircleMarker center={item} key={index} />,
+            null,
           )
         }
         {
