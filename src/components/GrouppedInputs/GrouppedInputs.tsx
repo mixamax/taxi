@@ -3,6 +3,7 @@ import './styles.scss'
 import cn from 'classnames'
 
 interface IProps {
+  children?: React.ReactNode,
   label?: string,
   className?: string,
 }

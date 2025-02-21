@@ -5,7 +5,7 @@ import { IRoom, IFurniture } from '../../types/types'
 import cn from 'classnames'
 import rooms from '../../constants/rooms'
 import { gradient } from '../../tools/theme'
-import MetaTags from 'react-meta-tags'
+import { Helmet } from 'react-helmet-async'
 import SITE_CONSTANTS from '../../siteConstants'
 
 interface IProps {
@@ -21,7 +21,7 @@ const Rooms: React.FC<IProps> = ({
 }) => {
   return (
     <>
-      <MetaTags>
+      <Helmet>
         <style>
           {`
             .rooms__item:hover, .rooms__item:focus, .rooms__item:active {
@@ -42,7 +42,7 @@ const Rooms: React.FC<IProps> = ({
             }
           `}
         </style>
-      </MetaTags>
+      </Helmet>
       <label
         className="input__label"
       >

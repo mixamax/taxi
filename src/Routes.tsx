@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useEffect } from 'react'
-import { Route, Switch, Redirect, Link, useHistory } from 'react-router-dom'
+import { Route, Routes, Navigate, useNavigate } from 'react-router-dom'
 import {
   configSelectors,
 } from './state/config'
@@ -42,10 +42,10 @@ const UnavailableBase = () => {
 }
 
 const HomePageRedirect = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
   useEffect(() => {
     const timer = setTimeout(() => {
-      history.push('/passenger-order')
+      navigate('/passenger-order')
     }, 11000)
     return () => clearTimeout(timer)
   }, [])
@@ -83,22 +83,29 @@ const HomePageRedirect = () => {
 }
 
 const AppRoutes: React.FC<{user: IUser | null}> = ({ user }) => (
-  <Switch>
-    <Route exact path="/" component={PassengerOrder}/>
-    <Route path="/passenger-order" component={PassengerOrder}/>
-    <Route path="/driver-order/:id" component={Order}/>
-    <Route path="/driver-order" component={DriverOrder}/>
-    <Route path="/driver-order-test" component={DriverOrder}/>
-    <Route path="/sandbox" component={Sandbox}/>
-    <Redirect
-      from='*'
-      to={
-        user?.u_role === EUserRoles.Client ?
-          '/passenger-order' :
-          user?.u_role === EUserRoles.Driver ? '/driver-order' : '/'
-      }
-    />
-  </Switch>
+  <>
+    <Routes>
+      <Route
+        path="/*"
+        element={<>
+          <Navigate
+            replace
+            to={
+              user?.u_role === EUserRoles.Client ?
+                '/passenger-order' :
+                user?.u_role === EUserRoles.Driver ? '/driver-order' : '/'
+            }
+          />
+          <PassengerOrder />
+        </>}
+      />
+      <Route path="/passenger-order" element={<PassengerOrder />} />
+      <Route path="/driver-order/:id" element={<Order />} />
+      <Route path="/driver-order" element={<DriverOrder />} />
+      <Route path="/driver-order-test" element={<DriverOrder />} />
+      <Route path="/sandbox" element={<Sandbox />} />
+    </Routes>
+  </>
 )
 
 export default connector(AppRoutesWrapper)

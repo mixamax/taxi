@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { connect, ConnectedProps } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import StatusCard from '../../components/Card/OrderCard'
 import Separator from '../../components/separator/Separator'
 import './styles.scss'
-import history from '../../tools/history'
 import { t, TRANSLATION } from '../../localization'
 import Button from '../../components/Button'
 import images from '../../constants/images'
@@ -49,7 +49,9 @@ const DriverOrders: React.FC<IProps> = ({
   const [showHistoryOrders, setShowHistoryOrders] = useState(true)
   const [statusID, setStatusID] = useState(statuses[0].id)
 
-  const handleOrderClick = (id: string) => history.push(`/driver-order/${id}`)
+  const navigate = useNavigate()
+
+  const handleOrderClick = (id: string) => navigate(`/driver-order/${id}`)
 
   const handleDrovePassengerClick = () => {
     API.setOutDrive(true)

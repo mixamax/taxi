@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { connect, ConnectedProps } from 'react-redux'
-import { useHistory } from 'react-router-dom'
 import AppRoutes from './Routes'
 import CancelOrderModal from './components/modals/CancelModal'
 import TimerModal from './components/modals/PickTimeModal'
@@ -21,7 +20,7 @@ import ProfileModal from './components/modals/ProfileModal'
 import CandidatesModal from './components/modals/CandidatesModal'
 import MessageModal from './components/modals/MessageModal'
 import SITE_CONSTANTS from './siteConstants'
-import MetaTags from 'react-meta-tags'
+import { Helmet } from 'react-helmet-async'
 import { configSelectors } from './state/config'
 import { userActionCreators, userSelectors } from './state/user'
 import './App.scss'
@@ -61,8 +60,6 @@ const App: React.FC<IProps> = ({
     )
   }
 
-  const history = useHistory()
-
   useEffect(() => {
     initUser()
 
@@ -74,53 +71,47 @@ const App: React.FC<IProps> = ({
   }, [])
 
   const getMetaTags = () => {
-    let _tags = [],
-      _domain = `${window.location.protocol}//${window.location.host}/`
+    let _domain = `${window.location.protocol}//${window.location.host}/`
 
-    _tags.push(
-      SITE_CONSTANTS.OG_IMAGE && (
-        <meta property="og:image" content={_domain + SITE_CONSTANTS.OG_IMAGE} />
-      ),
+    return (
+      <Helmet>
+        {SITE_CONSTANTS.OG_IMAGE && (
+          <meta property="og:image" content={_domain + SITE_CONSTANTS.OG_IMAGE} />
+        )}
+        {SITE_CONSTANTS.TW_IMAGE && (
+          <meta
+            property="twitter:image"
+            content={_domain + SITE_CONSTANTS.TW_IMAGE}
+          />
+        )}
+        <style>{`
+          .colored {
+            color: ${SITE_CONSTANTS.PALETTE.primary.dark}
+          }
+
+          section details summary {
+            color: ${SITE_CONSTANTS.PALETTE.primary.dark};
+          }
+          section details summary::after {
+            border-top: 10px solid ${SITE_CONSTANTS.PALETTE.primary.main};
+          }
+
+          .modal .active {
+            color: ${SITE_CONSTANTS.PALETTE.primary.dark}
+          }
+          .modal form fieldset h3, .modal form fieldset h4 {
+            color: ${SITE_CONSTANTS.PALETTE.primary.dark}
+          }
+
+          .phone-link {
+            border-bottom: 1px solid ${SITE_CONSTANTS.PALETTE.primary.light};
+          }
+          .phone-link:hover {
+            border-bottom-color: ${SITE_CONSTANTS.PALETTE.primary.dark};
+          }
+        `}</style>
+      </Helmet>
     )
-    _tags.push(
-      SITE_CONSTANTS.TW_IMAGE && (
-        <meta
-          property="twitter:image"
-          content={_domain + SITE_CONSTANTS.TW_IMAGE}
-        />
-      ),
-    )
-    _tags.push(
-      <style>{`
-    .colored { 
-      color: ${SITE_CONSTANTS.PALETTE.primary.dark}
-    }
-
-    section details summary {
-      color: ${SITE_CONSTANTS.PALETTE.primary.dark};
-    }
-    section details summary::after {
-      border-top: 10px solid ${SITE_CONSTANTS.PALETTE.primary.main};
-    }
-
-    .modal .active {
-      color: ${SITE_CONSTANTS.PALETTE.primary.dark}
-    }
-    .modal form fieldset h3, .modal form fieldset h4 {
-      color: ${SITE_CONSTANTS.PALETTE.primary.dark}
-    }
-
-    .phone-link {
-      border-bottom: 1px solid ${SITE_CONSTANTS.PALETTE.primary.light};
-    }
-    .phone-link:hover {
-      border-bottom-color: ${SITE_CONSTANTS.PALETTE.primary.dark};
-    }
-    `}</style>,
-    )
-
-    _tags = _tags.filter((item) => !!item)
-    return _tags.length > 0 ? <MetaTags>{_tags}</MetaTags> : null
   }
 
   console.log(

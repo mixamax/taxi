@@ -496,7 +496,7 @@ const RegisterForm: React.FC<IProps> = ({
             multiple: true,
           }}
           inputType={EInputTypes.File}
-          error={errors.passport_photo?.message}
+          error={errors.passport_photo?.message?.toString()}
         />
       )}
 
@@ -516,7 +516,7 @@ const RegisterForm: React.FC<IProps> = ({
             multiple: true,
           }}
           inputType={EInputTypes.File}
-          error={errors.driver_license_photo?.message}
+          error={errors.driver_license_photo?.message?.toString()}
         />
       )}
 
@@ -536,7 +536,7 @@ const RegisterForm: React.FC<IProps> = ({
             multiple: true,
           }}
           inputType={EInputTypes.File}
-          error={errors.license_photo?.message}
+          error={errors.license_photo?.message?.toString()}
         />
       )}
 

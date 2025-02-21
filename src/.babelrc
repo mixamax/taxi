@@ -10,7 +10,7 @@
           "ie": "11"
         },
         "useBuiltIns": "usage",
-        "corejs": 3,
+        "corejs": "3.40",
         "debug": true
       }],
     "@babel/preset-react"

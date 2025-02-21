@@ -2,7 +2,7 @@ import cn from 'classnames'
 import React from 'react'
 import images from '../../constants/images'
 import { t, TRANSLATION } from '../../localization'
-import MetaTags from 'react-meta-tags'
+import { Helmet } from 'react-helmet-async'
 import './styles.scss'
 import { gradient } from '../../tools/theme'
 
@@ -31,7 +31,7 @@ const CompareVariants: React.FC<IProps> = ({ value, onChange }) => {
 
   return (
     <div className="compareVariants">
-      <MetaTags>
+      <Helmet>
         <style>
           {`
             .compareVariants__item--selected {
@@ -39,7 +39,7 @@ const CompareVariants: React.FC<IProps> = ({ value, onChange }) => {
             }
           `}
         </style>
-      </MetaTags>
+      </Helmet>
       {
         (
           Object.keys(ECompareVariants)

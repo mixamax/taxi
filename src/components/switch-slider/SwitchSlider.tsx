@@ -1,7 +1,7 @@
 import React from 'react'
 import './styles.scss'
 import cn from 'classnames'
-import MetaTags from 'react-meta-tags'
+import { Helmet } from 'react-helmet-async'
 import SITE_CONSTANTS from '../../siteConstants'
 
 interface IButton {
@@ -26,7 +26,7 @@ const SwitchSlider: React.FC<IProps> = ({
   ...inputProps
 }) => (
   <div className={cn('switcher__wrapper', wrapperClassName, { 'switcher__wrapper--vertical': isVertical })}>
-    <MetaTags>
+    <Helmet>
       <style>
         {`
           input:checked + .switcher__slider-circle {
@@ -38,7 +38,7 @@ const SwitchSlider: React.FC<IProps> = ({
           }
         `}
       </style>
-    </MetaTags>
+    </Helmet>
     {startButton && <button onClick={() => onValueChanged(false)} type='button' className="switcher__button">
       {startButton.label}
     </button>}

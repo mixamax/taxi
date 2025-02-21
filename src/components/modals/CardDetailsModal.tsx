@@ -41,8 +41,8 @@ const CardDetailsModal: React.FC<IProps> = ({
     mode: 'onChange',
   })
 
-  const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
-    e.preventDefault()
+  const onSubmit = (data: any, e?: React.BaseSyntheticEvent) => {
+    (e as React.BaseSyntheticEvent).preventDefault()
 
     if (isValid) {
       console.log('Fields is valid')

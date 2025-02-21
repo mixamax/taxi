@@ -46,7 +46,6 @@ const JSONForm: React.FC<IProps> = ({
   errors = {},
   fields,
 }) => {
-  if (configStatus !== EStatuses.Success) return null
   const data = (window as any).data || {}
 
   const form = useMemo(() => {
@@ -162,7 +161,7 @@ const JSONForm: React.FC<IProps> = ({
   const yupSchema = yup.object(validationSchema)
   const isValid = yupSchema.isValidSync(values)
 
-  const handleChange = useCallback((e, name, value) => {
+  const handleChange = useCallback((e: any, name: any, value: any) => {
     setValues({
       ...values,
       [name]: value,
@@ -181,7 +180,7 @@ const JSONForm: React.FC<IProps> = ({
     },
   }), [isValid, state])
 
-  const handleSubmit = useCallback(e => {
+  const handleSubmit = useCallback((e: any) => {
     e.preventDefault()
     const submitValues: any = {}
     for (let [key, value] of Object.entries(values)) {
@@ -199,7 +198,7 @@ const JSONForm: React.FC<IProps> = ({
     onSubmit && onSubmit(submitValues)
   }, [values])
 
-  return (
+  return configStatus === EStatuses.Success && (
     <div style={{ position: 'relative', zIndex: 500 }}>
       <form onSubmit={handleSubmit}>
         {form.map((formElement: TFormElement, i: number) => formElement.name ?
@@ -215,6 +214,7 @@ const JSONForm: React.FC<IProps> = ({
           /> :
           <CustomComponent
             {...formElement}
+            key={i}
             values={values}
             variables={variables}
           />,

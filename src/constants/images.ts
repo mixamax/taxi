@@ -54,6 +54,7 @@ const names = {
   mapArrowVoting: 'map-arrow-voting.svg',
   mapOrderVoting: 'map-voting.svg',
   mapOrderWating: 'map-waiting.svg',
+  mapOrderPerforming: 'map-performing.svg',
   mapMarkerProfit: 'map-marker-profit.svg',
   mapArrowHome: 'map-arrow-home.svg',
   returnIcon: 'return-icon.svg',

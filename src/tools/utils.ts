@@ -232,7 +232,9 @@ export const getPayment = (
     _startOfNightTime = _startOfNightTime.subtract(1, 'days')
   }
 
+  // @ts-ignore
   const callRate = +(window as any).data.car_classes[order?.b_car_class || carClass || ECarClasses.Any]?.courier_call_rate ?? SITE_CONSTANTS.COURIER_CALL_RATE
+  // @ts-ignore
   const farePer1Km = +(window as any).data.car_classes[order?.b_car_class || carClass || ECarClasses.Any]?.courier_fare_per_1_km ?? SITE_CONSTANTS.COURIER_FARE_PER_1_KM
 
   let _value = 0,
@@ -478,7 +480,7 @@ interface TConvertKeys {
   toJSONKeys?: string[],
   customKeys?: {[key: string]: Function}
 }
-const convertTypes = <T, R>(
+const convertTypes = <T extends object, R>(
   object: T,
   {
     toFloatKeys = [],

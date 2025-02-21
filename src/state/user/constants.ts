@@ -1,5 +1,5 @@
 import { ArrayValue } from './../../types/index'
-import { appName } from '../../config'
+import { appName } from '../../constants'
 import { TRANSLATION } from '../../localization'
 import { EStatuses, IRegisterResponse, ITokens, IUser } from '../../types/types'
 

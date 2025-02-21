@@ -1,12 +1,11 @@
 import React from 'react'
 import { connect, ConnectedProps } from 'react-redux'
 import Button from '../Button'
-import history from '../../tools/history'
 import './styles.scss'
 import * as API from '../../API'
 import { t, TRANSLATION } from '../../localization'
 import { modalsActionCreators, modalsSelectors } from '../../state/modals'
-import { matchPath, useLocation } from 'react-router-dom'
+import { matchPath, useLocation, useNavigate } from 'react-router-dom'
 import { IRootState } from '../../state'
 import Overlay from './Overlay'
 
@@ -28,14 +27,15 @@ const CancelDriverOrderModal: React.FC<IProps> = ({
   setDriverCancelModal,
 }) => {
   const location = useLocation()
-  const id = matchPath<{id: string}>(location.pathname, {
+  const navigate = useNavigate()
+  const id = matchPath({
     path: '/driver-order/:id',
-  })?.params.id
+  }, location.pathname)?.params.id
 
   const onCancel = () => {
     if (id) {
       API.cancelDrive(id)
-      history.push('/driver-order')
+      navigate('/driver-order')
     }
     setDriverCancelModal(false)
   }

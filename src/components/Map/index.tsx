@@ -3,11 +3,12 @@ import { connect, ConnectedProps } from 'react-redux'
 import Button from '../Button'
 import './styles.scss'
 import L from 'leaflet'
+import Fullscreen from 'react-leaflet-fullscreen-plugin'
 import SITE_CONSTANTS from '../../siteConstants'
 import { t, TRANSLATION } from '../../localization'
 import { IRootState } from '../../state'
 import { modalsActionCreators, modalsSelectors } from '../../state/modals'
-import { MapContainer, Marker, CircleMarker, TileLayer, Popup, Tooltip, Polyline } from 'react-leaflet'
+import { MapContainer, Marker, CircleMarker, TileLayer, Popup, Tooltip, Polyline, useMap } from 'react-leaflet'
 import { EMapModalTypes } from '../../state/modals/constants'
 import { clientOrderActionCreators, clientOrderSelectors } from '../../state/clientOrder'
 import { orderSelectors } from '../../state/order'
@@ -56,6 +57,34 @@ interface IProps extends ConnectedProps<typeof connector> {
 
 const Map: React.FC<IProps> = ({
   isOpen = true,
+  defaultCenter,
+  isModal,
+  containerClassName,
+  ...props
+}) => {
+  return (
+    <div
+      className={cn('map-container', containerClassName, { 'map-container--active': isOpen, 'map-container--modal': isModal })}
+      key={SITE_CONSTANTS.MAP_MODE}
+    >
+      <MapContainer
+        center={defaultCenter || SITE_CONSTANTS.DEFAULT_POSITION}
+        zoom={defaultZoom}
+        className='map'
+        // crs={SITE_CONSTANTS.MAP_MODE === MAP_MODE.YANDEX ? L.CRS.EPSG3395 : L.CRS.EPSG3857}
+        attributionControl={false}
+      >
+        <MapContent
+          {...{ isOpen, defaultCenter, isModal, containerClassName }}
+          {...props}
+        />
+      </MapContainer>
+    </div>
+  )
+}
+
+const MapContent: React.FC<IProps> = ({
+  isOpen = true,
   type,
   defaultCenter,
   clientFrom,
@@ -76,12 +105,13 @@ const Map: React.FC<IProps> = ({
   onClose,
   containerClassName,
 }) => {
+  const map = useMap()
+
   const [staticMarkers, setStaticMarkers] = useState<IStaticMarker[]>([])
   const [userCoordinates, setUserCoordinates] = useState<IAddressPoint | null>(null)
   const [buttonsPopupCoordinates, setButtonPopupCoordinates] = useState<[number, number] | null>(null)
   const [routeInfo, setRouteInfo] = useState<IRouteInfo | null>(null)
   const [showRouteInfo, setShowRouteInfo] = useState(false)
-  const [map, setMap] = useState<L.Map | null>(null)
 
   let from: IAddressPoint | null = null,
     to: IAddressPoint | null = null
@@ -152,18 +182,19 @@ const Map: React.FC<IProps> = ({
   useEffect(() => {
     if (!map) return
 
-    navigator.geolocation.getCurrentPosition(
-      ({ coords }) => {
-        const point = {
-          latitude: coords.latitude,
-          longitude: coords.longitude,
-        }
-        setUserCoordinates(point)
-        map.panTo([point.latitude, point.longitude])
-      },
-      error => console.error(error),
-      { enableHighAccuracy: true },
-    )
+    map.once('locationfound', (e: L.LocationEvent) => {
+      setUserCoordinates({
+        latitude: e.latlng.lat,
+        longitude: e.latlng.lng,
+      })
+      if (!defaultCenter)
+        map.setView(e.latlng)
+    })
+    map.once('locationerror', (e: L.ErrorEvent) => console.error(e.message))
+    map.locate({
+      timeout: Infinity,
+      enableHighAccuracy: true,
+    })
 
     map.on('click', (e: L.LeafletMouseEvent) => {
       if (!(e.originalEvent?.target as HTMLDivElement)?.classList?.contains('map')) return
@@ -247,134 +278,126 @@ const Map: React.FC<IProps> = ({
 
   return (
     <>
-      <div
-        className={cn('map-container', containerClassName, { 'map-container--active': isOpen, 'map-container--modal': isModal })}
-        key={SITE_CONSTANTS.MAP_MODE}
-      >
-        <MapContainer
-          center={defaultCenter || SITE_CONSTANTS.DEFAULT_POSITION}
-          zoom={defaultZoom}
-          className='map'
-          // crs={SITE_CONSTANTS.MAP_MODE === MAP_MODE.YANDEX ? L.CRS.EPSG3395 : L.CRS.EPSG3857}
-          whenCreated={setMap}
-          attributionControl={false}
-        >
-          {
-            showRouteInfo && (
-              <div
-                className="map-container__route"
-              >
+      {
+        showRouteInfo && (
+          <div
+            className="map-container__route"
+          >
 
-                <b>{t(TRANSLATION.DISTANCE)}</b> {routeInfo?.distance}km<br />
-                <b>{t(TRANSLATION.EXPECTED_DURATION)}</b>&nbsp;
-                {duration}
-              </div>
-            )
+            <b>{t(TRANSLATION.DISTANCE)}</b> {routeInfo?.distance}km<br />
+            <b>{t(TRANSLATION.EXPECTED_DURATION)}</b>&nbsp;
+            {duration}
+          </div>
+        )
+      }
+      {
+        routeInfo && (
+          <Polyline positions={routeInfo.points} />
+        )
+      }
+      {
+        !!userCoordinates?.latitude &&
+        !!userCoordinates?.longitude &&
+        <CircleMarker
+          radius={10}
+          center={[userCoordinates.latitude, userCoordinates.longitude]}
+        />
+      }
+      {staticMarkers.map(marker => (
+        <Marker
+          position={[marker.latitude, marker.longitude]}
+          icon={new L.Icon({
+            iconUrl: images.activeMarker,
+            iconSize: [24, 34],
+            iconAnchor: [12, 34],
+            popupAnchor: [0, -35],
+          })}
+        >
+          {!!marker.tooltip &&
+            <Tooltip direction="top" offset={[0, -40]} opacity={1} permanent>{marker.tooltip}</Tooltip>
           }
-          {
-            routeInfo && (
-              <Polyline positions={routeInfo.points} />
-            )
-          }
-          {
-            !!userCoordinates?.latitude &&
-            !!userCoordinates?.longitude &&
-            <CircleMarker center={[userCoordinates.latitude, userCoordinates.longitude]} />
-          }
-          {staticMarkers.map(marker => (
-            <Marker
-              position={[marker.latitude, marker.longitude]}
-              icon={new L.Icon({
-                iconUrl: images.activeMarker,
-                iconSize: [24, 34],
-                iconAnchor: [12, 34],
-                popupAnchor: [0, -35],
-              })}
-            >
-              {!!marker.tooltip &&
-                <Tooltip direction="top" offset={[0, -40]} opacity={1} permanent>{marker.tooltip}</Tooltip>
-              }
-              {!!marker.popup && <Popup>{marker.popup}</Popup>}
-            </Marker>
-          ))}
-          {!!from?.latitude && !!from?.longitude &&
-            <Marker
-              position={[from.latitude, from.longitude]}
-              icon={new L.Icon({
-                iconUrl: images.markerFrom,
-                iconSize: [35, 41],
-                iconAnchor: [18, 41],
-                popupAnchor: [0, -35],
-              })}
-            >
-              <Popup>{t(TRANSLATION.FROM)}{!!from.address && `: ${from.shortAddress || from.address}`}</Popup>
-            </Marker>
-          }
-          {!!to?.latitude && !!to?.longitude &&
-            <Marker
-              position={[to.latitude, to.longitude]}
-              icon={new L.Icon({
-                iconUrl: images.markerTo,
-                iconSize: [36, 41],
-                iconAnchor: [18, 41],
-                popupAnchor: [0, -35],
-              })}
-            >
-              <Popup>{t(TRANSLATION.TO)}{!!to.address && `: ${to.shortAddress || to.address}`}</Popup>
-            </Marker>
-          }
-          <img
-            src="https://unpkg.com/leaflet@1.6.0/dist/images/marker-icon-2x.png"
-            className="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive"
-            alt="Центр"
-            tabIndex={0}
+          {!!marker.popup && <Popup>{marker.popup}</Popup>}
+        </Marker>
+      ))}
+      {!!from?.latitude && !!from?.longitude &&
+        <Marker
+          position={[from.latitude, from.longitude]}
+          icon={new L.Icon({
+            iconUrl: images.markerFrom,
+            iconSize: [35, 41],
+            iconAnchor: [18, 41],
+            popupAnchor: [0, -35],
+          })}
+        >
+          <Popup>{t(TRANSLATION.FROM)}{!!from.address && `: ${from.shortAddress || from.address}`}</Popup>
+        </Marker>
+      }
+      {!!to?.latitude && !!to?.longitude &&
+        <Marker
+          position={[to.latitude, to.longitude]}
+          icon={new L.Icon({
+            iconUrl: images.markerTo,
+            iconSize: [36, 41],
+            iconAnchor: [18, 41],
+            popupAnchor: [0, -35],
+          })}
+        >
+          <Popup>{t(TRANSLATION.TO)}{!!to.address && `: ${to.shortAddress || to.address}`}</Popup>
+        </Marker>
+      }
+      <img
+        src="https://unpkg.com/leaflet@1.6.0/dist/images/marker-icon-2x.png"
+        className="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive"
+        alt="Центр"
+        tabIndex={0}
+      />
+      <Fullscreen
+        position="topleft"
+      />
+      {/* {!disableButtons && <div className={cn('modal-buttons',{'z-indexed': isModal})}>
+        {!!setFrom && (
+          <Button
+            className='modal-button'
+            type="button"
+            text={t(TRANSLATION.FROM)}
+            onClick={(event) => {
+              event.preventDefault()
+              event.stopPropagation()
+              handleFromClick()}}
           />
-          {/* {!disableButtons && <div className={cn('modal-buttons',{'z-indexed': isModal})}>
-            {!!setFrom && (
-              <Button
-                className='modal-button'
-                type="button"
-                text={t(TRANSLATION.FROM)}
-                onClick={(event) => {
-                  event.preventDefault()
-                  event.stopPropagation()
-                  handleFromClick()}}
-              />
-            )}
-            {!!setTo && (
-              <Button
-                className='modal-button'
-                text={t(TRANSLATION.TO)}
-                onClick={(event) => {
-                  event.preventDefault()
-                  event.stopPropagation()
-                  handleToClick()
-                }}
-              />
-            )}
-            {!!(from?.latitude && from?.longitude) && !!(to?.latitude && to?.longitude) && (
-              <Button
-                className='modal-button'
-                text={t(TRANSLATION.BUILD_THE_ROUTE)}
-                onClick={handleRouteClick}
-              />
-            )}
-            <Button
-              className='modal-button'
-              skipHandler={true}
-              text={t(TRANSLATION.CLOSE)}
-              onClick={() => {
-                if (onClose) return onClose()
-                setMapModal({ ...defaultMapModal })
-              }}
-            />
-          </div>} */}
-          <TileLayer
-            attribution={getAttribution()}
-            url={getTileServerUrl()}
+        )}
+        {!!setTo && (
+          <Button
+            className='modal-button'
+            text={t(TRANSLATION.TO)}
+            onClick={(event) => {
+              event.preventDefault()
+              event.stopPropagation()
+              handleToClick()
+            }}
           />
-        </MapContainer>
-      </div>
+        )}
+        {!!(from?.latitude && from?.longitude) && !!(to?.latitude && to?.longitude) && (
+          <Button
+            className='modal-button'
+            text={t(TRANSLATION.BUILD_THE_ROUTE)}
+            onClick={handleRouteClick}
+          />
+        )}
+        <Button
+          className='modal-button'
+          skipHandler={true}
+          text={t(TRANSLATION.CLOSE)}
+          onClick={() => {
+            if (onClose) return onClose()
+            setMapModal({ ...defaultMapModal })
+          }}
+        />
+      </div>} */}
+      <TileLayer
+        attribution={getAttribution()}
+        url={getTileServerUrl()}
+      />
     </>
   )
 }

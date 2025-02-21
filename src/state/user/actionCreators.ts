@@ -5,11 +5,15 @@ export const register = (payload: Parameters<typeof API.register>[0]) => {
   return { type: ActionTypes.REGISTER_REQUEST, payload }
 }
 
-export const login = (payload: Parameters<typeof API.login>[0]) => {
+export const login = (payload: Parameters<typeof API.login>[0] & {
+  navigate: (location: string) => void
+}) => {
   return { type: ActionTypes.LOGIN_REQUEST, payload }
 }
 
-export const googleLogin = (payload: Parameters<typeof API.googleLogin>[0]) => {
+export const googleLogin = (payload: Parameters<typeof API.googleLogin>[0] & {
+  navigate: (location: string) => void
+}) => {
   return { type: ActionTypes.GOOGLE_LOGIN_REQUEST, payload }
 }
 

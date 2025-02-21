@@ -21,6 +21,10 @@
     "jsx": "react-jsx",
     "downlevelIteration": true,
     "strictPropertyInitialization": false,
+    "paths": {
+      "react": ["./node_modules/@types/react"],
+      "@mona-health/react-input-mask": ["./node_modules/@types/react-input-mask"]
+    },
   },
   "include": ["src"]
 }

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { connect, ConnectedProps } from 'react-redux'
+import { useParams, useNavigate } from 'react-router-dom'
 import Button from '../../components/Button'
 import Input from '../../components/Input'
 import { addHiddenOrder } from '../../tools/utils'
-import history from '../../tools/history'
 import * as API from '../../API'
 import { t, TRANSLATION } from '../../localization'
 import ClientInfo from '../../components/order/ClientInfo'
@@ -50,13 +50,7 @@ interface IFormValues {
   performers_price: number
 }
 
-interface IProps extends ConnectedProps<typeof connector> {
-  match: {
-    params: {
-      id: string,
-    },
-  },
-}
+interface IProps extends ConnectedProps<typeof connector> {}
 
 const Order: React.FC<IProps> = ({
   order,
@@ -73,14 +67,12 @@ const Order: React.FC<IProps> = ({
   setCancelDriverOrderModal,
   setMessageModal,
   setAlarmModal,
-  match: {
-    params: {
-      id,
-    },
-  },
 }) => {
   const [isFromAddressShort, setIsFromAddressShort] = useState(true)
   const [isToAddressShort, setIsToAddressShort] = useState(true)
+
+  const id = useParams().id as string
+  const navigate = useNavigate()
 
   const driver = order?.drivers?.find(item => item.c_state > EBookingDriverState.Canceled)
 
@@ -114,13 +106,17 @@ const Order: React.FC<IProps> = ({
       })
       .catch(error => {
         console.error(error)
-        setMessageModal({ isOpen: true, message: error || t(TRANSLATION.ERROR), status: EStatuses.Fail })
+        setMessageModal({
+          isOpen: true,
+          message: error.toString() || t(TRANSLATION.ERROR),
+          status: EStatuses.Fail,
+        })
       })
   }
 
   const onHideOrder = () => {
     addHiddenOrder(id, user?.u_id)
-    history.push('/driver-order')
+    navigate('/driver-order')
   }
 
   const onArrivedClick = () =>
@@ -135,7 +131,7 @@ const Order: React.FC<IProps> = ({
     API.setOrderState(id, EBookingDriverState.Started)
       .then(() => {
         getOrder(id)
-        history.push('/driver-order?tab=map')
+        navigate('/driver-order?tab=map')
       })
 
   const onCompleteOrderClick = () =>
@@ -156,7 +152,7 @@ const Order: React.FC<IProps> = ({
     setRatingModal({ isOpen: true })
 
   const onExit = () =>
-    history.push('/driver-order')
+    navigate('/driver-order')
 
   const getButtons = () => {
     if (!order) return (

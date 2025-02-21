@@ -6,7 +6,7 @@ import { UseFormReturn } from 'react-hook-form'
 import ErrorBlock from '../ErrorBlock'
 import { mapBlockObject } from '../../tools/utils'
 import Card from '../Card/Card'
-import { Checkbox } from '@material-ui/core'
+import { Checkbox } from '@mui/material'
 
 interface IProps {
   form: UseFormReturn,

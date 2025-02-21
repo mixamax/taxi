@@ -17,12 +17,12 @@ import {
   ITokens,
   ITrip,
   IUser,
-} from './types/types'
-import { Stringify, ValueOf } from './types/index'
-import { addToFormData, apiMethod, IApiMethodArguments, IResponseFields } from './tools/api'
-import { getBase64 } from './tools/utils'
+} from '../types/types'
+import { Stringify, ValueOf } from '../types/index'
+import { addToFormData, apiMethod, IApiMethodArguments, IResponseFields } from '../tools/api'
+import { getBase64 } from '../tools/utils'
 import axios from 'axios'
-import Config from './config'
+import Config from '../config'
 import {
   convertCar,
   convertOrder,
@@ -32,15 +32,18 @@ import {
   reverseConvertOrder,
   reverseConvertTrip,
   reverseConvertUser,
-} from './tools/utils'
-import { t, TRANSLATION } from './localization'
-import { ERegistrationType } from './state/user/constants'
-import { userSelectors } from './state/user'
-import store from './state'
-import { configSelectors } from './state/config'
-import SITE_CONSTANTS from './siteConstants'
-import getCountryISO3 from './tools/countryISO2To3'
-import { to } from './state/clientOrder/selectors'
+} from '../tools/utils'
+import { t, TRANSLATION } from '../localization'
+import { ERegistrationType } from '../state/user/constants'
+import { userSelectors } from '../state/user'
+import store from '../state'
+import { configSelectors } from '../state/config'
+import SITE_CONSTANTS from '../siteConstants'
+import getCountryISO3 from '../tools/countryISO2To3'
+import { to } from '../state/clientOrder/selectors'
+import { getCacheVersion } from './cacheVersion'
+
+export { getCacheVersion }
 
 export enum EBookingActions {
     SetConfirmState = 'set_confirm_state',
@@ -54,9 +57,6 @@ export enum EBookingActions {
     SetTips = 'set_tips',
     Edit = 'edit',
 }
-
-export const getCacheVersion = (url: string) => axios.get(`${url}/?cv=`)
-  .then(response => response?.data['cache version'])
 
 const _uploadFile = (
   { formData }: IApiMethodArguments,

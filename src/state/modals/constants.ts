@@ -1,6 +1,6 @@
 import { IAddressPoint, IOrder } from '../../types/types'
 import { EStatuses } from '../../types/types'
-import { appName } from '../../config'
+import { appName } from '../../constants'
 
 export const moduleName = 'modals'
 

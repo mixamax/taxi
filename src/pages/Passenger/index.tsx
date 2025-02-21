@@ -384,9 +384,9 @@ const PassengerOrder: React.FC<IProps> = ({
   })
 
   const values = useWatchWithEffect<IFormValues>(
+    // TODO
+    // @ts-ignore
     {
-      // TODO
-      // @ts-ignore
       control,
     },
     (actualValues) => {
@@ -914,6 +914,7 @@ const PassengerOrder: React.FC<IProps> = ({
                   <DeliveryForm
                     tab={tab}
                     courierAuto={courierAuto}
+                    // @ts-ignore
                     setCourierAuto={setCourierAuto} //если оставить ECourierAutoTypes не соберется
                     isIntercity={isIntercity}
                     setIsIntercity={setIsIntercity}

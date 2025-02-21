@@ -1,14 +1,13 @@
 import React, { useRef, useState } from 'react'
 import { connect, ConnectedProps } from 'react-redux'
-import { matchPath, useLocation } from 'react-router-dom'
-import history from '../../tools/history'
+import { matchPath, useLocation, useNavigate } from 'react-router-dom'
 import './styles.scss'
 import { t, TRANSLATION } from '../../localization'
 import { useInterval } from '../../tools/hooks'
 import moment from 'moment'
 import images from '../../constants/images'
 import { IRootState } from '../../state'
-import { EBookingDriverState, EUserRoles } from '../../types/types'
+import { EBookingDriverState } from '../../types/types'
 import { configSelectors, configActionCreators } from '../../state/config'
 import { modalsActionCreators, modalsSelectors } from '../../state/modals'
 import { clientOrderSelectors } from '../../state/clientOrder'
@@ -61,6 +60,7 @@ const Header: React.FC<IProps> = ({
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const location = useLocation()
+  const navigate = useNavigate()
 
   const duration = moment.duration(seconds * 1000)
 
@@ -86,13 +86,15 @@ const Header: React.FC<IProps> = ({
   }, 1000)
 
   const onReturn = () => {
-    history.push('/driver-order')
+    navigate('/driver-order')
   }
 
   const toggleLanguagesOpened = () => setLanguagesOpened(prev => !prev)
   const toggleMenuOpened = () => setMenuOpened(prev => !prev)
 
-  const detailedOrderID = matchPath<{ id: string }>(location.pathname, { path: '/driver-order/:id' })?.params.id
+  const detailedOrderID = matchPath({
+    path: '/driver-order/:id',
+  }, location.pathname)?.params.id
 
   let time = ''
   if (duration.hours() >= 10)
@@ -144,7 +146,7 @@ const Header: React.FC<IProps> = ({
                       <button
                         onClick={() =>
                           item.href ?
-                            history.push(item.href) :
+                            navigate(item.href) :
                             item.action && (() => { setMenuOpened(false); item.action(index) })()
                         }
                         className="menu__button"

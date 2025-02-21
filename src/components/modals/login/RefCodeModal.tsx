@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { connect, ConnectedProps } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import Button from '../../Button'
 import * as API from '../../../API'
 import '../styles.scss'
@@ -51,8 +52,9 @@ const RefCodeModal: React.FC<IProps> = ({
   whatsappSignUp,
   whatsappSignUpData,
 }) => {
-
   const [isVisible, toggleVisibility] = useVisibility(false)
+
+  const navigate = useNavigate()
 
   const schema = yup.object({
     code: yup.string(),
@@ -88,7 +90,7 @@ const RefCodeModal: React.FC<IProps> = ({
         whatsappSignUp({ type: ERegistrationType.Whatsapp, login: whatsappSignUpData.u_phone, })
         return
       } else {
-        googleLogin({ data, auth_hash: null })
+        googleLogin({ data, auth_hash: null, navigate })
         return  
       }
     }
@@ -104,7 +106,7 @@ const RefCodeModal: React.FC<IProps> = ({
         whatsappSignUp({ type: ERegistrationType.Whatsapp, login: whatsappSignUpData.u_phone, ref_code:formData.code })
         return
       } else {
-        googleLogin({ data, auth_hash: null })
+        googleLogin({ data, auth_hash: null, navigate })
         return  
       }
     })

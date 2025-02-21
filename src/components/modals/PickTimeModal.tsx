@@ -5,7 +5,7 @@ import { t, TRANSLATION } from '../../localization'
 import moment from 'moment'
 import { clientOrderActionCreators, clientOrderSelectors } from '../../state/clientOrder'
 import cn from 'classnames'
-import { TimePicker } from '@material-ui/pickers'
+import { TimePicker } from '@mui/x-date-pickers'
 import { IRootState } from '../../state'
 import { modalsActionCreators, modalsSelectors } from '../../state/modals'
 import { dateFormatTime } from '../../tools/utils'
@@ -90,13 +90,14 @@ const PickTimeModal: React.FC<IProps> = ({
         }
         <div className={cn('main__time-picker', { 'main__time-picker--visible': isPickerOpen })}>
           <TimePicker
-            autoOk
+            autoFocus
             ampm={false}
             open={isPickerOpen}
             onClose={() => setIsPickerOpen(false)}
-            TextFieldComponent={() => null}
+            slots={{
+              textField: () => null
+            }}
             views={['hours', 'minutes']}
-            variant="inline"
             value={moment(time, 'H:mm')}
             onChange={(date) => date && setTime(date.clone().add(period === EPeriods.Tomorrow ? 1 : 0, 'days'))}
           />

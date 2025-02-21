@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import DriverOrders from './Orders'
 import DriverMap from './Map'
 import { t, TRANSLATION } from '../../localization'
 import { connect, ConnectedProps } from 'react-redux'
 import { IRootState } from '../../state'
 import { useInterval, useQuery } from '../../tools/hooks'
-import history from '../../tools/history'
 import './styles.scss'
 import { ordersSelectors, ordersActionCreators } from '../../state/orders'
 import { modalsActionCreators } from '../../state/modals'
@@ -50,6 +50,7 @@ const Driver: React.FC<IProps> = ({
   getReadyOrders,
   setLoginModal,
 }) => {
+  const navigate = useNavigate()
   const { tab = EDriverTabs.Lite } = useQuery()
 
   useInterval(() => {
@@ -87,19 +88,19 @@ const Driver: React.FC<IProps> = ({
     <>
       <div className="driver-tabs">
         <button
-          onClick={() => history.push(`?tab=${EDriverTabs.Lite}`)}
+          onClick={() => navigate(`?tab=${EDriverTabs.Lite}`)}
           className={cn('driver-tabs__tab', { 'driver-tabs__tab--active': tab === EDriverTabs.Lite })}
         >
           {t(TRANSLATION.LIGHT)}
         </button>
         <button
-          onClick={() => history.push(`?tab=${EDriverTabs.Detailed}`)}
+          onClick={() => navigate(`?tab=${EDriverTabs.Detailed}`)}
           className={cn('driver-tabs__tab', { 'driver-tabs__tab--active': tab === EDriverTabs.Detailed })}
         >
           {t(TRANSLATION.ALL)}
         </button>
         <button
-          onClick={() => history.push(`?tab=${EDriverTabs.Map}`)}
+          onClick={() => navigate(`?tab=${EDriverTabs.Map}`)}
           className={cn('driver-tabs__tab', { 'driver-tabs__tab--active': tab === EDriverTabs.Map })}
         >
           {t(TRANSLATION.MAP)}

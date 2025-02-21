@@ -1,20 +1,20 @@
 import cn from 'classnames'
 import React from 'react'
 import './styles.scss'
-import MetaTags from 'react-meta-tags'
+import { Helmet } from 'react-helmet-async'
 import SITE_CONSTANTS from '../../siteConstants'
 
 interface IProps {
   isOpen: boolean,
   onClick?: () => any,
-  children: React.ReactChild
+  children: React.ReactNode
 }
 
 const Overlay: React.FC<IProps> = ({ isOpen, onClick, children }) => (
   <div
     className={cn('overlay__wrapper', { 'overlay__wrapper--active': isOpen })}
   >
-    <MetaTags>
+    <Helmet>
       <style>
         {`
         .modal form fieldset, .login-modal fieldset {
@@ -25,7 +25,7 @@ const Overlay: React.FC<IProps> = ({ isOpen, onClick, children }) => (
         }
         `}
       </style>
-    </MetaTags>
+    </Helmet>
     <div
       className="overlay"
       onClick={onClick}

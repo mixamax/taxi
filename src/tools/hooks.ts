@@ -1,7 +1,10 @@
 import _ from 'lodash'
 import React, { useState, useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
-import { useWatch } from 'react-hook-form'
+import {
+  useWatch,
+  DeepPartialSkipArrayKey, Control, FieldValues,
+} from 'react-hook-form'
 
 const cacheValue = (value: any, parentObjectKey: string, valueKey: string, callback: Function) => {
   try {
@@ -52,25 +55,13 @@ export const useCachedState = <T>(
     valueKey = splittedKey[1]
   }
 
-  const [value, setValue] = useState(_defaultValue)
-
-  let dirty: boolean = false
-  let setDirty: React.Dispatch<React.SetStateAction<boolean>>
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  if (additionalData.dirty) [dirty, setDirty] = useState<boolean>(false)
-
-  let previousValue: T | undefined = undefined
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  if (additionalData.previousValue || additionalData.dirty) previousValue = usePrevious<T>(value)
-
-  useEffect(() => {
+  const [value, setValue] = useState(() => {
     let value
     try {
       if (parentObjectKey) {
         const localStorageObject = localStorage.getItem(parentObjectKey)
-        if (!localStorageObject)
-          throw new Error('There is no such object')
-        value = JSON.parse(localStorageObject)[valueKey] ?? _defaultValue
+        value = localStorageObject &&
+          (JSON.parse(localStorageObject)[valueKey] ?? _defaultValue)
       } else {
         value = localStorage.getItem(valueKey) ?? _defaultValue
       }
@@ -80,11 +71,20 @@ export const useCachedState = <T>(
     }
 
     if (allowableValues) {
-      setValue(allowableValues.includes(value) ? value : _defaultValue)
+      return allowableValues.includes(value) ? value : _defaultValue
     } else {
-      setValue(value ?? defaultValue)
+      return value ?? defaultValue
     }
-  }, [])
+  })
+
+  let dirty: boolean = false
+  let setDirty: React.Dispatch<React.SetStateAction<boolean>>
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  if (additionalData.dirty) [dirty, setDirty] = useState<boolean>(false)
+
+  let previousValue: T | undefined = undefined
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  if (additionalData.previousValue || additionalData.dirty) previousValue = usePrevious<T>(value)
 
   useEffect(() => {
     if (additionalData.dirty && !dirty && previousValue !== undefined && !_.isEqual(value, previousValue)) {
@@ -104,7 +104,7 @@ export const useCachedState = <T>(
 
 /** Returns value before update */
 export const usePrevious = <T = any>(value: any) => {
-  const ref = useRef<T>()
+  const ref = useRef<T>(undefined)
 
   useEffect(() => {
     ref.current = value
@@ -115,8 +115,13 @@ export const usePrevious = <T = any>(value: any) => {
 
 type WatchValuesType = {[x: string]: any}
 /** Works like useWatch, but also do actions on some value change */
-export const useWatchWithEffect = <T>(
-  props: Partial<Parameters<typeof useWatch>[0]>,
+export const useWatchWithEffect = <T extends FieldValues = FieldValues>(
+  props: {
+    defaultValue?: DeepPartialSkipArrayKey<T>;
+    control?: Control<T>;
+    disabled?: boolean;
+    exact?: boolean;
+  },
   callback: (values: WatchValuesType, previousValues: WatchValuesType | undefined) => void,
 ) => {
   const values = useWatch(props)
@@ -132,7 +137,7 @@ export const useWatchWithEffect = <T>(
 }
 
 export const useInterval = (callback: Function, delay: number, immediately?: boolean) => {
-  const savedCallback = useRef<Function>()
+  const savedCallback = useRef<Function>(undefined)
 
   useEffect(() => {
     savedCallback.current = callback

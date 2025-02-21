@@ -1,5 +1,5 @@
 import { EStatuses, IAddressPoint, IUser } from '../../types/types'
-import { appName } from '../../config'
+import { appName } from '../../constants'
 import { IOrder } from '../../types/types'
 
 export const moduleName = 'order'

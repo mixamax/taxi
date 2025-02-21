@@ -1,4 +1,4 @@
-import { appName } from '../../config'
+import { appName } from '../../constants'
 import { IOrder } from '../../types/types'
 
 export const moduleName = 'orders'

@@ -8,7 +8,6 @@ import { t, TRANSLATION } from '../../localization'
 import * as API from './../../API'
 import { PromiseReturn, TAction } from '../../types'
 import { EStatuses, EUserRoles, ITokens, IUser } from '../../types/types'
-import history from '../../tools/history'
 import { setUser } from './actionCreators'
 import { clearOrders } from '../orders/actionCreators'
 import SITE_CONSTANTS from '../../siteConstants'
@@ -49,9 +48,9 @@ function* loginSaga(data: TAction) {
     localStorage.setItem('tokens', JSON.stringify(result.tokens))
 
     if(result.user.u_role === EUserRoles.Client || result.user.u_role === EUserRoles.Agent) {
-      history.push('/passenger-order')
+      data.payload.navigate('/passenger-order')
     } else if(result.user.u_role === EUserRoles.Driver) {
-      history.push('/driver-order')
+      data.payload.navigate('/driver-order')
     }
 
     yield put({
@@ -76,9 +75,9 @@ function* googleLoginSaga(data: TAction) {
     localStorage.setItem('tokens', JSON.stringify(result.tokens))
 
     if(result.user.u_role === EUserRoles.Client || result.user.u_role === EUserRoles.Agent) {
-      history.push('/passenger-order')
+      data.payload.navigate('/passenger-order')
     } else if(result.user.u_role === EUserRoles.Driver) {
-      history.push('/driver-order')
+      data.payload.navigate('/driver-order')
     }
 
     yield put({

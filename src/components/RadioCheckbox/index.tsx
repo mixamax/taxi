@@ -1,6 +1,6 @@
 import React, { InputHTMLAttributes, useMemo } from 'react'
 import cn from 'classnames'
-import MetaTags from 'react-meta-tags'
+import { Helmet } from 'react-helmet-async'
 import './styles.scss'
 import { gradient } from '../../tools/theme'
 
@@ -13,7 +13,7 @@ const RadioCheckbox: React.FC<IProps> = ({ textLabel, ...props }) => {
 
   return (
     <>
-      <MetaTags>
+      <Helmet>
         <style>
           {`
             .radio__input:checked + .radio__label::before {
@@ -21,7 +21,7 @@ const RadioCheckbox: React.FC<IProps> = ({ textLabel, ...props }) => {
             }
           `}
         </style>
-      </MetaTags>
+      </Helmet>
       <span className="radio__wrapper">
         <input
           type="checkbox"

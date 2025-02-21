@@ -51,7 +51,7 @@ const JSONFormElement = (props: {
     }
   }, [])
 
-  const validate = useCallback((value) => {
+  const validate = useCallback((value: any) => {
     if (!validationSchema) return
     const empty = getCalculation(validation.required, values, variables) ? '' : null
     validationSchema.validate(value === '' ? empty : value)

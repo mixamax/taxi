@@ -1,6 +1,6 @@
 import cn from 'classnames'
 import React, { useState } from 'react'
-import MetaTags from 'react-meta-tags'
+import { Helmet } from 'react-helmet-async'
 import bigTruckServices, { IBigTruckService } from '../../constants/bigTruckServices'
 import { t, TRANSLATION } from '../../localization'
 import { gradient } from '../../tools/theme'
@@ -34,7 +34,7 @@ const BigTruckServices: React.FC<IProps> = ({ value, onChange }) => {
 
   return (
     <div className="bigTruckServices">
-      <MetaTags>
+      <Helmet>
         <style>
           {`
             .bigTruckServices__cell--selected, .bigTruckServices__cell--current {
@@ -42,7 +42,7 @@ const BigTruckServices: React.FC<IProps> = ({ value, onChange }) => {
             }
           `}
         </style>
-      </MetaTags>
+      </Helmet>
 
       <label className="input__label">{t(TRANSLATION.ADDITIONAL_SERVICES_P)}:</label>
       <div className="bigTruckServices__body">

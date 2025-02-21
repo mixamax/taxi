@@ -15,7 +15,7 @@ const Sandbox = () => {
     },
   )
   const [contentKey, setContentKey] = useState(Date.now())
-  const editor = useRef<JSONEditor>()
+  const editor = useRef<JSONEditor>(null)
 
   const updateFrameKey = () => {
     setContentKey(Date.now())

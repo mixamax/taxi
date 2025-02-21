@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import './styles.scss'
-import InputMask, { Props as InputMaskProps } from 'react-input-mask'
+import InputMask, { Props as InputMaskProps } from '@mona-health/react-input-mask'
 import SITE_CONSTANTS from '../../siteConstants'
 import useMergedRef from '@react-hook/merged-ref'
 import { ISelectOption } from '../../types'
@@ -8,7 +8,7 @@ import cn from 'classnames'
 import Button from '../Button'
 import { ESuggestionType, ISuggestion } from '../../types/types'
 import { t, TRANSLATION } from '../../localization'
-import MetaTags from 'react-meta-tags'
+import { Helmet } from 'react-helmet-async'
 import images from '../../constants/images'
 import CompareVariants, { ECompareVariants } from '../CompareVariants'
 import RadioCheckbox from '../RadioCheckbox'
@@ -99,7 +99,10 @@ const Input: React.FC<IProps> = (
   const innerRef = React.createRef<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>()
   const refs: any[] = [innerRef]
   if ((inputProps as React.ComponentProps<'input'>).ref) refs.push((inputProps as React.ComponentProps<'input'>).ref)
-  if ((inputProps as InputMaskProps).inputRef) refs.push((inputProps as InputMaskProps).inputRef)
+  if ((inputProps as InputMaskProps).inputRef) {
+    refs.push((inputProps as InputMaskProps).inputRef)
+    delete (inputProps as InputMaskProps).inputRef;
+  }
   const mergedRef = useMergedRef(...refs)
 
   const addImageToRaw = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -163,7 +166,7 @@ const Input: React.FC<IProps> = (
         return (
           <InputMask
             alwaysShowMask
-            inputRef={mergedRef}
+            ref={mergedRef}
             {...inputProps as InputMaskProps}
             mask={SITE_CONSTANTS.DEFAULT_PHONE_MASK}
             {...properties}
@@ -247,7 +250,7 @@ const Input: React.FC<IProps> = (
       )
     }
     >
-      <MetaTags>
+      <Helmet>
         <style>
           {`
             .input__label {
@@ -270,7 +273,7 @@ const Input: React.FC<IProps> = (
 
           `}
         </style>
-      </MetaTags>
+      </Helmet>
       <div
         className={cn('input__header', { 'input__header--empty': !showDisablerCheckbox && !defaultValue && !label && !sideCheckbox })}
       >

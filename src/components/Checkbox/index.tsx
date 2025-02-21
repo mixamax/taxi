@@ -1,7 +1,7 @@
 import React from 'react'
 import classNames from 'classnames'
 import './styles.scss'
-import MetaTags from 'react-meta-tags'
+import { Helmet } from 'react-helmet-async'
 import SITE_CONSTANTS from '../../siteConstants'
 
 interface IProps extends React.ComponentProps<'input'> {
@@ -25,7 +25,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, IProps>(
         disabled: inputProps.disabled,
       })}
       >
-        <MetaTags>
+        <Helmet>
           <style>
             {`
             .checkbox input + label:before {
@@ -33,7 +33,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, IProps>(
             }
             `}
           </style>
-        </MetaTags>
+        </Helmet>
         <input
           ref={ref}
           type="checkbox"

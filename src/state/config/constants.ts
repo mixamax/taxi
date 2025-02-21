@@ -1,4 +1,4 @@
-import { appName } from '../../config'
+import { appName } from '../../constants'
 import { EStatuses, ILanguage } from '../../types/types'
 
 export const moduleName = 'config' as const

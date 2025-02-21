@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import './styles.scss'
-import history from '../../tools/history'
-import { MapContainer, Marker, TileLayer, CircleMarker, Polyline } from 'react-leaflet'
+import { MapContainer, Marker, TileLayer, CircleMarker, Polyline, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import Fullscreen from 'react-leaflet-fullscreen-plugin'
 import Button from '../../components/Button'
@@ -22,17 +22,52 @@ interface IProps {
   readyOrders: IOrder[] | null,
 }
 
+interface IContentProps extends IProps {
+  locate: boolean,
+  setZoom: (zoom: number) => void
+  setPosition: (position: L.LatLngExpression) => void
+}
+
 const cachedDriverMapStateKey = 'cachedDriverMapState'
 
-const DriverOrderMapMode: React.FC<IProps> = ({
-  user,
-  activeOrders,
-  readyOrders,
-}) => {
-  const [zoom, setZoom] = useCachedState(
+const DriverOrderMapMode: React.FC<IProps> = props => {
+  const [position, setPosition] = useCachedState<L.LatLngExpression | undefined>(
+    `${cachedDriverMapStateKey}.position`,
+  )
+  const [zoom, setZoom] = useCachedState<number>(
     `${cachedDriverMapStateKey}.zoom`,
     15,
   )
+
+  return (
+    <section className="driver-order-map-mode">
+      <MapContainer
+        center={position ?? SITE_CONSTANTS.DEFAULT_POSITION}
+        zoom={zoom}
+        className='map'
+        // crs={SITE_CONSTANTS.MAP_MODE === MAP_MODE.YANDEX ? L.CRS.EPSG3395 : L.CRS.EPSG3857}
+      >
+        <DriverOrderMapModeContent
+          locate={!position}
+          {...{ setPosition, setZoom }}
+          {...props}
+        />
+      </MapContainer>
+    </section>
+  )
+}
+
+const DriverOrderMapModeContent: React.FC<IContentProps> = ({
+  user,
+  activeOrders,
+  readyOrders,
+  locate,
+  setPosition,
+  setZoom,
+}) => {
+  const navigate = useNavigate()
+  const map = useMap()
+
   const [lastPositions, setLastPositions] = useState<[number, number][]>([])
   const [arrowIcon, setArrowIcon] = useState(new L.DivIcon({
     iconAnchor: [20, 40],
@@ -42,18 +77,20 @@ const DriverOrderMapMode: React.FC<IProps> = ({
     shadowAnchor: [7, 40],
     html: `<img src='${images.mapArrow}'>`,
   }))
-  const [map, setMap] = useState<L.Map | null>(null)
 
   useEffect(() => {
     if (map) {
-      navigator.geolocation.getCurrentPosition(
-        ({ coords }) => {
-          setLastPositions([[coords.latitude, coords.longitude]])
-          map?.panTo([coords.latitude, coords.longitude])
-        },
-        error => console.error(error),
-        { enableHighAccuracy: true },
-      )
+      map.once('locationfound', (e: L.LocationEvent) => {
+        setLastPositions([[e.latlng.lat, e.latlng.lng]])
+        if (locate)
+          map.setView(e.latlng)
+      })
+      map.once('locationerror', (e: L.ErrorEvent) => console.error(e.message))
+      map.locate({
+        timeout: Infinity,
+        enableHighAccuracy: true,
+      })
+
       map.on(
         'click',
         (e: L.LeafletMouseEvent) => {
@@ -65,8 +102,13 @@ const DriverOrderMapMode: React.FC<IProps> = ({
         },
       )
       map.on(
-        'zoomend', (e) => {
-          setZoom(e.target._animateToZoom)
+        'zoomend', () => {
+          setZoom(map.getZoom())
+        },
+      )
+      map.on(
+        'moveend', () => {
+          setPosition(map.getCenter())
         },
       )
     }
@@ -110,6 +152,13 @@ const DriverOrderMapMode: React.FC<IProps> = ({
     )
   }, 2000)
 
+  const performingOrder = activeOrders
+    ?.find(item => ([
+      EBookingDriverState.Performer, EBookingDriverState.Arrived
+    ] as any[]).includes(
+      item.drivers?.find(item => item.u_id === user?.u_id)?.c_state)
+    )
+
   const currentOrder = activeOrders
     ?.find(item =>
       item.drivers?.find(item => item.u_id === user?.u_id)?.c_state === EBookingDriverState.Started,
@@ -119,137 +168,134 @@ const DriverOrderMapMode: React.FC<IProps> = ({
     if (!currentOrder) return
 
     API.setOrderState(currentOrder.b_id, EBookingDriverState.Finished)
-    history.push(`/driver-order/${currentOrder.b_id}`)
+    navigate(`/driver-order/${currentOrder.b_id}`)
   }
 
   return (
-    <section className="driver-order-map-mode">
-      <MapContainer
-        center={SITE_CONSTANTS.DEFAULT_POSITION}
-        zoom={zoom}
-        className='map'
-        // crs={SITE_CONSTANTS.MAP_MODE === MAP_MODE.YANDEX ? L.CRS.EPSG3395 : L.CRS.EPSG3857}
-        whenCreated={setMap}
-      >
-        <TileLayer
-          attribution={getAttribution()}
-          url={getTileServerUrl()}
-        />
-        {
-          lastPositions.length &&
-          lastPositions.map((item, index) => index === lastPositions.length - 1 ?
-            <Marker position={item} icon={arrowIcon} key={index} /> :
-            null,
-          )
-        }
-        {
-          !!lastPositions.length &&
-          <Polyline positions={lastPositions} />
-        }
-        {
-          !!readyOrders?.length &&
-          readyOrders
-            .filter(item => item.b_start_latitude && item.b_start_longitude)
-            .map(item => {
-              const angle = getAngle(
-                {
-                  latitude: item.b_start_latitude,
-                  longitude: item.b_start_longitude,
-                }, {
-                latitude: item.b_destination_latitude,
-                longitude: item.b_destination_longitude,
-              },
-              )
-
-              return (
-                <Marker
-                  position={[item.b_start_latitude, item.b_start_longitude] as L.LatLngExpression}
-                  icon={new L.DivIcon({
-                    iconAnchor: [20, 40],
-                    popupAnchor: [0, -35],
-                    iconSize: [50, 50],
-                    shadowSize: [29, 40],
-                    shadowAnchor: [7, 40],
-                    html: `<div class='order-marker'>
-                        <div class='order-marker-hint'>
-                          <div class='row-info'>
-                            ${item.b_destination_address}
-                          </div>
-                           <div class='row-info'>
-                            <div>${item.b_start_datetime.format(dateFormatTime)}</div>
-                            <div class='competitors-num'>${item.drivers || 0}</div>
-                          </div>
-                          <div class='row-info'>
-                            <div class='price'>${item.b_price_estimate || 0}</div>
-                            <div class='tips'>${item.b_tips || 0}</div>
-                            <img
-                              src='${images.mapMarkerProfit}'
-                            />
-                            <div class='order-profit'>${item.b_passengers_count || 0}</div>
-                          </div>
-                        </div>
-                        <img
-                         
-                          src='${item.b_voting ? images.mapOrderVoting : images.mapOrderWating}'
-                        >
-                      </div>`,
-                  })}
-                  eventHandlers={{
-                    click: () => history.push(`/driver-order/${item.b_id}`),
-                  }}
-                  key={item.b_id}
-                />
-              )
-            })
-        }
-        <Fullscreen
-          position="topleft"
-        />
-        <button
-          className='no-coords-orders'
-          onClick={() => history.push(`?tab=${EDriverTabs.Detailed}`)}
-        >
-          {
-            (
-              !!readyOrders && readyOrders
-                .filter(item => !item.b_start_latitude || !item.b_start_longitude)
-                .length
-            ) || 0
-          }
-        </button>
-        {
-          currentOrder && (
-            <Button
-              text={t(TRANSLATION.CLOSE_DRIVE)}
-              className="finish-drive-button"
-              onClick={onCompleteOrderClick}
-            />
-          )
-        }
-        {
-          !!activeOrders?.length && (
-            <div
-              style={{
-                zIndex: 400,
-                position: 'absolute',
-                left: '70px',
-                right: '70px',
-                height: '100%',
-              }}
-            >
+    <>
+      <TileLayer
+        attribution={getAttribution()}
+        url={getTileServerUrl()}
+      />
+      {
+        lastPositions.length &&
+        lastPositions.map((item, index) => index === lastPositions.length - 1 ?
+          <Marker position={item} icon={arrowIcon} key={index} /> :
+          null,
+        )
+      }
+      {
+        !!lastPositions.length &&
+        <Polyline positions={lastPositions} />
+      }
+      {
+        [
+          ...(readyOrders || []),
+          ...(performingOrder ? [performingOrder] : []),
+        ]
+          .filter(item => item.b_start_latitude && item.b_start_longitude)
+          .map(item => {
+            const angle = getAngle(
               {
-                activeOrders.map(order => (
-                  <ChatToggler
-                    anotherUserID={order.u_id}
-                    orderID={order.b_id}
-                  />
-                ))
-              }
-            </div>
-          )
+                latitude: item.b_start_latitude,
+                longitude: item.b_start_longitude,
+              }, {
+              latitude: item.b_destination_latitude,
+              longitude: item.b_destination_longitude,
+            },
+            )
+
+            return (
+              <Marker
+                position={[item.b_start_latitude, item.b_start_longitude] as L.LatLngExpression}
+                icon={new L.DivIcon({
+                  iconAnchor: [20, 40],
+                  popupAnchor: [0, -35],
+                  iconSize: [50, 50],
+                  shadowSize: [29, 40],
+                  shadowAnchor: [7, 40],
+                  html: `<div class='order-marker'>
+                      <div class='order-marker-hint'>
+                        <div class='row-info'>
+                          ${item.b_destination_address}
+                        </div>
+                         <div class='row-info'>
+                          <div>${item.b_start_datetime.format(dateFormatTime)}</div>
+                          <div class='competitors-num'>${item.drivers?.length || 0}</div>
+                        </div>
+                        <div class='row-info'>
+                          <div class='price'>${item.b_price_estimate || 0}</div>
+                          <div class='tips'>${item.b_tips || 0}</div>
+                          <img
+                            src='${images.mapMarkerProfit}'
+                          />
+                          <div class='order-profit'>${item.b_passengers_count || 0}</div>
+                        </div>
+                      </div>
+                      <img
+                        src='${
+                          item === performingOrder ? images.mapOrderPerforming :
+                          item.b_voting ? images.mapOrderVoting :
+                          images.mapOrderWating
+                        }'
+                      >
+                    </div>`,
+                })}
+                eventHandlers={{
+                  click: () => navigate(`/driver-order/${item.b_id}`),
+                }}
+                key={item.b_id}
+              />
+            )
+          })
+      }
+      <Fullscreen
+        position="topleft"
+      />
+      <button
+        className='no-coords-orders'
+        onClick={() => navigate(`?tab=${EDriverTabs.Detailed}`)}
+      >
+        {
+          (
+            !!readyOrders && readyOrders
+              .filter(item => !item.b_start_latitude || !item.b_start_longitude)
+              .length
+          ) || 0
         }
-      </MapContainer>
-    </section>
+      </button>
+      {
+        currentOrder && (
+          <Button
+            text={t(TRANSLATION.CLOSE_DRIVE)}
+            className="finish-drive-button"
+            onClick={onCompleteOrderClick}
+          />
+        )
+      }
+      {
+        !!activeOrders?.length && (
+          <div
+            style={{
+              zIndex: 400,
+              position: 'absolute',
+              left: '70px',
+              right: '70px',
+            }}
+          >
+            {
+              activeOrders.map(order => (
+                <ChatToggler
+                  anotherUserID={order.u_id}
+                  orderID={order.b_id}
+                  key={order.b_id}
+                />
+              ))
+            }
+          </div>
+        )
+      }
+    </>
   )
 }
 

@@ -1,5 +1,5 @@
 import { Moment } from 'moment'
-import { appName } from '../../config'
+import { appName } from '../../constants'
 import { EStatuses, IAddressPoint, IOrder } from '../../types/types'
 
 export const moduleName = 'clientOrder'

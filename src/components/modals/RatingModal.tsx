@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import Rating from 'react-rating'
 import { connect, ConnectedProps } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import Button from '../Button'
 import Input from '../Input'
-import history from '../../tools/history'
 import * as API from '../../API'
 import { t, TRANSLATION } from '../../localization'
 import images from '../../constants/images'
@@ -41,13 +41,15 @@ const RatingModal: React.FC<IProps> = ({
 
   const _orderID = orderID || detailedOrder?.b_id || selectedOrder
 
+  const navigate = useNavigate()
+
   const onRating = () => {
     if (!_orderID) return
 
     API.setOrderRating(_orderID, stars)
 
     if (detailedOrder) {
-      history.push('/driver-order')
+      navigate('/driver-order')
     }
 
     setRatingModal({ isOpen: false })

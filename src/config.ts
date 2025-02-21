@@ -1,13 +1,7 @@
-import { getCacheVersion } from './API'
+import { getCacheVersion } from './API/cacheVersion'
 import store from './state'
 import { setConfigError, setConfigLoaded } from './state/config/actionCreators'
-
-export const appName = 'taxi-web'
-
-export const API_URL = 'https://ibronevik.ru/taxi/c/gruzvill/api/v1/'
-
-export const WHATSAPP_BOT_URL = 'http://localhost:7000'
-export const WHATSAPP_BOT_KEY = '1472'
+import { API_URL } from './constants'
 
 let _configName: string
 
