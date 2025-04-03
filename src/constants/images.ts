@@ -124,6 +124,17 @@ const names = {
   arrowDownFrame: 'arrow-down-frame.svg',
   arrowUpFrame: 'arrow-up-frame.svg',
   cameraIcon: 'camera-icon.svg',
+  dollarMinimalistic: 'dollarMinimalistic.svg',
+  logo: 'logo.svg',
+  emoji_1: 'emoji_1.png',
+  emoji_2: 'emoji_2.png',
+  emoji_3: 'emoji_3.png',
+  emoji_4: 'emoji_4.png',
+  emoji_5: 'emoji_5.png',
+  emoji_6: 'emoji_6.png',
+  emoji_7: 'emoji_7.png',
+  emoji_7_1: 'emoji_7_1.png',
+  emoji_8: 'emoji_8.png',
 }
 
 export default new Proxy({}, {

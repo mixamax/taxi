@@ -122,7 +122,7 @@ const Header: React.FC<IProps> = ({
   return (
     <header
       className='header'
-      style={{ background: gradient() }}
+      // style={{ background: gradient() }}
     >
       <div className="column">
         <span className='api'>1</span>
@@ -137,7 +137,7 @@ const Header: React.FC<IProps> = ({
                   width={25}
                   height={16}
                   strokeWidth={2}
-                  color='white'
+                  color='#FF2400'
                   animationDuration={0.5}
                 />
                 <ul className={cn('menu__list', { 'menu__list--active': menuOpened })}>
@@ -169,7 +169,7 @@ const Header: React.FC<IProps> = ({
           
         }
         setIsShowSwitchersMenu(!isShowSwitchersMenu)
-      }}>{heading}</h2>
+      }}><img src={images.logo} /></h2>
       <div className="column">
         <div
           onClick={() => toggleLanguagesOpened()}

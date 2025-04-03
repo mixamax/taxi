@@ -1,5 +1,13 @@
 // $border-color: #858585;
 
+.input {
+  &__buttons {
+    img {
+      width: 22px;
+    }
+  }
+}
+
 // .input-file {
 //     display: flex;
 //     margin: 0.5rem 1rem;

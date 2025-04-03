@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactElement } from 'react'
 import { connect, ConnectedProps } from 'react-redux'
 import cn from 'classnames'
 import { IRootState } from '../../state'
@@ -24,6 +24,7 @@ interface IProps extends React.ComponentProps<'button'>, ConnectedProps<typeof c
   imageProps?: React.ComponentProps<'img'>,
   skipHandler?: boolean,
   text?: string,
+  svg?: ReactElement,
   label?: string,
   status?: EStatuses,
   colorType?: EColorTypes
@@ -34,6 +35,7 @@ const Button: React.FC<IProps> = ({
   imageProps,
   skipHandler,
   text,
+  svg,
   label,
   status = EStatuses.Default,
   user,
@@ -85,6 +87,7 @@ const Button: React.FC<IProps> = ({
             />
           )}
           {text}
+          {svg}
         </button>
       </div>
     </>

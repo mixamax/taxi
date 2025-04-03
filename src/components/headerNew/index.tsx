@@ -170,7 +170,7 @@ const Header: React.FC<IProps> = ({
         </button>}
       </div>
       {/* <h2>{heading}</h2> */}
-      <div className='header-logo'>Logo</div>
+      <div className='header-logo'><img src={images.logo} /></div>
       {/* <div className="column">
                 <div
                     onClick={() => toggleLanguagesOpened()}

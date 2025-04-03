@@ -191,8 +191,10 @@ export const emailRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)
 const DISTANCE_COEFFICIENT = 1.5
 
 export const dateFormat = 'YYYY-MM-DD HH:mm:ssZ'
-export const dateShowFormat = 'YYYY-MM-DD HH:mm'
-export const dateFormatDate = 'YYYY-MM-DD'
+// export const dateShowFormat = 'YYYY-MM-DD HH:mm'
+export const dateShowFormat = 'HH:mm DD-MM'
+export const dateFormatDate = 'DD-MM'
+// export const dateFormatDate = 'YYYY-MM-DD'
 export const dateFormatTime = 'HH:mm:ss'
 export const dateFormatTimeShort = 'HH:mm'
 
@@ -684,6 +686,29 @@ export const formatComment = (
     }`
 
   return `${custom ? `${custom}, ` : ''}${userID ? `${t(TRANSLATION.CLIENT, { toLower: true })} - ${userID}` : ''}`
+}
+
+const EMOJI: Record<string, string> = {
+  1: images.emoji_1,
+  2: images.emoji_2,
+  3: images.emoji_3,
+  4: images.emoji_4,
+  5: images.emoji_5,
+  6: images.emoji_6,
+  7: images.emoji_7,
+  '7.1': images.emoji_7_1,
+  8: images.emoji_8,
+}
+
+export const formatCommentWithEmoji = (
+  ids: IOrder['b_comments'],
+) => {
+  return ids
+    ?.filter(item => parseInt(item) < 99)
+    .map(item => ({
+      src: EMOJI[item],
+      hint: t(TRANSLATION.BOOKING_COMMENTS[item])
+    }))
 }
 
 export const getHints = (text?: string) => {
