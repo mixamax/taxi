@@ -99,7 +99,7 @@ const MiniOrder: React.FC<IProps> = ({
         avatarSize={avatarSize}
         order={order}
         // user={user}
-        address={address}
+        loadedAddress={address}
         orderId={order.b_id}
         closeModal={() => setActiveModal(false)}
       />,

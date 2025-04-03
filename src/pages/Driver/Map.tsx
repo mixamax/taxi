@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './styles.scss'
 import { MapContainer, Marker, TileLayer, CircleMarker, Polyline, useMap } from 'react-leaflet'
@@ -9,12 +9,14 @@ import { t, TRANSLATION } from '../../localization'
 import { useInterval } from '../../tools/hooks'
 import * as API from '../../API'
 import ChatToggler from '../../components/Chat/Toggler'
-import { EBookingDriverState, IOrder, IUser } from '../../types/types'
+import { EBookingDriverState, IAddressPoint, IOrder, IUser } from '../../types/types'
 import { useCachedState } from '../../tools/hooks'
 import images from '../../constants/images'
 import { dateFormatTime, getAngle, getAttribution, getTileServerUrl } from '../../tools/utils'
-import { EDriverTabs } from '.'
+import { EDriverTabs, OrderAddressContext } from '.'
 import SITE_CONSTANTS from '../../siteConstants'
+import CardModal from '../../components/modals/CardModal'
+import { createPortal } from 'react-dom'
 
 interface IProps {
   user: IUser,
@@ -65,6 +67,13 @@ const DriverOrderMapModeContent: React.FC<IContentProps> = ({
   setPosition,
   setZoom,
 }) => {
+
+  const context = useContext(OrderAddressContext);
+
+  const [activeModal, setActiveModal] = useState(false)
+  const [choosedOrder, setChoosedOrder] = useState<IOrder|null>(null)
+  const [address, setAddress] = useState<IAddressPoint|null>(null)
+
   const navigate = useNavigate()
   const map = useMap()
 
@@ -171,6 +180,9 @@ const DriverOrderMapModeContent: React.FC<IContentProps> = ({
     navigate(`/driver-order/${currentOrder.b_id}`)
   }
 
+  let avatar = images.avatar
+  let avatarSize = '48px'
+
   return (
     <>
       <TileLayer
@@ -242,7 +254,8 @@ const DriverOrderMapModeContent: React.FC<IContentProps> = ({
                     </div>`,
                 })}
                 eventHandlers={{
-                  click: () => navigate(`/driver-order/${item.b_id}`),
+                  // click: () => navigate(`/driver-order/${item.b_id}`),
+                  click: () => setChoosedOrder(item),
                 }}
                 key={item.b_id}
               />
@@ -273,6 +286,19 @@ const DriverOrderMapModeContent: React.FC<IContentProps> = ({
           />
         )
       }
+      {choosedOrder !== null && createPortal(
+        <CardModal
+          active={choosedOrder !== null}
+          avatar={avatar}
+          avatarSize={avatarSize}
+          order={choosedOrder}
+          // user={user}
+          loadedAddress={context?.ordersAddressRef.current[choosedOrder.b_id] || null}
+          orderId={choosedOrder?.b_id || ''}
+          closeModal={() => setChoosedOrder(null)}
+        />,
+        document.body
+      )}
       {/* {
         !!activeOrders?.length && (
           <div

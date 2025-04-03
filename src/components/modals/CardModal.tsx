@@ -1,6 +1,6 @@
-import { addHiddenOrder, dateFormatDate, dateShowFormat, formatComment, formatCommentWithEmoji, getOrderCount, getPayment } from "../../tools/utils"
+import { addHiddenOrder, dateFormatDate, dateShowFormat, formatComment, formatCommentWithEmoji, getOrderCount, getPayment, shortenAddress } from "../../tools/utils"
 import { EBookingDriverState, EBookingStates, EColorTypes, EPaymentWays, EStatuses, IAddressPoint, IOrder, IUser } from "../../types/types"
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Button from "../Button"
 import { t, TRANSLATION } from "../../localization"
 import * as API from '../../API'
@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom"
 import { Loader } from "../loader/Loader"
 import Payment from "../order/orderInfo/Payment"
 import { CURRENCY } from "../../siteConstants"
+import { OrderAddressContext } from "../../pages/Driver"
 
 
 const bookingStates: Record<number, keyof typeof EBookingStates> = {
@@ -78,15 +79,15 @@ interface CardModalProps extends IProps {
   active: boolean
   avatarSize: string
   avatar: string
-  order: IOrder
+  order: IOrder | null
   // user: IUser
-  address: IAddressPoint|null
+  loadedAddress: IAddressPoint|null
   orderId: string
   closeModal: () => void
 }
 const CardModal: React.FC<CardModalProps> = ({ active, avatarSize, avatar, order, user, orderId, closeModal,
   client,
-  address,
+  loadedAddress,
   destination,
   status,
   message,
@@ -101,6 +102,10 @@ const CardModal: React.FC<CardModalProps> = ({ active, avatarSize, avatar, order
   setActiveChat
  }: CardModalProps) => {
 
+  const context = useContext(OrderAddressContext);
+
+  const [address, setAddress] = useState<IAddressPoint|null>(loadedAddress || null)
+
   const driver = order?.drivers?.find(item => item.c_state > EBookingDriverState.Canceled)
 
   const [isFromAddressShort, setIsFromAddressShort] = useState<boolean>((localStorage.getItem('isFromAddressShort')==='true'))
@@ -112,16 +117,35 @@ const CardModal: React.FC<CardModalProps> = ({ active, avatarSize, avatar, order
     mode: 'onSubmit',
   })
 
-  useEffect(() => {
-    getOrder(orderId)
-    return () => {
-      setOrder(null)
-    }
-  }, [])
+  // useEffect(() => {
+  //   getOrder(orderId)
+  //   return () => {
+  //     setOrder(null)
+  //   }
+  // }, [])
 
-  useInterval(() => {
-    getOrder(orderId)
-  }, 3000)
+  // useInterval(() => {
+  //   getOrder(orderId)
+  // }, 3000)
+
+  useEffect(() => {
+    if ( !order?.b_start_latitude || !order.b_start_longitude || context?.ordersAddressRef.current[order.b_id] || loadedAddress !== null ) return
+    API.reverseGeocode(order.b_start_latitude?.toString(), order.b_start_longitude?.toString())
+      .then(res => {
+        const val = {
+          latitude: order.b_start_latitude,
+          longitude: order.b_start_longitude,
+          address: res.display_name,
+          shortAddress: shortenAddress(
+            res.display_name, res.address.city || res.address.town || res.address.village,
+          ),
+        }
+        if ( context?.ordersAddressRef.current ) {
+          context.ordersAddressRef.current[order.b_id] = val
+        }
+        setAddress(val)
+      })
+  }, [])
 
   const handleSubmit = () => {
     const isCandidate = ['96', '95'].some(item => order?.b_comments?.includes(item))
@@ -348,17 +372,17 @@ const CardModal: React.FC<CardModalProps> = ({ active, avatarSize, avatar, order
   }
 
   const getStatusText = () => {
-    if (order.b_voting) return t(TRANSLATION.VOTER)
+    if (order?.b_voting) return t(TRANSLATION.VOTER)
     return ''
   }
 
   const getStatusTextColor = () => {
-    if (order.b_voting) return '#FF2400'
+    if (order?.b_voting) return '#FF2400'
     // 'reccomended': return '#00A72F'\
     return 'rgba(0, 0, 0, 0.25)'
   }
 
-  const _type = order.b_payment_way === EPaymentWays.Credit ? TRANSLATION.CARD : TRANSLATION.CASH
+  const _type = order?.b_payment_way === EPaymentWays.Credit ? TRANSLATION.CARD : TRANSLATION.CASH
   const _value = (order && order.b_options && order.b_options.customer_price) ?
     t(_type) + '. ' + t(TRANSLATION.WHAT_WE_DELIVERING) + ` ${order.b_options.customer_price} ${CURRENCY.SIGN}` :
     t(_type) + '. ' + t(TRANSLATION.FIXED) + ` ${getPayment(order).text} ${CURRENCY.SIGN}`
@@ -376,7 +400,7 @@ const CardModal: React.FC<CardModalProps> = ({ active, avatarSize, avatar, order
             }}
           />
           <div className="name" >
-            <p>{client?.u_family?.trimStart()} {client?.u_name?.trimStart()} {client?.u_middle?.trimStart()} <span> ({order?.u_id}) ({bookingStates[order?.b_state]})</span></p>
+            <p>{client?.u_family?.trimStart()} {client?.u_name?.trimStart()} {client?.u_middle?.trimStart()} <span> ({order?.u_id}) ({bookingStates[order?.b_state as any]})</span></p>
             {/* <p>{t(TRANSLATION.CLIENT)}: {client?.u_name} ({order?.u_id})</p> */}
           </div>
           <div className='stars' >
@@ -388,7 +412,7 @@ const CardModal: React.FC<CardModalProps> = ({ active, avatarSize, avatar, order
             ))}
             <span>24/20</span>
           </div>
-          <b style={{ color: getStatusTextColor() }}>№{order.b_id} {getStatusText()}</b>
+          <b style={{ color: getStatusTextColor() }}>№{order?.b_id} {getStatusText()}</b>
         </div>
 
         <div className='address' >
@@ -400,7 +424,10 @@ const CardModal: React.FC<CardModalProps> = ({ active, avatarSize, avatar, order
             {t(TRANSLATION.FROM)}: 
               {address?.shortAddress
               ? <>
-                <span >{isFromAddressShort && address?.shortAddress ? address?.shortAddress : address?.address}</span>
+                {address
+                  ? <span>{address?.shortAddress ? address?.shortAddress : address?.address}</span>
+                  : <Loader />
+                }
                 {address?.shortAddress && (
                   <img
                     src={isFromAddressShort ? images.minusIcon : images.plusIcon}
@@ -409,7 +436,7 @@ const CardModal: React.FC<CardModalProps> = ({ active, avatarSize, avatar, order
                   />
                 )}
               </>
-              : order.b_destination_address ? <span>{order.b_start_address}</span> : <Loader />
+              : order?.b_destination_address ? <span>{order?.b_start_address}</span> : <Loader />
               }
               <span
                 onClick={() => {
@@ -468,14 +495,14 @@ const CardModal: React.FC<CardModalProps> = ({ active, avatarSize, avatar, order
           </div>
           
           {
-            !(order.b_comments?.includes('97') || order.b_comments?.includes('98')) &&
+            !(order?.b_comments?.includes('97') || order?.b_comments?.includes('98')) &&
               <span className='status-card__seats'>
                 {/* <img
                   src={getOrderIcon(order)}
                   alt={t(TRANSLATION.SEATS)}
                 /> */}
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" ><circle cx="6.00004" cy="4.00001" r="2.66667" stroke="#FF2400"/><path d="M10 6C11.1046 6 12 5.10457 12 4C12 2.89543 11.1046 2 10 2" stroke="#FF2400" strokeLinecap="round"/><ellipse cx="6.00004" cy="11.3333" rx="4.66667" ry="2.66667" stroke="#FF2400"/><path d="M12 9.33334C13.1695 9.58981 14 10.2393 14 11C14 11.6862 13.3242 12.282 12.3333 12.5803" stroke="#FF2400" strokeLinecap="round"/></svg>
-                <label>{getOrderCount(order)}</label>
+                <label>{getOrderCount(order as any)}</label>
               </span>
           }
 

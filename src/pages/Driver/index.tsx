@@ -127,11 +127,14 @@ const Driver: React.FC<IProps> = ({
         </OrderAddressContext.Provider>
       }
       {tab === EDriverTabs.Map &&
-        <DriverMap
-          user={user}
-          activeOrders={activeOrders}
-          readyOrders={readyOrders}
-        />}
+        <OrderAddressContext.Provider value={{ordersAddressRef}}>
+          <DriverMap
+            user={user}
+            activeOrders={activeOrders}
+            readyOrders={readyOrders}
+          />
+        </OrderAddressContext.Provider>
+      }
     </>
   )
 }
