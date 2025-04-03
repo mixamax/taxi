@@ -273,7 +273,7 @@ const DriverOrderMapModeContent: React.FC<IContentProps> = ({
           />
         )
       }
-      {
+      {/* {
         !!activeOrders?.length && (
           <div
             style={{
@@ -294,7 +294,7 @@ const DriverOrderMapModeContent: React.FC<IContentProps> = ({
             }
           </div>
         )
-      }
+      } */}
     </>
   )
 }

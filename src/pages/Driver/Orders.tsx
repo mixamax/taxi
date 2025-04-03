@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { createContext, useState } from 'react'
 import { connect, ConnectedProps } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import StatusCard from '../../components/Card/OrderCard'
@@ -10,7 +10,7 @@ import images from '../../constants/images'
 import { IUserState } from '../../state/user/constants'
 import { IOrdersState } from '../../state/orders/constants'
 import { modalsActionCreators } from '../../state/modals'
-import { EBookingDriverState, EColorTypes, IUser } from '../../types/types'
+import { EBookingDriverState, EColorTypes, IAddressPoint, IUser } from '../../types/types'
 import { EDriverTabs } from '.'
 import MiniOrder from '../../components/driver-order/mini-order'
 import { statuses } from '../../constants/miniOrders'
@@ -27,14 +27,17 @@ const mapDispatchToProps = {
 
 const connector = connect(null, mapDispatchToProps)
 
+
+
+
+
 interface IProps extends ConnectedProps<typeof connector> {
   user: IUserState['user'],
   activeOrders: IOrdersState['activeOrders'],
   historyOrders: IOrdersState['historyOrders'],
   readyOrders: IOrdersState['readyOrders'],
-  type: Omit<EDriverTabs, EDriverTabs.Map>
+  type: Omit<EDriverTabs, EDriverTabs.Map>,
 }
-
 const DriverOrders: React.FC<IProps> = ({
   user,
   activeOrders,
@@ -46,7 +49,7 @@ const DriverOrders: React.FC<IProps> = ({
 }) => {
   const [showCandidateOrders, setShowCandidateOrders] = useState(true)
   const [showReadyOrders, setShowReadyOrders] = useState(true)
-  const [showHistoryOrders, setShowHistoryOrders] = useState(true)
+  const [showHistoryOrders, setShowHistoryOrders] = useState(false)
   const [statusID, setStatusID] = useState(statuses[0].id)
 
   const navigate = useNavigate()
@@ -114,7 +117,7 @@ const DriverOrders: React.FC<IProps> = ({
                 order={item}
                 user={user as IUser}
               />
-          ))) || <div>{t(TRANSLATION.NO_ACTUAL_DRIVE)}</div>
+            ))) || <div className='driver-orders-empty' >{t(TRANSLATION.NO_ACTUAL_DRIVE)}</div>
         }
       </div>
       {!!candidateOrders?.length && (
@@ -151,7 +154,7 @@ const DriverOrders: React.FC<IProps> = ({
       )}
       <Separator
         onClick={() => setShowReadyOrders(prev => !prev)}
-        src={showReadyOrders ? images.minusCircle : images.plusCircle}
+        active={showReadyOrders}
         text={t(TRANSLATION.ACTUAL)}
       />
       <div
@@ -197,7 +200,7 @@ const DriverOrders: React.FC<IProps> = ({
       </div>
       <Separator
         text={t(TRANSLATION.ORDERS_HISTORY)}
-        src={showHistoryOrders ? images.minusCircle : images.plusCircle}
+        active={showHistoryOrders}
         onClick={() => setShowHistoryOrders(prev => !prev)}
       />
       <div

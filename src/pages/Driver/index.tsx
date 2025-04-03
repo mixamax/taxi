@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { createContext, useContext, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import DriverOrders from './Orders'
 import DriverMap from './Map'
@@ -10,7 +10,7 @@ import './styles.scss'
 import { ordersSelectors, ordersActionCreators } from '../../state/orders'
 import { modalsActionCreators } from '../../state/modals'
 import { userSelectors } from '../../state/user'
-import { EUserRoles } from '../../types/types'
+import { EUserRoles, IAddressPoint } from '../../types/types'
 import cn from 'classnames'
 import ErrorFrame from '../../components/ErrorFrame'
 import images from '../../constants/images'
@@ -30,6 +30,12 @@ const mapDispatchToProps = {
 
 const connector = connect(mapStateToProps, mapDispatchToProps)
 
+
+export const OrderAddressContext = createContext<{ ordersAddressRef: React.RefObject<{
+  [orderId: string]: IAddressPoint;
+}> }|null>(null);
+
+
 export enum EDriverTabs {
   Map = 'map',
   Lite = 'lite',
@@ -39,7 +45,6 @@ export enum EDriverTabs {
 interface IProps extends ConnectedProps<typeof connector> {
 
 }
-
 const Driver: React.FC<IProps> = ({
   activeOrders,
   readyOrders,
@@ -50,8 +55,12 @@ const Driver: React.FC<IProps> = ({
   getReadyOrders,
   setLoginModal,
 }) => {
-  const navigate = useNavigate()
+
   const { tab = EDriverTabs.Lite } = useQuery()
+  
+  const navigate = useNavigate()
+
+  const ordersAddressRef = useRef<{ [orderId:string]: IAddressPoint }>({})
 
   useInterval(() => {
     user && getActiveOrders()
@@ -107,13 +116,16 @@ const Driver: React.FC<IProps> = ({
         </button>
       </div>
       {(tab === EDriverTabs.Lite || tab === EDriverTabs.Detailed) &&
-        <DriverOrders
-          user={user}
-          type={tab}
-          activeOrders={activeOrders}
-          readyOrders={readyOrders}
-          historyOrders={historyOrders}
-        />}
+        <OrderAddressContext.Provider value={{ordersAddressRef}}>
+          <DriverOrders
+            user={user}
+            type={tab}
+            activeOrders={activeOrders}
+            readyOrders={readyOrders}
+            historyOrders={historyOrders}
+          />
+        </OrderAddressContext.Provider>
+      }
       {tab === EDriverTabs.Map &&
         <DriverMap
           user={user}

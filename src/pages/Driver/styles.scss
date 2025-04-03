@@ -2,21 +2,28 @@
 
 .driver {
   &-tabs {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
     margin-bottom: 10px;
+    margin-top: 8px;
+    padding: 0 16px;
 
     &__tab {
       border: none;
       background: none;
       font-family: Roboto;
-      font-size: 17px;
-      color: rgb(94, 94, 94);
+      font-weight: 600;
+      font-size: 13px;
+      color: rgb(0, 0, 0, 0.25);
+      background-color: #E7E7E7;
+      border-radius: 4px;
       cursor: pointer;
+      padding: 8px 0;
 
       &--active {
-        border-bottom: 1px solid black;
+        background-color: #FF2400;
+        color: #FFFFFF;
       }
     }
 
@@ -33,16 +40,16 @@
   }
 
   &-statuses {
+    width: auto;
     display: flex;
-    margin: 0 0 20px 0;
     align-items: center;
     flex-wrap: wrap;
-    width: auto;
+    gap: 8px;
+    margin: 0 0 8px 0;
 
     span {
       display: flex;
       align-items: center;
-      margin-right: 5px;
       cursor: pointer;
 
       label {
@@ -52,6 +59,11 @@
         color: #5E5E5E;
       }
 
+      &:not(:last-child) {
+        border-right: 1px solid #F1F1F1;
+        padding-right: 8px;
+      }
+
       .requested,
       .recomended,
       .trip,
@@ -59,35 +71,49 @@
       .rating,
       .urgently,
       .taken {
-        height: 20px;
-        width: 20px;
-        border-radius: 50%;
-        margin-right: 5px;
-
-        background: grey;
-        border: 2px solid darkslategrey;
+        height: 24px;
+        width: 24px;
+        border-radius: 8px;
+        margin-right: 4px;
+        border: 1px solid #FF2400;
       }
 
       .recomended {
         background: #00A72F;
-        border: 2px solid #4CED32;
+        border: 1px solid transparent;
       }
 
       .requested {
         background: #FFD12E;
-        border: 2px solid #FFA114;
+        border: 1px solid transparent;
       }
     }
   }
 
   &-orders {
-    margin-bottom: 30px;
+    position: relative;
     height: 0;
     overflow: hidden;
+    font-weight: 400;
+    padding: 0;
+    
+    &:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      width: calc(100% - 32px);
+      height: 1px;
+      background-color: #F1F1F1;
+      bottom: 0;
+    }
 
     &--active {
       height: auto;
-      padding: 10px;
+      padding: 10px 16px 16px 16px;
+    }
+
+    &-empty {
+      font-size: 13px;
+      font-weight: 500;
     }
   }
 }

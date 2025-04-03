@@ -1,7 +1,8 @@
 $height: 73px;
 
 .header {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   justify-content: space-between;
   align-items: center;
   height: $height;
@@ -97,7 +98,9 @@ $height: 73px;
     display: flex;
     align-items: center;
 
-
+    &:nth-of-type(2) {
+      justify-self: end;
+    }
   }
 
   .menu {
